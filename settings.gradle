@@ -1,1 +1,4 @@
 rootProject.name = 'WorldEvents'
+include 'api'
+include 'paper'
+
