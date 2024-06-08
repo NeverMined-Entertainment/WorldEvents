@@ -41,6 +41,6 @@ public class Placeholders extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        return super.onRequest(player, params);
+        return null;
     }
 }
