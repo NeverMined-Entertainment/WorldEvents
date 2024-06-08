@@ -45,7 +45,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     private void initializeConfig()
     {
         Config.global.setConfigGenerator(this, "config.yml");
-        Config.global.generateConfig("1.1.0");
+        Config.global.generateConfig(getDescription().getVersion());
         reloadConfig();
         Config.global.reloadConfig(getConfig());
     }
