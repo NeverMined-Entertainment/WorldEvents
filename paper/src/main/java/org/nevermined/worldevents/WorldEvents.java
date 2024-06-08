@@ -7,6 +7,9 @@ import me.wyne.wutils.i18n.I18n;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
+import org.nevermined.worldevents.config.GlobalConfig;
+import org.nevermined.worldevents.config.modules.ConfigModule;
+import org.nevermined.worldevents.hooks.Placeholders;
 import org.nevermined.worldevents.modules.PluginModule;
 
 import java.io.File;
@@ -15,21 +18,28 @@ import java.util.concurrent.Executors;
 @Singleton
 public final class WorldEvents extends ExtendedJavaPlugin {
 
+    private Injector injector;
+
+    private GlobalConfig globalConfig;
+
     @Override
     public void enable() {
         saveDefaultConfig();
         initializeLogger();
         initializeI18n();
-        initializeConfig();
 
         try {
-            Injector injector = Guice.createInjector(
-                    new PluginModule(this)
+            injector = Guice.createInjector(
+                    new PluginModule(this),
+                    new ConfigModule()
             );
         } catch (CreationException | ConfigurationException | ProvisionException e)
         {
             Log.global.exception("Guice exception", e);
         }
+
+        initializeConfig();
+        injector.getInstance(Placeholders.class).register();
     }
 
     private void initializeLogger()
@@ -44,6 +54,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     private void initializeConfig()
     {
+        globalConfig = injector.getInstance(GlobalConfig.class);
         Config.global.setConfigGenerator(this, "config.yml");
         Config.global.generateConfig(getDescription().getVersion());
         reloadConfig();
@@ -57,4 +68,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         I18n.global.setDefaultLanguage(I18n.getDefaultLanguageFile(this));
     }
 
+    public GlobalConfig getGlobalConfig() {
+        return globalConfig;
+    }
 }
