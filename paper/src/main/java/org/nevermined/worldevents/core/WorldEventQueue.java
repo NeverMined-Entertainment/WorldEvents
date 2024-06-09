@@ -102,10 +102,10 @@ public class WorldEventQueue implements WorldEventQueueApi {
 
             EventData eventData = new EventData(
                     miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, configSection.getString(eventKey + ".name"))),
-                    configSection.getStringList(eventKey + ".description").stream()
+                    configSection.contains(eventKey + ".description") ? configSection.getStringList(eventKey + ".description").stream()
                             .map(s -> PlaceholderAPI.setPlaceholders(null, s))
                             .map(miniMessage::deserialize)
-                            .toList(),
+                            .toList() : new ArrayList<>(),
                     configSection.getInt(eventKey + ".chance"),
                     configSection.getLong(eventKey + ".duration"),
                     configSection.getLong(eventKey + ".cooldown")
