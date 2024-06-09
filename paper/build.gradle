@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
-    compileOnly "me.clip:placeholderapi:2.11.5"
+    compileOnly "me.clip:placeholderapi:2.11.6"
     compileOnly "dev.jorel:commandapi-bukkit-core:9.4.1"
 
     implementation project(":api")
@@ -34,6 +34,7 @@ shadowJar {
     relocate "org.javatuples", "org.nevermined.worldevents.shadow.javatuples"
     relocate "me.lucko.helper", "org.nevermined.worldevents.shadow.lucko.helper"
     relocate "com.google.inject", "org.nevermined.worldevents.shadow.google.guice"
+    relocate "com.google.common", "org.nevermined.worldevents.shadow.google.common"
     relocate "net.kyori", "org.nevermined.worldevents.shadow.kyori"
     relocate "me.wyne.wutils", "org.nevermined.worldevents.shadow.wutils"
 }

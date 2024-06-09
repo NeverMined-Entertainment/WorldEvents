@@ -7,13 +7,14 @@ import me.wyne.wutils.i18n.I18n;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
+import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.config.GlobalConfig;
 import org.nevermined.worldevents.config.modules.ConfigModule;
+import org.nevermined.worldevents.core.WorldEventManager;
+import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;
 import org.nevermined.worldevents.hooks.Placeholders;
+import org.nevermined.worldevents.hooks.modules.HooksModule;
 import org.nevermined.worldevents.modules.PluginModule;
 
 import java.io.File;
@@ -36,15 +37,25 @@ public final class WorldEvents extends ExtendedJavaPlugin {
             injector = Guice.createInjector(
                     new PluginModule(this),
                     new ConfigModule(),
-                    new ExpansionModule()
+                    new HooksModule(),
+                    new ExpansionModule(),
+                    new WorldEventManagerModule()
             );
-        } catch (CreationException | ConfigurationException | ProvisionException e)
+        } catch (CreationException e)
         {
-            Log.global.exception("Guice exception", e);
+            Log.global.exception("Guice injector creation exception", e);
         }
 
         initializeConfig();
-        injector.getInstance(Placeholders.class).register();
+
+        try {
+            injector.getInstance(Placeholders.class).register();
+            injector.getInstance(WorldEventManagerApi.class).startEventQueue("demo-queue-1");
+        } catch (ConfigurationException | ProvisionException e)
+        {
+            Log.global.exception("Guice configuration/provision exception", e);
+        }
+
     }
 
     private void initializeLogger()
@@ -59,7 +70,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     private void initializeConfig()
     {
-        globalConfig = injector.getInstance(GlobalConfig.class);
         Config.global.setConfigGenerator(this, "config.yml");
         Config.global.generateConfig(getDescription().getVersion());
         reloadConfig();

@@ -11,19 +11,19 @@ public class DemoExpansion implements WorldEventAction {
 
     @Override
     public void startEvent(EventData eventData) {
-        Log.global.info("Event started!");
-        Log.global.info(LegacyComponentSerializer.legacyAmpersand().serialize(eventData.name()));
-        eventData.description().stream().map(c -> LegacyComponentSerializer.legacyAmpersand().serialize(c)).forEach(Log.global::info);
-        Log.global.info("Chance: " + eventData.chancePercent());
-        Log.global.info("Duration (sec): " + eventData.durationSeconds());
-        Log.global.info("Cooldown (sec): " + eventData.cooldownSeconds());
-        Log.global.info("Start: " + Instant.now().toString());
-        Log.global.info("Finish: " + Instant.now().plusSeconds(eventData.durationSeconds()).toString());
+        Log.global.warn("Event started!");
+        Log.global.warn(LegacyComponentSerializer.legacyAmpersand().serialize(eventData.name()));
+        eventData.description().stream().map(c -> LegacyComponentSerializer.legacyAmpersand().serialize(c)).forEach(Log.global::warn);
+        Log.global.warn("Chance: " + eventData.chancePercent());
+        Log.global.warn("Duration (sec): " + eventData.durationSeconds());
+        Log.global.warn("Cooldown (sec): " + eventData.cooldownSeconds());
+        Log.global.warn("Start: " + Instant.now().toString());
+        Log.global.warn("Finish: " + Instant.now().plusSeconds(eventData.durationSeconds()).toString());
     }
 
     @Override
     public void finishEvent(EventData eventData) {
-        Log.global.info("Event finished!");
+        Log.global.warn("Event " + LegacyComponentSerializer.legacyAmpersand().serialize(eventData.name()) + " finished!");
     }
 
 }

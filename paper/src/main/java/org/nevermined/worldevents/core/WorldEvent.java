@@ -53,11 +53,11 @@ public class WorldEvent implements WorldEventApi {
     {
         WorldEventFinish finishEvent = new WorldEventFinish(this, queue);
         finishEvent.callEvent();
-        queue.pollEvent();
         action.finishEvent(eventData);
         isActive = false;
         if (!finishPromise.isClosed())
             finishPromise.closeSilently();
+        queue.pollEvent();
     }
 
     @Override

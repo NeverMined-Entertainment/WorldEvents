@@ -36,6 +36,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     {
         WorldEventApi event = eventQueue.poll();
         eventQueue.add(selectRandomEvent());
+        peekEvent().startEvent(this);
         return event;
     }
 
@@ -55,7 +56,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
         for (WorldEventApi event : eventList)
         {
             cumulativeWeight += event.getEventData().chancePercent();
-            if (randomValue < cumulativeWeight)
+            if (randomValue >= cumulativeWeight)
                 return event;
         }
         return null;
@@ -67,6 +68,9 @@ public class WorldEventQueue implements WorldEventQueueApi {
 
         for (String eventKey : configSection.getKeys(false))
         {
+            if (eventKey.equalsIgnoreCase("queue-capacity"))
+                continue;
+
             EventData eventData = new EventData(
                     miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, configSection.getString(eventKey + ".name"))),
                     configSection.getStringList(eventKey + ".description").stream()

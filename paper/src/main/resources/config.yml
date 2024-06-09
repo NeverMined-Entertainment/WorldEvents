@@ -20,6 +20,7 @@ events:
       duration: 60
       cooldown: 60
   demo-queue-2:
+    queue-capacity: 2
     demo-event-2-1:
       name: "Demo 2-1"
       description:
