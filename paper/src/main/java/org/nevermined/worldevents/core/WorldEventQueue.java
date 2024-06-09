@@ -63,6 +63,12 @@ public class WorldEventQueue implements WorldEventQueueApi {
             eventCyclePromise.closeSilently();
     }
 
+    @Override
+    public Queue<WorldEventApi> getEventQueue()
+    {
+        return eventQueue;
+    }
+
     private void generateInitialQueue()
     {
         for (int i = 0; i < queueCapacity; i++)

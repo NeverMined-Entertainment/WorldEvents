@@ -7,16 +7,20 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.WorldEvents;
+import org.nevermined.worldevents.api.core.WorldEventManagerApi;
+import org.nevermined.worldevents.core.WorldEventManager;
 
 @Singleton
 public class Placeholders extends PlaceholderExpansion {
 
     private final WorldEvents plugin;
+    private final WorldEventManagerApi worldEventManager;
 
     @Inject
-    public Placeholders(WorldEvents plugin)
+    public Placeholders(WorldEvents plugin, WorldEventManagerApi worldEventManager)
     {
         this.plugin = plugin;
+        this.worldEventManager = worldEventManager;
     }
 
     @Override
@@ -43,4 +47,6 @@ public class Placeholders extends PlaceholderExpansion {
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
         return null;
     }
+
+
 }
