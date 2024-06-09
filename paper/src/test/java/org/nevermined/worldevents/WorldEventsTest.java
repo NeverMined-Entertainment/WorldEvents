@@ -7,7 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.nevermined.worldevents.config.modules.ConfigModule;
-import org.nevermined.worldevents.core.modules.ExpansionModule;
+import org.nevermined.worldevents.expansions.modules.ExpansionModule;
 
 import static org.junit.jupiter.api.Assertions.*;
 

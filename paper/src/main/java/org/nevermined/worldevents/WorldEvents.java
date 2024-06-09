@@ -7,9 +7,12 @@ import me.wyne.wutils.i18n.I18n;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 import org.nevermined.worldevents.config.GlobalConfig;
 import org.nevermined.worldevents.config.modules.ConfigModule;
-import org.nevermined.worldevents.core.modules.ExpansionModule;
+import org.nevermined.worldevents.expansions.modules.ExpansionModule;
 import org.nevermined.worldevents.hooks.Placeholders;
 import org.nevermined.worldevents.modules.PluginModule;
 

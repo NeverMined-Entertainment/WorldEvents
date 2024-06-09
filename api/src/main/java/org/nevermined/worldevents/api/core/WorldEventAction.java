@@ -1,4 +1,4 @@
-package org.nevermined.worldevents.core;
+package org.nevermined.worldevents.api.core;
 
 public interface WorldEventAction {
 
