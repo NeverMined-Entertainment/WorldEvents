@@ -61,8 +61,6 @@ public class WorldEvent implements WorldEventApi {
         stopEvent.callEvent();
         action.stopEvent(eventData);
         isActive = false;
-        if (stopPromise != null && !stopPromise.isClosed())
-            stopPromise.closeSilently();
     }
 
     @Override

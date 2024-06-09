@@ -10,8 +10,6 @@ import me.wyne.wutils.log.Log;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.config.StringConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
-import org.nevermined.worldevents.config.GlobalConfig;
-import org.nevermined.worldevents.config.StringConfig;
 import org.nevermined.worldevents.config.modules.ConfigModule;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;

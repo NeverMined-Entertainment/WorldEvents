@@ -29,8 +29,7 @@ public class WorldEventManager implements WorldEventManagerApi {
     public void startEventQueue(String queueKey)
     {
         eventQueueMap.get(queueKey)
-                .peekEvent()
-                .startEvent(eventQueueMap.get(queueKey));
+                .startNext();
     }
 
     private void loadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap)
