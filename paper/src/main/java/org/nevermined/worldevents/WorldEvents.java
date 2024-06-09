@@ -7,11 +7,12 @@ import me.wyne.wutils.i18n.I18n;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
+import org.nevermined.worldevents.api.config.GlobalConfigApi;
+import org.nevermined.worldevents.api.config.StringConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.config.GlobalConfig;
 import org.nevermined.worldevents.config.StringConfig;
 import org.nevermined.worldevents.config.modules.ConfigModule;
-import org.nevermined.worldevents.core.WorldEventManager;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;
 import org.nevermined.worldevents.hooks.Placeholders;
@@ -26,7 +27,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     private Injector injector;
 
-    private GlobalConfig globalConfig;
+    private GlobalConfigApi globalConfig;
 
     @Override
     public void enable() {
@@ -71,8 +72,8 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     private void initializeConfig()
     {
         try {
-            StringConfig stringConfig = injector.getInstance(StringConfig.class);
-            globalConfig = injector.getInstance(GlobalConfig.class);
+            StringConfigApi stringConfig = injector.getInstance(StringConfigApi.class);
+            globalConfig = injector.getInstance(GlobalConfigApi.class);
             Config.global.registerConfigObject(stringConfig);
         } catch (ConfigurationException | ProvisionException e)
         {
@@ -92,7 +93,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         I18n.global.setDefaultLanguage(I18n.getDefaultLanguageFile(this));
     }
 
-    public GlobalConfig getGlobalConfig() {
+    public GlobalConfigApi getGlobalConfig() {
         return globalConfig;
     }
 }
