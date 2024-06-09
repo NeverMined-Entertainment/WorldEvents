@@ -1,6 +1,8 @@
 package org.nevermined.worldevents.core;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.lucko.helper.Schedulers;
+import me.lucko.helper.promise.Promise;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
 import org.nevermined.worldevents.api.core.EventData;
@@ -9,6 +11,7 @@ import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class WorldEventQueue implements WorldEventQueueApi {
 
@@ -17,6 +20,8 @@ public class WorldEventQueue implements WorldEventQueueApi {
 
     private final int queueCapacity;
     private int totalWeight = 0;
+
+    private Promise<Void> cooldownPromise;
 
     public WorldEventQueue(ConfigurationSection configSection, Map<String, WorldEventAction> actionTypeMap)
     {
@@ -36,7 +41,9 @@ public class WorldEventQueue implements WorldEventQueueApi {
     {
         WorldEventApi event = eventQueue.poll();
         eventQueue.add(selectRandomEvent());
-        peekEvent().startEvent(this);
+        Schedulers.sync().runLater(() -> {
+           peekEvent().startEvent(this);
+        }, event.getEventData().cooldownSeconds(), TimeUnit.SECONDS);
         return event;
     }
 
