@@ -56,7 +56,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
         for (WorldEventApi event : eventList)
         {
             cumulativeWeight += event.getEventData().chancePercent();
-            if (randomValue >= cumulativeWeight)
+            if (cumulativeWeight >= randomValue)
                 return event;
         }
         return null;

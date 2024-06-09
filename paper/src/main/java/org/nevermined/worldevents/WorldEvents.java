@@ -9,6 +9,7 @@ import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.config.GlobalConfig;
+import org.nevermined.worldevents.config.StringConfig;
 import org.nevermined.worldevents.config.modules.ConfigModule;
 import org.nevermined.worldevents.core.WorldEventManager;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
@@ -55,14 +56,13 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         {
             Log.global.exception("Guice configuration/provision exception", e);
         }
-
     }
 
     private void initializeLogger()
     {
         Log.global = Log.builder()
                 .setLogger(getLogger())
-                .setConfig(new ConfigurableLogConfig("global", Config.global, new BasicLogConfig(true, true, true, true)))
+                .setConfig(new ConfigurableLogConfig("Global", Config.global, new BasicLogConfig(true, true, true, true)))
                 .setLogDirectory(new File(getDataFolder(), "log"))
                 .setFileWriteExecutor(Executors.newSingleThreadExecutor())
                 .build();
@@ -70,6 +70,15 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     private void initializeConfig()
     {
+        try {
+            StringConfig stringConfig = injector.getInstance(StringConfig.class);
+            globalConfig = injector.getInstance(GlobalConfig.class);
+            Config.global.registerConfigObject(stringConfig);
+        } catch (ConfigurationException | ProvisionException e)
+        {
+            Log.global.exception("Guice exception while creating configuration", e);
+        }
+
         Config.global.setConfigGenerator(this, "config.yml");
         Config.global.generateConfig(getDescription().getVersion());
         reloadConfig();
