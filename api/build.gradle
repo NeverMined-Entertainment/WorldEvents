@@ -1,12 +1,54 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.9.1')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
+
+    implementation "org.javatuples:javatuples:1.2"
+    implementation "net.kyori:adventure-api:4.17.0"
+    implementation "net.kyori:adventure-text-minimessage:4.17.0"
 }
 
-test {
-    useJUnitPlatform()
+def targetJavaVersion = 16
+java {
+    withSourcesJar()
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            url myMavenRepoWriteUrl
+
+            credentials {
+                username myMavenRepoWriteUsername
+                password myMavenRepoWritePassword
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = 'WorldEvents-api'
+            version = version
+
+            from components.java
+        }
+    }
 }

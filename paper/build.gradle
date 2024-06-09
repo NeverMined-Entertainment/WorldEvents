@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
-    compileOnly 'me.clip:placeholderapi:2.11.5'
+    compileOnly "me.clip:placeholderapi:2.11.6"
     compileOnly "dev.jorel:commandapi-bukkit-core:9.4.1"
 
     implementation project(":api")
@@ -16,10 +16,15 @@ dependencies {
     implementation "com.google.inject.extensions:guice-assistedinject:7.0.0"
     implementation "net.kyori:adventure-api:4.17.0"
     implementation "net.kyori:adventure-text-minimessage:4.17.0"
+    implementation "net.kyori:adventure-text-serializer-legacy:4.17.0"
 
-    implementation "me.wyne:WUtils-config:2.5.1"
-    implementation "me.wyne:WUtils-log:3.0.2"
-    implementation "me.wyne:WUtils-i18n:2.0.9"
+    implementation "me.wyne:WUtils-config:2.5.2"
+    implementation "me.wyne:WUtils-log:3.0.3"
+    implementation "me.wyne:WUtils-i18n:2.1.0"
+
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+    testImplementation "com.github.MockBukkit:MockBukkit:v1.16-SNAPSHOT"
 }
 
 shadowJar {
@@ -29,6 +34,7 @@ shadowJar {
     relocate "org.javatuples", "org.nevermined.worldevents.shadow.javatuples"
     relocate "me.lucko.helper", "org.nevermined.worldevents.shadow.lucko.helper"
     relocate "com.google.inject", "org.nevermined.worldevents.shadow.google.guice"
+    relocate "com.google.common", "org.nevermined.worldevents.shadow.google.common"
     relocate "net.kyori", "org.nevermined.worldevents.shadow.kyori"
     relocate "me.wyne.wutils", "org.nevermined.worldevents.shadow.wutils"
 }
@@ -44,6 +50,8 @@ java {
 }
 
 tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         options.release = targetJavaVersion
     }
@@ -56,4 +64,8 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
+}
+
+test {
+    useJUnitPlatform()
 }
