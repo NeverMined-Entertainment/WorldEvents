@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
-    compileOnly 'me.clip:placeholderapi:2.11.5'
+    compileOnly "me.clip:placeholderapi:2.11.5"
     compileOnly "dev.jorel:commandapi-bukkit-core:9.4.1"
 
     implementation project(":api")
@@ -22,8 +22,8 @@ dependencies {
     implementation "me.wyne:WUtils-i18n:2.0.9"
 
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
-    testImplementation 'com.github.MockBukkit:MockBukkit:v1.16-SNAPSHOT'
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+    testImplementation "com.github.MockBukkit:MockBukkit:v1.16-SNAPSHOT"
 }
 
 shadowJar {

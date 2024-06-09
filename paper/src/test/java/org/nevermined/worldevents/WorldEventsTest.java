@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.nevermined.worldevents.config.modules.ConfigModule;
+import org.nevermined.worldevents.core.modules.ExpansionModule;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,6 +25,11 @@ public class WorldEventsTest {
         @Test
         void ConfigModuleTest() {
             assertDoesNotThrow(() -> Guice.createInjector(new ConfigModule()));
+        }
+
+        @Test
+        void ExpansionModuleTest() {
+            assertDoesNotThrow(() -> Guice.createInjector(new ExpansionModule()));
         }
 
     }

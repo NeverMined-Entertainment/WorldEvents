@@ -9,6 +9,7 @@ import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
 import org.nevermined.worldevents.config.GlobalConfig;
 import org.nevermined.worldevents.config.modules.ConfigModule;
+import org.nevermined.worldevents.core.modules.ExpansionModule;
 import org.nevermined.worldevents.hooks.Placeholders;
 import org.nevermined.worldevents.modules.PluginModule;
 
@@ -31,7 +32,8 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         try {
             injector = Guice.createInjector(
                     new PluginModule(this),
-                    new ConfigModule()
+                    new ConfigModule(),
+                    new ExpansionModule()
             );
         } catch (CreationException | ConfigurationException | ProvisionException e)
         {
