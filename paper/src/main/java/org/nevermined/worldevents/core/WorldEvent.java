@@ -6,7 +6,7 @@ import org.nevermined.worldevents.api.core.EventData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
-import org.nevermined.worldevents.api.events.WorldEventFinish;
+import org.nevermined.worldevents.api.events.WorldEventStop;
 import org.nevermined.worldevents.api.events.WorldEventStart;
 
 import java.time.Instant;
@@ -21,7 +21,7 @@ public class WorldEvent implements WorldEventApi {
     private boolean isActive = false;
     private Instant expireTime;
 
-    private Promise<Void> finishPromise;
+    private Promise<Void> stopPromise;
 
     public WorldEvent(EventData eventData, WorldEventAction action)
     {
@@ -38,6 +38,9 @@ public class WorldEvent implements WorldEventApi {
     @Override
     public void startEvent(WorldEventQueueApi queue)
     {
+        if (isActive)
+            return;
+
         WorldEventStart startEvent = new WorldEventStart(this, queue);
         startEvent.callEvent();
         if (startEvent.isCancelled())
@@ -45,19 +48,21 @@ public class WorldEvent implements WorldEventApi {
         action.startEvent(eventData);
         expireTime = Instant.now().plusSeconds(eventData.durationSeconds());
         isActive = true;
-        finishPromise = Schedulers.sync().runLater(() -> finishEvent(queue), eventData.durationSeconds(), TimeUnit.SECONDS);
+        stopPromise = Schedulers.sync().runLater(() -> stopEvent(queue), eventData.durationSeconds(), TimeUnit.SECONDS);
     }
 
     @Override
-    public void finishEvent(WorldEventQueueApi queue)
+    public void stopEvent(WorldEventQueueApi queue)
     {
-        WorldEventFinish finishEvent = new WorldEventFinish(this, queue);
-        finishEvent.callEvent();
-        action.finishEvent(eventData);
+        if (!isActive)
+            return;
+
+        WorldEventStop stopEvent = new WorldEventStop(this, queue);
+        stopEvent.callEvent();
+        action.stopEvent(eventData);
         isActive = false;
-        if (!finishPromise.isClosed())
-            finishPromise.closeSilently();
-        queue.pollEvent();
+        if (stopPromise != null && !stopPromise.isClosed())
+            stopPromise.closeSilently();
     }
 
     @Override
@@ -68,6 +73,11 @@ public class WorldEvent implements WorldEventApi {
     @Override
     public WorldEventAction getAction() {
         return action;
+    }
+
+    @Override
+    public Promise<Void> getStopPromise() {
+        return stopPromise;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.nevermined.worldevents.core;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.lucko.helper.Schedulers;
 import me.lucko.helper.promise.Promise;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,7 +20,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     private final int queueCapacity;
     private int totalWeight = 0;
 
-    private Promise<Void> cooldownPromise;
+    private Promise<Void> eventCyclePromise;
 
     public WorldEventQueue(ConfigurationSection configSection, Map<String, WorldEventAction> actionTypeMap)
     {
@@ -41,10 +40,27 @@ public class WorldEventQueue implements WorldEventQueueApi {
     {
         WorldEventApi event = eventQueue.poll();
         eventQueue.add(selectRandomEvent());
-        Schedulers.sync().runLater(() -> {
-           peekEvent().startEvent(this);
-        }, event.getEventData().cooldownSeconds(), TimeUnit.SECONDS);
         return event;
+    }
+
+    @Override
+    public void startNext()
+    {
+        WorldEventApi event = peekEvent();
+        event.startEvent(this);
+        eventCyclePromise = event.getStopPromise().thenRunDelayedSync(() -> {
+            pollEvent();
+            startNext();
+        }, event.getEventData().cooldownSeconds(), TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void stopCurrent()
+    {
+        WorldEventApi event = pollEvent();
+        event.stopEvent(this);
+        if (eventCyclePromise != null && !eventCyclePromise.isClosed())
+            eventCyclePromise.closeSilently();
     }
 
     private void generateInitialQueue()
