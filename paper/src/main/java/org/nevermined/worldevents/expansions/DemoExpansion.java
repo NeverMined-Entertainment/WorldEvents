@@ -22,8 +22,8 @@ public class DemoExpansion implements WorldEventAction {
     }
 
     @Override
-    public void finishEvent(EventData eventData) {
-        Log.global.warn("Event " + LegacyComponentSerializer.legacyAmpersand().serialize(eventData.name()) + " finished!");
+    public void stopEvent(EventData eventData) {
+        Log.global.warn("Event " + LegacyComponentSerializer.legacyAmpersand().serialize(eventData.name()) + " stopped!");
     }
 
 }

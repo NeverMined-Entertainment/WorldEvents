@@ -5,13 +5,13 @@ import org.bukkit.event.HandlerList;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
 
-public class WorldEventFinish extends Event {
+public class WorldEventStop extends Event {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
     private WorldEventApi worldEvent;
     private WorldEventQueueApi worldEventQueue;
 
-    public WorldEventFinish(WorldEventApi worldEvent, WorldEventQueueApi queue)
+    public WorldEventStop(WorldEventApi worldEvent, WorldEventQueueApi queue)
     {
         this.worldEvent = worldEvent;
         this.worldEventQueue = queue;
