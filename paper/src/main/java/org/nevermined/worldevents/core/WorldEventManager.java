@@ -2,12 +2,16 @@ package org.nevermined.worldevents.core;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.nevermined.worldevents.api.core.WorldEventAction;
-import org.nevermined.worldevents.api.core.WorldEventApi;
-import org.nevermined.worldevents.api.core.WorldEventManagerApi;
-import org.nevermined.worldevents.api.core.WorldEventQueueApi;
+import org.nevermined.worldevents.api.core.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,9 +57,28 @@ public class WorldEventManager implements WorldEventManagerApi {
 
     private void loadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap)
     {
+        MiniMessage miniMessage = MiniMessage.miniMessage();
+
         for (String queueKey : config.getConfigurationSection("events").getKeys(false))
         {
-            eventQueueMap.put(queueKey, new WorldEventQueue(config.getConfigurationSection("events." + queueKey), actionTypeMap));
+            ConfigurationSection queueSection = config.getConfigurationSection("events." + queueKey);
+            eventQueueMap.put(queueKey, new WorldEventQueue(new QueueData(
+                    queueSection.contains("name")
+                            ? miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, queueSection.getString("name")))
+                            : Component.text(queueKey),
+                    queueSection.contains("description")
+                            ? queueSection.getStringList("description").stream()
+                            .map(s -> PlaceholderAPI.setPlaceholders(null, s))
+                            .map(miniMessage::deserialize)
+                            .toList()
+                            : Collections.unmodifiableList(new ArrayList<>()),
+                    queueSection.contains("item")
+                            ? Material.getMaterial(queueSection.getString("item"))
+                            : Material.NETHER_STAR,
+                    queueSection.getInt("capacity")
+            ),
+                    queueSection,
+                    actionTypeMap));
         }
     }
 

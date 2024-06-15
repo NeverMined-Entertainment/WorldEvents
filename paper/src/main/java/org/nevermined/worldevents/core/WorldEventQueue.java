@@ -3,26 +3,36 @@ package org.nevermined.worldevents.core;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucko.helper.promise.Promise;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.nevermined.worldevents.api.core.*;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class WorldEventQueue implements WorldEventQueueApi {
 
+    private final List<String> RESERVED_CONFIG_NAMES = new ArrayList<>() {
+        { add("name"); }
+        { add("description"); }
+        { add("item"); }
+        { add("capacity"); }
+    };
+    
+    private final QueueData queueData;
+
     private final Set<WorldEventSelfFactoryApi> eventList = new HashSet<>();
     private final Queue<WorldEventApi> eventQueue = new LinkedList<>();
-
-    private final int queueCapacity;
+    
     private int totalWeight = 0;
 
     private Promise<Void> eventCyclePromise;
 
-    public WorldEventQueue(ConfigurationSection configSection, Map<String, WorldEventAction> actionTypeMap)
+    public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
     {
-        queueCapacity = configSection.getInt("queue-capacity");
-        loadEventList(configSection, actionTypeMap);
+        this.queueData = queueData;
+        loadEventList(queueSection, actionTypeMap);
         generateInitialQueue();
     }
 
@@ -71,9 +81,14 @@ public class WorldEventQueue implements WorldEventQueueApi {
         return (LinkedList<WorldEventApi>)eventQueue;
     }
 
+    @Override
+    public QueueData getQueueData() {
+        return queueData;
+    }
+
     private void generateInitialQueue()
     {
-        for (int i = 0; i < queueCapacity; i++)
+        for (int i = 0; i < queueData.capacity(); i++)
         {
             eventQueue.add(selectRandomEvent());
         }
@@ -93,26 +108,32 @@ public class WorldEventQueue implements WorldEventQueueApi {
         return null;
     }
 
-    private void loadEventList(ConfigurationSection configSection, Map<String, WorldEventAction> actionTypeMap)
+    private void loadEventList(ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
     {
         MiniMessage miniMessage = MiniMessage.miniMessage();
 
-        for (String eventKey : configSection.getKeys(false))
+        for (String eventKey : queueSection.getKeys(false))
         {
-            if (eventKey.equalsIgnoreCase("queue-capacity"))
+            if (RESERVED_CONFIG_NAMES.stream().anyMatch(reserved -> reserved.equalsIgnoreCase(eventKey)))
                 continue;
-
+            
+            ConfigurationSection eventSection = queueSection.getConfigurationSection(eventKey);
             EventData eventData = new EventData(
-                    miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, configSection.getString(eventKey + ".name"))),
-                    configSection.contains(eventKey + ".description") ? configSection.getStringList(eventKey + ".description").stream()
+                    miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, eventSection.getString("name"))),
+                    eventSection.contains("description")
+                            ? eventSection.getStringList("description").stream()
                             .map(s -> PlaceholderAPI.setPlaceholders(null, s))
                             .map(miniMessage::deserialize)
-                            .toList() : new ArrayList<>(),
-                    configSection.getInt(eventKey + ".chance"),
-                    configSection.getLong(eventKey + ".duration"),
-                    configSection.getLong(eventKey + ".cooldown")
+                            .toList()
+                            : Collections.unmodifiableList(new ArrayList<>()),
+                    eventSection.contains("item")
+                            ? Material.getMaterial(eventSection.getString("item"))
+                            : Material.BEACON,
+                    eventSection.getInt("chance"),
+                    eventSection.getLong("duration"),
+                    eventSection.getLong("cooldown")
             );
-            eventList.add(new WorldEventFactory(eventData, actionTypeMap.get(configSection.getString(eventKey + ".type"))));
+            eventList.add(new WorldEventFactory(eventData, actionTypeMap.get(eventSection.getString("type"))));
             totalWeight += eventData.chancePercent();
         }
     }

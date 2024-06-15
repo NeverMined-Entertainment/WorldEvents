@@ -8,8 +8,11 @@ import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
-import org.nevermined.worldevents.api.config.StringConfigApi;
+import org.nevermined.worldevents.api.config.MainGuiConfigApi;
+import org.nevermined.worldevents.api.config.QueuesGuiConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
+import org.nevermined.worldevents.commands.WorldEventsCommand;
+import org.nevermined.worldevents.commands.modules.CommandModule;
 import org.nevermined.worldevents.config.modules.ConfigModule;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;
@@ -27,6 +30,8 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     private GlobalConfigApi globalConfig;
 
+    private WorldEventManagerApi worldEventManager;
+
     @Override
     public void enable() {
         saveDefaultConfig();
@@ -39,7 +44,8 @@ public final class WorldEvents extends ExtendedJavaPlugin {
                     new ConfigModule(),
                     new HooksModule(),
                     new ExpansionModule(),
-                    new WorldEventManagerModule()
+                    new WorldEventManagerModule(),
+                    new CommandModule()
             );
         } catch (CreationException e)
         {
@@ -50,7 +56,9 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
         try {
             injector.getInstance(Placeholders.class).register();
-            injector.getInstance(WorldEventManagerApi.class).startEventQueue("demo-queue-1");
+            worldEventManager = injector.getInstance(WorldEventManagerApi.class);
+            worldEventManager.startEventQueue("demo-queue-1");
+            injector.getInstance(WorldEventsCommand.class);
         } catch (ConfigurationException | ProvisionException e)
         {
             Log.global.exception("Guice configuration/provision exception", e);
@@ -70,9 +78,11 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     private void initializeConfig()
     {
         try {
-            StringConfigApi stringConfig = injector.getInstance(StringConfigApi.class);
+            MainGuiConfigApi mainGuiConfig = injector.getInstance(MainGuiConfigApi.class);
+            QueuesGuiConfigApi queuesGuiConfig = injector.getInstance(QueuesGuiConfigApi.class);
             globalConfig = injector.getInstance(GlobalConfigApi.class);
-            Config.global.registerConfigObject(stringConfig);
+            Config.global.registerConfigObject(mainGuiConfig);
+            Config.global.registerConfigObject(queuesGuiConfig);
         } catch (ConfigurationException | ProvisionException e)
         {
             Log.global.exception("Guice exception while creating configuration", e);
@@ -93,5 +103,9 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     public GlobalConfigApi getGlobalConfig() {
         return globalConfig;
+    }
+
+    public WorldEventManagerApi getWorldEventManager() {
+        return worldEventManager;
     }
 }

@@ -11,5 +11,6 @@ public interface WorldEventQueueApi {
     void stopCurrent();
     Queue<WorldEventApi> getEventQueue();
     List<WorldEventApi> getEventQueueAsList();
+    QueueData getQueueData();
 
 }
