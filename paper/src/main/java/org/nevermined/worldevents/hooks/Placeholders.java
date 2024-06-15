@@ -10,14 +10,11 @@ import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
-import org.nevermined.worldevents.core.WorldEventManager;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.regex.Pattern;
 
 @Singleton
 public class Placeholders extends PlaceholderExpansion {

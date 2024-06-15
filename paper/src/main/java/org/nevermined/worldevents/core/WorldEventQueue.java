@@ -4,17 +4,14 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucko.helper.promise.Promise;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
-import org.nevermined.worldevents.api.core.EventData;
-import org.nevermined.worldevents.api.core.WorldEventApi;
-import org.nevermined.worldevents.api.core.WorldEventAction;
-import org.nevermined.worldevents.api.core.WorldEventQueueApi;
+import org.nevermined.worldevents.api.core.*;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class WorldEventQueue implements WorldEventQueueApi {
 
-    private final Set<WorldEventApi> eventList = new HashSet<>();
+    private final Set<WorldEventSelfFactoryApi> eventList = new HashSet<>();
     private final Queue<WorldEventApi> eventQueue = new LinkedList<>();
 
     private final int queueCapacity;
@@ -82,11 +79,11 @@ public class WorldEventQueue implements WorldEventQueueApi {
         Random random = new Random();
         int randomValue = random.nextInt(totalWeight);
         int cumulativeWeight = 0;
-        for (WorldEventApi event : eventList)
+        for (WorldEventSelfFactoryApi eventFactory : eventList)
         {
-            cumulativeWeight += event.getEventData().chancePercent();
+            cumulativeWeight += eventFactory.getEventData().chancePercent();
             if (cumulativeWeight >= randomValue)
-                return event;
+                return eventFactory.create();
         }
         return null;
     }
@@ -110,7 +107,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
                     configSection.getLong(eventKey + ".duration"),
                     configSection.getLong(eventKey + ".cooldown")
             );
-            eventList.add(new WorldEvent(eventData, actionTypeMap.get(configSection.getString(eventKey + ".type"))));
+            eventList.add(new WorldEventFactory(eventData, actionTypeMap.get(configSection.getString(eventKey + ".type"))));
             totalWeight += eventData.chancePercent();
         }
     }
