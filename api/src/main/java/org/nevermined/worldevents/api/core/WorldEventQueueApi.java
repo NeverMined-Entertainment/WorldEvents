@@ -1,5 +1,6 @@
 package org.nevermined.worldevents.api.core;
 
+import java.util.List;
 import java.util.Queue;
 
 public interface WorldEventQueueApi {
@@ -9,5 +10,6 @@ public interface WorldEventQueueApi {
     void startNext();
     void stopCurrent();
     Queue<WorldEventApi> getEventQueue();
+    List<WorldEventApi> getEventQueueAsList();
 
 }

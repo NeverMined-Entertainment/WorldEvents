@@ -66,6 +66,11 @@ public class WorldEventQueue implements WorldEventQueueApi {
         return eventQueue;
     }
 
+    @Override
+    public List<WorldEventApi> getEventQueueAsList() {
+        return (LinkedList<WorldEventApi>)eventQueue;
+    }
+
     private void generateInitialQueue()
     {
         for (int i = 0; i < queueCapacity; i++)

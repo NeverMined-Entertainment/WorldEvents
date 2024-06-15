@@ -13,6 +13,7 @@ import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -86,7 +87,7 @@ public class Placeholders extends PlaceholderExpansion {
     private void createNameParser()
     {
         eventDataParserMap.put("name", (queueKey, eventIndex) -> {
-            LinkedList<WorldEventApi> queue = ((LinkedList<WorldEventApi>)worldEventManager.getEventQueueMap().get(queueKey).getEventQueue());
+            List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return LegacyComponentSerializer.legacyAmpersand().serialize(queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().name());
         });
     }
@@ -94,7 +95,7 @@ public class Placeholders extends PlaceholderExpansion {
     private void createDescriptionParser()
     {
         eventDataParserMap.put("description", (queueKey, eventIndex) -> {
-            LinkedList<WorldEventApi> queue = ((LinkedList<WorldEventApi>)worldEventManager.getEventQueueMap().get(queueKey).getEventQueue());
+            List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().description()
                     .stream()
                     .map(component -> LegacyComponentSerializer.legacyAmpersand().serialize(component))
@@ -105,7 +106,7 @@ public class Placeholders extends PlaceholderExpansion {
     private void createChanceParser()
     {
         eventDataParserMap.put("chance", (queueKey, eventIndex) -> {
-            LinkedList<WorldEventApi> queue = ((LinkedList<WorldEventApi>)worldEventManager.getEventQueueMap().get(queueKey).getEventQueue());
+            List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return String.valueOf(queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().chancePercent());
         });
     }
@@ -113,7 +114,7 @@ public class Placeholders extends PlaceholderExpansion {
     private void createDurationParser()
     {
         eventDataParserMap.put("duration", (queueKey, eventIndex) -> {
-            LinkedList<WorldEventApi> queue = ((LinkedList<WorldEventApi>)worldEventManager.getEventQueueMap().get(queueKey).getEventQueue());
+            List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return String.valueOf(queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().durationSeconds());
         });
     }
@@ -121,7 +122,7 @@ public class Placeholders extends PlaceholderExpansion {
     private void createCooldownParser()
     {
         eventDataParserMap.put("cooldown", (queueKey, eventIndex) -> {
-            LinkedList<WorldEventApi> queue = ((LinkedList<WorldEventApi>)worldEventManager.getEventQueueMap().get(queueKey).getEventQueue());
+            List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return String.valueOf(queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().cooldownSeconds());
         });
     }
@@ -129,7 +130,7 @@ public class Placeholders extends PlaceholderExpansion {
     private void createActiveParser()
     {
         eventDataParserMap.put("active", (queueKey, eventIndex) -> {
-            LinkedList<WorldEventApi> queue = ((LinkedList<WorldEventApi>)worldEventManager.getEventQueueMap().get(queueKey).getEventQueue());
+            List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return String.valueOf(queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).isActive());
         });
     }
