@@ -8,9 +8,7 @@ import org.bukkit.entity.Player;
 import org.javatuples.Pair;
 import org.nevermined.worldevents.WorldEvents;
 
-public class MainGui {
-
-    private final Gui gui;
+public class MainGui extends BaseGui<Gui> {
 
     public MainGui(WorldEvents plugin, Player player)
     {
@@ -23,15 +21,10 @@ public class MainGui {
         buildQueuesItem(plugin, player);
     }
 
-    public void openGui(Player player)
-    {
-        gui.open(player);
-    }
-
     private void buildQueuesItem(WorldEvents plugin, Player player)
     {
         Pair<Integer, GuiItem> queuesItem = plugin.getGlobalConfig().mainGuiConfig().getQueuesItem(event -> {
-            new QueuesGui(this, plugin.getGlobalConfig().queuesGuiConfig(), plugin.getWorldEventManager(), player).openGui(player);
+            new QueuesGui(this, plugin.getGlobalConfig(), plugin.getWorldEventManager(), player).openGui(player);
         });
         gui.setItem(queuesItem.getValue0(), queuesItem.getValue1());
     }

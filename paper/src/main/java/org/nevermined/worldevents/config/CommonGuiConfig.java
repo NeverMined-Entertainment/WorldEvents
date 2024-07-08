@@ -7,14 +7,14 @@ import me.wyne.wutils.config.ConfigEntry;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.javatuples.Pair;
-import org.nevermined.worldevents.api.config.QueuesGuiConfigApi;
+import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
 import org.nevermined.worldevents.config.configurables.GuiItemConfigurable;
 import org.nevermined.worldevents.config.configurables.MaterialConfigurable;
 
 import java.util.ArrayList;
 
 @Singleton
-public class QueuesGuiConfig implements QueuesGuiConfigApi {
+public class CommonGuiConfig implements CommonGuiConfigApi {
 
     @ConfigEntry(section = "GUI.Queues Gui", path = "queues-gui-border")
     private MaterialConfigurable border = new MaterialConfigurable(Material.CYAN_STAINED_GLASS_PANE);
@@ -46,7 +46,6 @@ public class QueuesGuiConfig implements QueuesGuiConfigApi {
             null, null
     );
 
-    @Override
     public Material getBorder() {
         return border.getMaterial();
     }
@@ -68,4 +67,5 @@ public class QueuesGuiConfig implements QueuesGuiConfigApi {
     {
         return new Pair<>(navigationBack.getSlot(), navigationBack.build(action));
     }
+
 }

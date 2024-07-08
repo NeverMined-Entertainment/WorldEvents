@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.javatuples.Pair;
 
-public interface QueuesGuiConfigApi {
+public interface CommonGuiConfigApi {
 
     Material getBorder();
     Pair<Integer, GuiItem> getNavigationPrevious(GuiAction<InventoryClickEvent> action);

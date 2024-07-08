@@ -3,7 +3,7 @@ package org.nevermined.worldevents.hooks;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import me.wyne.wutils.log.Log;
+import me.wyne.wutils.i18n.I18n;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,10 @@ import org.nevermined.worldevents.api.core.QueueData;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -43,8 +46,10 @@ public class Placeholders extends PlaceholderExpansion {
         createQueueItemParser();
         createEventChanceParser();
         createEventDurationParser();
+        createEventExpireParser();
         createEventCooldownParser();
         createEventActiveParser();
+        createQueueActiveParser();
         createQueueCapacityParser();
     }
 
@@ -171,6 +176,17 @@ public class Placeholders extends PlaceholderExpansion {
         });
     }
 
+    private void createEventExpireParser()
+    {
+        eventDataParserMap.put("expire", (queueKey, eventIndex) -> {
+            List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
+            AtomicReference<String> expireFormatted = new AtomicReference<>("??:??:??");
+            queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getExpireTime().ifPresent(instant ->
+                    expireFormatted.set(DateTimeFormatter.ofPattern(I18n.global.getString("event-expire-time-format")).withZone(ZoneId.systemDefault()).format(instant)));
+            return expireFormatted.get();
+        });
+    }
+
     private void createEventCooldownParser()
     {
         eventDataParserMap.put("cooldown", (queueKey, eventIndex) -> {
@@ -184,6 +200,13 @@ public class Placeholders extends PlaceholderExpansion {
         eventDataParserMap.put("active", (queueKey, eventIndex) -> {
             List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return String.valueOf(queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).isActive());
+        });
+    }
+
+    private void createQueueActiveParser()
+    {
+        queueDataParserMap.put("active", queueKey -> {
+            return String.valueOf(worldEventManager.getEventQueueMap().get(queueKey).isActive());
         });
     }
 

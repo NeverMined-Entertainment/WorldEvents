@@ -7,9 +7,10 @@ import me.wyne.wutils.i18n.I18n;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
+import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.config.MainGuiConfigApi;
-import org.nevermined.worldevents.api.config.QueuesGuiConfigApi;
+import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.commands.WorldEventsCommand;
 import org.nevermined.worldevents.commands.modules.CommandModule;
@@ -79,9 +80,11 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     {
         try {
             MainGuiConfigApi mainGuiConfig = injector.getInstance(MainGuiConfigApi.class);
-            QueuesGuiConfigApi queuesGuiConfig = injector.getInstance(QueuesGuiConfigApi.class);
+            CommonGuiConfigApi commonGuiConfig = injector.getInstance(CommonGuiConfigApi.class);
+            QueueGuiConfigApi queuesGuiConfig = injector.getInstance(QueueGuiConfigApi.class);
             globalConfig = injector.getInstance(GlobalConfigApi.class);
             Config.global.registerConfigObject(mainGuiConfig);
+            Config.global.registerConfigObject(commonGuiConfig);
             Config.global.registerConfigObject(queuesGuiConfig);
         } catch (ConfigurationException | ProvisionException e)
         {

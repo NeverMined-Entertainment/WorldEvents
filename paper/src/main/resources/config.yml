@@ -11,6 +11,7 @@ events:
       name: "<!i>Demo 1-1"
       description:
         - "<!i>Demo 1-1 description"
+      item: NETHER_STAR
       type: "Demo"
       chance: 50
       duration: 60
