@@ -9,7 +9,6 @@ import org.nevermined.worldevents.api.core.*;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class WorldEventQueue implements WorldEventQueueApi {
 
@@ -27,6 +26,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     
     private int totalWeight = 0;
 
+    private boolean isActive = false;
     private Promise<Void> eventCyclePromise;
 
     public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
@@ -55,6 +55,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     {
         WorldEventApi event = peekEvent();
         event.startEvent(this);
+        isActive = true;
         eventCyclePromise = event.getStopPromise().thenRunDelayedSync(() -> {
             pollEvent();
             startNext();
@@ -66,8 +67,14 @@ public class WorldEventQueue implements WorldEventQueueApi {
     {
         WorldEventApi event = pollEvent();
         event.stopEvent(this);
+        isActive = false;
         if (eventCyclePromise != null && !eventCyclePromise.isClosed())
             eventCyclePromise.closeSilently();
+    }
+
+    @Override
+    public boolean isActive() {
+        return isActive;
     }
 
     @Override

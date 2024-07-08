@@ -9,6 +9,8 @@ public interface WorldEventQueueApi {
     WorldEventApi pollEvent();
     void startNext();
     void stopCurrent();
+
+    boolean isActive();
     Queue<WorldEventApi> getEventQueue();
     List<WorldEventApi> getEventQueueAsList();
     QueueData getQueueData();
