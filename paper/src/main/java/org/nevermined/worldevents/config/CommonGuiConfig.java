@@ -16,10 +16,10 @@ import java.util.ArrayList;
 @Singleton
 public class CommonGuiConfig implements CommonGuiConfigApi {
 
-    @ConfigEntry(section = "GUI.Queues Gui", path = "queues-gui-border")
+    @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-border")
     private MaterialConfigurable border = new MaterialConfigurable(Material.CYAN_STAINED_GLASS_PANE);
 
-    @ConfigEntry(section = "GUI.Queues Gui", path = "queues-gui-previous")
+    @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-previous")
     private GuiItemConfigurable navigationPrevious = new GuiItemConfigurable(
             48,
             Material.PAPER,
@@ -28,7 +28,7 @@ public class CommonGuiConfig implements CommonGuiConfigApi {
             null, null
     );
 
-    @ConfigEntry(section = "GUI.Queues Gui", path = "queues-gui-next")
+    @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-next")
     private GuiItemConfigurable navigationNext = new GuiItemConfigurable(
             50,
             Material.PAPER,
@@ -37,7 +37,7 @@ public class CommonGuiConfig implements CommonGuiConfigApi {
             null, null
     );
 
-    @ConfigEntry(section = "GUI.Queues Gui", path = "queues-gui-back")
+    @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-back")
     private GuiItemConfigurable navigationBack = new GuiItemConfigurable(
             53,
             Material.RED_STAINED_GLASS_PANE,
