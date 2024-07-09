@@ -144,5 +144,4 @@ public class WorldEventQueue implements WorldEventQueueApi {
             totalWeight += eventData.chancePercent();
         }
     }
-
 }

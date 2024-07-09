@@ -7,6 +7,8 @@ import me.wyne.wutils.i18n.I18n;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.Bukkit;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.config.MainGuiConfigApi;
@@ -33,8 +35,12 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     private WorldEventManagerApi worldEventManager;
 
+    private BukkitAudiences adventure;
+
     @Override
     public void enable() {
+        this.adventure = BukkitAudiences.create(this);
+
         saveDefaultConfig();
         initializeLogger();
         initializeI18n();
@@ -63,6 +69,14 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         } catch (ConfigurationException | ProvisionException e)
         {
             Log.global.exception("Guice configuration/provision exception", e);
+        }
+    }
+
+    @Override
+    protected void disable() {
+        if(this.adventure != null) {
+            this.adventure.close();
+            this.adventure = null;
         }
     }
 
@@ -102,6 +116,13 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         I18n.global.loadLanguage("lang/ru.yml", this);
         I18n.global.loadDefaultPluginLanguage(this);
         I18n.global.setDefaultLanguage(I18n.getDefaultLanguageFile(this));
+    }
+
+    public BukkitAudiences adventure() {
+        if(this.adventure == null) {
+            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
+        }
+        return this.adventure;
     }
 
     public GlobalConfigApi getGlobalConfig() {

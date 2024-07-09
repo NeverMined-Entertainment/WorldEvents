@@ -10,7 +10,6 @@ dependencies {
     implementation "me.lucko:helper:5.6.14"
     implementation "dev.triumphteam:triumph-gui:3.1.10"
     implementation "net.kyori:adventure-api:4.17.0"
-    implementation "net.kyori:adventure-text-minimessage:4.17.0"
     implementation "com.google.inject:guice:7.0.0"
 }
 
