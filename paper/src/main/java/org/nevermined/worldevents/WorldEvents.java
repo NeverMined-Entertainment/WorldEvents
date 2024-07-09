@@ -1,6 +1,8 @@
 package org.nevermined.worldevents;
 
 import com.google.inject.*;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.wyne.wutils.config.Config;
 import me.wyne.wutils.i18n.I18n;
@@ -8,6 +10,7 @@ import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
@@ -38,7 +41,13 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     private BukkitAudiences adventure;
 
     @Override
+    protected void load() {
+        CommandAPI.onLoad(new CommandAPIBukkitConfig(this));
+    }
+
+    @Override
     public void enable() {
+        CommandAPI.onEnable();
         this.adventure = BukkitAudiences.create(this);
 
         saveDefaultConfig();
@@ -74,6 +83,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     @Override
     protected void disable() {
+        CommandAPI.onDisable();
         if(this.adventure != null) {
             this.adventure.close();
             this.adventure = null;

@@ -2,7 +2,6 @@ name: WorldEvents
 version: '${version}'
 main: org.nevermined.worldevents.WorldEvents
 api-version: '1.16'
-depend: [ CommandAPI ]
 softdepend: [ PlaceholderAPI ]
 author: Wyne
 description: Manages gameplay events
