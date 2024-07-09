@@ -6,6 +6,7 @@ import dev.jorel.commandapi.*;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.StringArgument;
 import me.wyne.wutils.i18n.I18n;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.nevermined.worldevents.WorldEvents;
@@ -55,6 +56,7 @@ public class WorldEventsCommand {
                                 suggestions.add("stop");
                             else
                                 suggestions.add("start");
+                            suggestions.add("skip");
 
                             return suggestions;
                         })))
@@ -73,16 +75,28 @@ public class WorldEventsCommand {
 
                     if (action.equalsIgnoreCase("start") && !queue.isActive()) {
                         queue.startNext();
-                        plugin.adventure().sender(sender).sendMessage(I18n.global.getComponent(locale, "success-queue-activated", Placeholder.unparsed("queue-key", queueKey)));
+                        plugin.adventure().sender(sender).sendMessage(I18n.global.getComponent(locale, "success-queue-activated", Placeholder.component("queue-name", queue.getQueueData().name())));
                     }
                     else if (action.equalsIgnoreCase("start") && queue.isActive())
-                        throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getComponent(locale, "error-queue-already-active", Placeholder.unparsed("queue-key", queueKey)));
+                        throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getComponent(locale, "error-queue-already-active", Placeholder.component("queue-name", queue.getQueueData().name())));
                     else if (action.equalsIgnoreCase("stop") && queue.isActive()) {
                         queue.stopCurrent();
-                        plugin.adventure().sender(sender).sendMessage(I18n.global.getComponent(locale, "success-queue-deactivated", Placeholder.unparsed("queue-key", queueKey)));
+                        plugin.adventure().sender(sender).sendMessage(I18n.global.getComponent(locale, "success-queue-deactivated", Placeholder.component("queue-name", queue.getQueueData().name())));
                     }
                     else if (action.equalsIgnoreCase("stop") && !queue.isActive())
-                        throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getComponent(locale, "error-queue-already-inactive", Placeholder.unparsed("queue-key", queueKey)));
+                        throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getComponent(locale, "error-queue-already-inactive", Placeholder.component("queue-name", queue.getQueueData().name())));
+                    else if (action.equalsIgnoreCase("skip") && queue.isActive()) {
+                        Component eventName = queue.peekEvent().getEventData().name();
+                        queue.stopCurrent();
+                        queue.startNext();
+                        plugin.adventure().sender(sender).sendMessage(I18n.global.getComponent(locale, "success-event-skipped", Placeholder.component("event-name", eventName)));
+                    }
+                    else if (action.equalsIgnoreCase("skip") && !queue.isActive())
+                    {
+                        Component eventName = queue.pollEvent().getEventData().name();
+                        queue.startNext();
+                        plugin.adventure().sender(sender).sendMessage(I18n.global.getComponent(locale, "success-event-skipped", Placeholder.component("event-name", eventName)));
+                    }
                 });
 
     }

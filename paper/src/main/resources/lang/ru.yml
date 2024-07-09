@@ -27,10 +27,11 @@ queue-gui-header: "Очередь %worldevents_queue_<queue-key>_name%"
 ### Messages
 
 ## Success
-success-queue-activated: "<green>Очередь <queue-key> активирована!"
-success-queue-deactivated: "<green>Очередь <queue-key> деактивирована!"
+success-queue-activated: "<green>Очередь <queue-name> активирована!"
+success-queue-deactivated: "<green>Очередь <queue-name> деактивирована!"
+success-event-skipped: "<green>Ивент <event-name> пропущен!"
 
 ## Errors
 error-queue-not-found: "<red>Очередь <queue-key> не существует!"
-error-queue-already-active: "<red>Очередь <queue-key> уже активна!"
-error-queue-already-inactive: "<red>Очередь <queue-key> уже отключена!"
+error-queue-already-active: "<red>Очередь <queue-name> уже активна!"
+error-queue-already-inactive: "<red>Очередь <queue-name> уже отключена!"
