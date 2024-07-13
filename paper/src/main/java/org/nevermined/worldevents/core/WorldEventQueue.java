@@ -21,8 +21,8 @@ public class WorldEventQueue implements WorldEventQueueApi {
     
     private final QueueData queueData;
 
-    private final Set<WorldEventSelfFactoryApi> eventList = new HashSet<>();
-    private final Queue<WorldEventApi> eventQueue = new LinkedList<>();
+    private final Map<String, WorldEventSelfFactoryApi> eventSet = new HashMap<>();
+    private final Queue<WorldEventApi> eventQueue;
     
     private int totalWeight = 0;
 
@@ -32,7 +32,8 @@ public class WorldEventQueue implements WorldEventQueueApi {
     public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
     {
         this.queueData = queueData;
-        loadEventList(queueSection, actionTypeMap);
+        this.eventQueue = new LinkedList<>();
+        loadEventSet(queueSection, actionTypeMap);
         generateInitialQueue();
     }
 
@@ -73,8 +74,18 @@ public class WorldEventQueue implements WorldEventQueueApi {
     }
 
     @Override
+    public void replaceEvent(int index, WorldEventApi event) {
+        getEventQueueAsList().set(index, event);
+    }
+
+    @Override
     public boolean isActive() {
         return isActive;
+    }
+
+    @Override
+    public Map<String, WorldEventSelfFactoryApi> getEventSet() {
+        return eventSet;
     }
 
     @Override
@@ -106,7 +117,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
         Random random = new Random();
         int randomValue = random.nextInt(totalWeight);
         int cumulativeWeight = 0;
-        for (WorldEventSelfFactoryApi eventFactory : eventList)
+        for (WorldEventSelfFactoryApi eventFactory : eventSet.values())
         {
             cumulativeWeight += eventFactory.getEventData().chancePercent();
             if (cumulativeWeight >= randomValue)
@@ -115,7 +126,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
         return null;
     }
 
-    private void loadEventList(ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
+    private void loadEventSet(ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
     {
         MiniMessage miniMessage = MiniMessage.miniMessage();
 
@@ -140,7 +151,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
                     eventSection.getLong("duration"),
                     eventSection.getLong("cooldown")
             );
-            eventList.add(new WorldEventFactory(eventData, actionTypeMap.get(eventSection.getString("type"))));
+            eventSet.put(eventKey, new WorldEventFactory(eventData, actionTypeMap.get(eventSection.getString("type"))));
             totalWeight += eventData.chancePercent();
         }
     }
