@@ -7,6 +7,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.wyne.wutils.i18n.I18n;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventApi;
@@ -60,11 +61,22 @@ public class QueueGui extends PaginatedGui {
 
             gui.addItem(ItemBuilder.from(event.getEventData().item())
                     .name(event.getEventData().name())
-                    .lore(lore)
+                    .lore(getEventLore(queueKey, String.valueOf(i), player, I18n.global.getStringList(player.locale(), "event-lore-order").toArray(String[]::new)))
                     .asGuiItem(clickEvent -> {
 
                     }));
         }
     }
 
+    private List<Component> getEventLore(String queueKey, String eventIndex, Player player, String ...paths)
+    {
+        List<Component> lore = new ArrayList<>();
+
+        for (String path : paths)
+        {
+            lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), path).replace("<queue-key>", queueKey).replace("<event-index>", eventIndex))));
+        }
+
+        return lore;
+    }
 }

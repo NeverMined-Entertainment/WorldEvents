@@ -6,8 +6,10 @@ import dev.jorel.commandapi.*;
 import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandArguments;
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.wyne.wutils.i18n.I18n;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -156,7 +158,7 @@ public class WorldEventsCommand {
                 }
             }
             case "info" ->
-                    plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "info-queue", Placeholder.unparsed("queue-key", queueKey)));
+                    plugin.adventure().sender(sender).sendMessage(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), I18n.reduceString(I18n.global.getStringList(I18n.toLocale(sender), "info-queue")).replace("<queue-key>", queueKey))));
         }
     }
 

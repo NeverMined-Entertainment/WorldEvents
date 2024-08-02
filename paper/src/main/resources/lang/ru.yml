@@ -2,6 +2,7 @@
 
 ## Event
 event-expire-time-format: "HHч:mmм:ssс"
+event-description-format: "<!i>Описание: %worldevents_event_<queue-key>_<event_index>_description%"
 event-chance-format: "<!i>Шанс: %worldevents_event_<queue-key>_<event-index>_chance%"
 event-duration-format: "<!i>Продолжительность: %worldevents_event_<queue-key>_<event-index>_duration%"
 event-cooldown-format: "<!i>Задержка: %worldevents_event_<queue-key>_<event-index>_cooldown%"
@@ -22,17 +23,24 @@ queues-gui-header: "Очереди ивентов"
 
 ## Queue Gui
 queue-gui-header: "Очередь %worldevents_queue_<queue-key>_name%"
+event-lore-order:
+  - "event-description-format"
+  - "event-chance-format"
+  - "event-duration-format"
+  - "event-cooldown-format"
+  - "event-expire-format"
+  - "event-active-format"
 
 
 ### Messages
 
 ## Info
-info-queue: "Ключ: <queue-key><br>
-  Название: %worldevents_queue_<queue-key>_name%<br>
-  Описание:<br>
-  %worldevents_queue_<queue-key>_description%<br>
-  Вместительность: %worldevents_queue_<queue-key>_capacity%<br>
-  Активен: %worldevents_queue_<queue-key>_active%"
+info-queue:
+  - "Ключ: <queue-key>"
+  - "Название: %worldevents_queue_<queue-key>_name%"
+  - "Описание: %worldevents_queue_<queue-key>_description%"
+  - "Вместительность: %worldevents_queue_<queue-key>_capacity%"
+  - "Активен: %worldevents_queue_<queue-key>_active%"
 
 ## Success
 success-queue-activated: "<green>Очередь <queue-name> активирована!"

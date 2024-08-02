@@ -11,6 +11,7 @@ import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.wyne.wutils.i18n.I18n;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -128,8 +129,9 @@ public class Placeholders extends PlaceholderExpansion {
             List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().description()
                     .stream()
+                    .reduce((c1, c2) -> c1.appendNewline().append(c2))
                     .map(component -> LegacyComponentSerializer.legacyAmpersand().serialize(component))
-                    .reduce("", (s, s2) -> s + "\n" + s2);
+                    .orElse("");
         });
     }
 
@@ -139,8 +141,9 @@ public class Placeholders extends PlaceholderExpansion {
             QueueData queueData = worldEventManager.getEventQueueMap().get(queueKey).getQueueData();
             return queueData.description()
                     .stream()
+                    .reduce((c1, c2) -> c1.appendNewline().append(c2))
                     .map(component -> LegacyComponentSerializer.legacyAmpersand().serialize(component))
-                    .reduce("", (s, s2) -> s + "\n" + s2);
+                    .orElse("");
         });
     }
 
