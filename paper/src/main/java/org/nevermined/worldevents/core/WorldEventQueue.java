@@ -137,6 +137,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
             
             ConfigurationSection eventSection = queueSection.getConfigurationSection(eventKey);
             EventData eventData = new EventData(
+                    eventKey,
                     miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, eventSection.getString("name"))),
                     eventSection.contains("description")
                             ? eventSection.getStringList("description").stream()

@@ -63,6 +63,7 @@ public class WorldEventManager implements WorldEventManagerApi {
         {
             ConfigurationSection queueSection = config.getConfigurationSection("events." + queueKey);
             eventQueueMap.put(queueKey, new WorldEventQueue(new QueueData(
+                    queueKey,
                     queueSection.contains("name")
                             ? miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, queueSection.getString("name")))
                             : Component.text(queueKey),

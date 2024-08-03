@@ -1,7 +1,7 @@
 ### Format
 
 ## Event
-event-expire-time-format: "HHч:mmм:ssс"
+event-expire-time-format: "dd.MM.yyyy HHч:mmм:ssс"
 event-chance-format: "<!i>Шанс: %worldevents_event_<queue-key>_<event-index>_chance%"
 event-duration-format: "<!i>Продолжительность: %worldevents_event_<queue-key>_<event-index>_duration%"
 event-cooldown-format: "<!i>Задержка: %worldevents_event_<queue-key>_<event-index>_cooldown%"
@@ -40,6 +40,16 @@ info-queue:
   - "Вместительность: %worldevents_queue_<queue-key>_capacity%"
   - "Активен: %worldevents_queue_<queue-key>_active%"
 
+info-event:
+  - "Ключ: <event-key>"
+  - "Название: %worldevents_event_<queue-key>_<event-index>_name%"
+  - "Описание: %worldevents_event_<queue-key>_<event-index>_description%"
+  - "Шанс: %worldevents_event_<queue-key>_<event-index>_chance%"
+  - "Продолжительность: %worldevents_event_<queue-key>_<event-index>_duration%"
+  - "Задержка: %worldevents_event_<queue-key>_<event-index>_cooldown%"
+  - "Окончание: %worldevents_event_<queue-key>_<event-index>_expire%"
+  - "Активен: %worldevents_event_<queue-key>_<event-index>_active%"
+
 ## Success
 success-queue-activated: "<green>Очередь <queue-name> активирована!"
 success-queue-deactivated: "<green>Очередь <queue-name> деактивирована!"
@@ -52,3 +62,4 @@ error-queue-already-active: "<red>Очередь <queue-name> уже актив�
 error-queue-already-inactive: "<red>Очередь <queue-name> уже отключена!"
 error-event-not-found: "<red>Ивент с индексом <event-index> не существует!"
 error-event-key-not-found: "<red>Ивент <event-key> не существует!"
+error-event-active-swap: "<red>Активный ивент невозможно изменить!"

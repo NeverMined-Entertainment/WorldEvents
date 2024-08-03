@@ -44,12 +44,13 @@ public class WorldEventsCommand {
                                 .then(new StringArgument("queueAction")
                                         .replaceSuggestions(ArgumentSuggestions.stringCollection(this::getQueueActionSuggestions))
                                         .executes(this::executeQueueCommand)
-                                        .then(new IntegerArgument("eventIndex", 1)
+                                        .then(new IntegerArgument("eventIndex", 0)
                                                 .replaceSafeSuggestions(SafeSuggestions.suggestCollection(this::getEventIndexSuggestions))
                                                 .then(new MultiLiteralArgument("eventAction", getEventActionSuggestions())
+                                                        .executes(this::executeEventCommand)
                                                                 .then(new StringArgument("eventKey")
                                                                         .replaceSuggestions(ArgumentSuggestions.stringCollection(this::getEventKeySuggestions))
-                                                                        .executes(this::executeEventTypeSwapCommand))
+                                                                        .executes(this::executeEventCommand))
                                                         )))))
 
                 .register();
@@ -80,6 +81,7 @@ public class WorldEventsCommand {
     {
         Set<String> suggestions = new HashSet<>();
         suggestions.add("swap");
+        suggestions.add("info");
         return suggestions.toArray(String[]::new);
     }
 
@@ -95,7 +97,7 @@ public class WorldEventsCommand {
             return suggestions;
 
         WorldEventQueueApi queue = plugin.getWorldEventManager().getEventQueueMap().get(queueKey);
-        for (int i = 1; i < queue.getEventQueue().size(); i++)
+        for (int i = 0; i < queue.getEventQueue().size(); i++)
             suggestions.add(i);
 
         return suggestions;
@@ -110,6 +112,8 @@ public class WorldEventsCommand {
         if (!validateQueueKey(queueKey))
             return suggestions;
         if (!(info.previousArgs().getOrDefaultRaw("queueAction", "")).equalsIgnoreCase("event"))
+            return suggestions;
+        if (!((String)(info.previousArgs().getOrDefault("eventAction", ""))).equalsIgnoreCase("swap"))
             return suggestions;
 
         WorldEventQueueApi queue = plugin.getWorldEventManager().getEventQueueMap().get(queueKey);
@@ -162,7 +166,7 @@ public class WorldEventsCommand {
         }
     }
 
-    private void executeEventTypeSwapCommand(CommandSender sender, CommandArguments args) throws WrapperCommandSyntaxException
+    private void executeEventCommand(CommandSender sender, CommandArguments args) throws WrapperCommandSyntaxException
     {
         String queueKey = (String) args.getOrDefault("queueKey", "");
         int eventIndex = (int) args.getOrDefault("eventIndex", 1);
@@ -178,14 +182,26 @@ public class WorldEventsCommand {
 
         Optional<WorldEventSelfFactoryApi> eventFactory = Optional.ofNullable(queue.getEventSet().get(eventKey));
 
-        if (eventFactory.isEmpty())
-            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getComponent("error-event-key-not-found", Placeholder.unparsed("event-key", eventKey)));
+        if (eventAction.equalsIgnoreCase("swap") && queue.getEventQueueAsList().get(eventIndex).isActive())
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-event-active-swap"));
+        if (eventAction.equalsIgnoreCase("swap") && eventFactory.isEmpty())
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-event-key-not-found", Placeholder.unparsed("event-key", eventKey)));
 
-        if (eventAction.equals("swap")) {
-            queue.replaceEvent(eventIndex, eventFactory.get().create());
-            plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender,"success-event-type-swapped",
-                    Placeholder.unparsed("event-index", String.valueOf(eventIndex)),
-                    Placeholder.component("event-name", eventFactory.get().getEventData().name())));
+        switch (eventAction) {
+            case "swap" -> {
+                queue.replaceEvent(eventIndex, eventFactory.get().create());
+                plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender,"success-event-type-swapped",
+                        Placeholder.unparsed("event-index", String.valueOf(eventIndex)),
+                        Placeholder.component("event-name", eventFactory.get().getEventData().name())));
+            }
+            case "info" -> {
+                plugin.adventure().sender(sender).sendMessage(MiniMessage.miniMessage().deserialize(
+                        PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), I18n.reduceString(I18n.global.getStringList(I18n.toLocale(sender), "info-event"))
+                                .replace("<event-key>", queue.getEventQueueAsList().get(eventIndex).getEventData().key())
+                                .replace("<queue-key>", queueKey)
+                                .replace("<event-index>", String.valueOf(eventIndex)))
+                ));
+            }
         }
     }
 
