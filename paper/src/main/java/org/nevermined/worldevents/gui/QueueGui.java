@@ -53,15 +53,11 @@ public class QueueGui extends PaginatedGui {
             WorldEventApi event = eventManager.getEventQueueMap().get(queueKey).getEventQueueAsList().get(i);
 
             List<Component> lore = new ArrayList<>(event.getEventData().description());
-            lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "event-chance-format").replace("<queue-key>", queueKey).replace("<event-index>", String.valueOf(i)))));
-            lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "event-duration-format").replace("<queue-key>", queueKey).replace("<event-index>", String.valueOf(i)))));
-            lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "event-cooldown-format").replace("<queue-key>", queueKey).replace("<event-index>", String.valueOf(i)))));
-            lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "event-expire-format").replace("<queue-key>", queueKey).replace("<event-index>", String.valueOf(i)))));
-            lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "event-active-format").replace("<queue-key>", queueKey).replace("<event-index>", String.valueOf(i)))));
+            lore.addAll(getEventLore(queueKey, String.valueOf(i), player, I18n.global.getStringList(player.locale(), "event-lore-order").toArray(String[]::new)));
 
             gui.addItem(ItemBuilder.from(event.getEventData().item())
                     .name(event.getEventData().name())
-                    .lore(getEventLore(queueKey, String.valueOf(i), player, I18n.global.getStringList(player.locale(), "event-lore-order").toArray(String[]::new)))
+                    .lore(lore)
                     .asGuiItem(clickEvent -> {
 
                     }));

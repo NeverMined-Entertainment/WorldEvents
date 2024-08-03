@@ -2,7 +2,6 @@
 
 ## Event
 event-expire-time-format: "HHч:mmм:ssс"
-event-description-format: "<!i>Описание: %worldevents_event_<queue-key>_<event_index>_description%"
 event-chance-format: "<!i>Шанс: %worldevents_event_<queue-key>_<event-index>_chance%"
 event-duration-format: "<!i>Продолжительность: %worldevents_event_<queue-key>_<event-index>_duration%"
 event-cooldown-format: "<!i>Задержка: %worldevents_event_<queue-key>_<event-index>_cooldown%"
@@ -24,7 +23,6 @@ queues-gui-header: "Очереди ивентов"
 ## Queue Gui
 queue-gui-header: "Очередь %worldevents_queue_<queue-key>_name%"
 event-lore-order:
-  - "event-description-format"
   - "event-chance-format"
   - "event-duration-format"
   - "event-cooldown-format"
