@@ -9,3 +9,5 @@ website: https://github.com/NeverMined-Entertainment/WorldEvents
 permissions:
   wevents.queuecontrol:
     description: 'Allows to start/stop event queues'
+  wevents.queuecreate:
+    description: 'Allows to create independent temporary queues'

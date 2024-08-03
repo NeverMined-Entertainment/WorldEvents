@@ -22,7 +22,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     private final QueueData queueData;
 
     private final Map<String, WorldEventSelfFactoryApi> eventSet = new HashMap<>();
-    private final Queue<WorldEventApi> eventQueue;
+    private final Queue<WorldEventApi> eventQueue = new LinkedList<>();
     
     private int totalWeight = 0;
 
@@ -32,7 +32,6 @@ public class WorldEventQueue implements WorldEventQueueApi {
     public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
     {
         this.queueData = queueData;
-        this.eventQueue = new LinkedList<>();
         loadEventSet(queueSection, actionTypeMap);
         generateInitialQueue();
     }

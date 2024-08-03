@@ -53,6 +53,7 @@ info-event:
 ## Success
 success-queue-activated: "<green>Очередь <queue-name> активирована!"
 success-queue-deactivated: "<green>Очередь <queue-name> деактивирована!"
+success-queue-created: "<green>Очередь <queue-name> создана!"
 success-event-skipped: "<green>Ивент <event-name> пропущен!"
 success-event-type-swapped: "<green>Ивент <event-index> изменен на <event-name>!"
 
@@ -60,6 +61,8 @@ success-event-type-swapped: "<green>Ивент <event-index> изменен на
 error-queue-not-found: "<red>Очередь <queue-key> не существует!"
 error-queue-already-active: "<red>Очередь <queue-name> уже активна!"
 error-queue-already-inactive: "<red>Очередь <queue-name> уже отключена!"
+error-queue-already-exists: "<red>Очередь <queue-key> уже существует!"
+error-queue-not-enough-events: "<red>Недостаточно ивентов для создания потока!"
 error-event-not-found: "<red>Ивент с индексом <event-index> не существует!"
 error-event-key-not-found: "<red>Ивент <event-key> не существует!"
 error-event-active-swap: "<red>Активный ивент невозможно изменить!"

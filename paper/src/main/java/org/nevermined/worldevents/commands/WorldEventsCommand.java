@@ -11,11 +11,14 @@ import me.wyne.wutils.i18n.I18n;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.nevermined.worldevents.WorldEvents;
+import org.nevermined.worldevents.api.core.QueueData;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
 import org.nevermined.worldevents.api.core.WorldEventSelfFactoryApi;
+import org.nevermined.worldevents.core.TempWorldEventQueue;
 import org.nevermined.worldevents.gui.MainGui;
 
 import java.util.*;
@@ -39,8 +42,9 @@ public class WorldEventsCommand {
                     new MainGui(plugin, sender).openGui(sender);
                 })
                 .then(new LiteralArgument("queue")
-                        .withPermission("wevets.queuecontrol")
-                        .then(new MultiLiteralArgument("queueKey", plugin.getWorldEventManager().getEventQueueMap().keySet().toArray(String[]::new))
+                        .withPermission("wevents.queuecontrol")
+                        .then(new StringArgument("queueKey")
+                                .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> plugin.getWorldEventManager().getEventQueueMap().keySet()))
                                 .then(new StringArgument("queueAction")
                                         .replaceSuggestions(ArgumentSuggestions.stringCollection(this::getQueueActionSuggestions))
                                         .executes(this::executeQueueCommand)
@@ -52,6 +56,21 @@ public class WorldEventsCommand {
                                                                         .replaceSuggestions(ArgumentSuggestions.stringCollection(this::getEventKeySuggestions))
                                                                         .executes(this::executeEventCommand))
                                                         )))))
+                .then(new LiteralArgument("create")
+                        .withPermission("wevent.queuecreate")
+                        .then(new StringArgument("queueKey")
+                                .replaceSuggestions(ArgumentSuggestions.strings("<your new queue key>"))
+                                .then(new StringArgument("queueName")
+                                        .replaceSuggestions(ArgumentSuggestions.strings("<queue name (optional)>")).setOptional(true))
+                                .then(new TextArgument("queueDescription")
+                                        .replaceSuggestions(ArgumentSuggestions.strings("<queue description (optional)>")).setOptional(true))
+                                .then(new ItemStackArgument("queueItem")
+                                        .replaceSuggestions(ArgumentSuggestions.strings("<queue item (optional)>")).setOptional(true))
+                                .then(new ListArgumentBuilder<String>("eventKeys")
+                                        .allowDuplicates(true)
+                                        .withList(this::getEventKeysList)
+                                        .withStringMapper().buildGreedy()
+                                        .executes(this::executeQueueCreateCommand))))
 
                 .register();
     }
@@ -60,7 +79,7 @@ public class WorldEventsCommand {
     {
         Set<String> suggestions = new HashSet<>();
 
-        String queueKey = (String) info.previousArgs().getOrDefault("queueKey", "");
+        String queueKey = info.previousArgs().getOrDefaultRaw("queueKey", "");
 
         if (!validateQueueKey(queueKey))
             return suggestions;
@@ -89,7 +108,7 @@ public class WorldEventsCommand {
     {
         Set<Integer> suggestions = new HashSet<>();
 
-        String queueKey = (String) info.previousArgs().getOrDefault("queueKey", "");
+        String queueKey = info.previousArgs().getOrDefaultRaw("queueKey", "");
 
         if (!validateQueueKey(queueKey))
             return suggestions;
@@ -107,7 +126,7 @@ public class WorldEventsCommand {
     {
         Set<String> suggestions = new HashSet<>();
 
-        String queueKey = (String) info.previousArgs().getOrDefault("queueKey", "");
+        String queueKey = info.previousArgs().getOrDefaultRaw("queueKey", "");
 
         if (!validateQueueKey(queueKey))
             return suggestions;
@@ -122,9 +141,16 @@ public class WorldEventsCommand {
         return suggestions;
     }
 
+    private Collection<String> getEventKeysList()
+    {
+        Set<String> eventKeys = new HashSet<>();
+        plugin.getWorldEventManager().getEventQueueMap().values().forEach(queue -> eventKeys.addAll(queue.getEventSet().keySet()));
+        return eventKeys;
+    }
+
     private void executeQueueCommand(CommandSender sender, CommandArguments args) throws WrapperCommandSyntaxException
     {
-        String queueKey = (String) args.getOrDefault("queueKey", "");
+        String queueKey = args.getOrDefaultRaw("queueKey", "");
         String action = args.getOrDefaultRaw("queueAction", "");
 
         if (!validateQueueKey(queueKey))
@@ -168,7 +194,7 @@ public class WorldEventsCommand {
 
     private void executeEventCommand(CommandSender sender, CommandArguments args) throws WrapperCommandSyntaxException
     {
-        String queueKey = (String) args.getOrDefault("queueKey", "");
+        String queueKey = args.getOrDefaultRaw("queueKey", "");
         int eventIndex = (int) args.getOrDefault("eventIndex", 1);
         String eventAction = (String) args.getOrDefault("eventAction", "");
         String eventKey = args.getOrDefaultRaw("eventKey", "");
@@ -203,6 +229,45 @@ public class WorldEventsCommand {
                 ));
             }
         }
+    }
+
+    private void executeQueueCreateCommand(CommandSender sender, CommandArguments args) throws WrapperCommandSyntaxException
+    {
+        String queueKey = args.getOrDefaultRaw("queueKey", "new-queue");
+        Component queueName = MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), args.getOrDefaultRaw("queueName", "<!i>New queue")));
+        List<Component> queueDescription = Arrays.stream(((String) args.getOrDefault("queueDescription", "")).split("(?i)<br\\s*/?>"))
+                .map(s -> MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), s)))
+                .toList();
+        if (queueDescription.get(0).children().isEmpty())
+            queueDescription = new ArrayList<>();
+        Material queueItem = ((ItemStack) args.getOrDefault("queueItem", new ItemStack(Material.NETHER_STAR))).getType();
+        List<String> eventKeys = (List<String>) args.getOrDefault("eventKeys", new ArrayList<String>());
+
+        if (plugin.getWorldEventManager().getEventQueueMap().containsKey(queueKey))
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-already-exists",
+                    Placeholder.unparsed("queue-key", queueKey)));
+        if (eventKeys.isEmpty())
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-not-enough-events"));
+
+        Map<String, WorldEventSelfFactoryApi> eventSet = new HashMap<>();
+
+        plugin.getWorldEventManager().getEventQueueMap().values()
+                .forEach(queue -> eventKeys
+                        .forEach(eventKey -> {
+                            if (queue.getEventSet().containsKey(eventKey))
+                                eventSet.put(eventKey, queue.getEventSet().get(eventKey));
+        }));
+
+        plugin.getWorldEventManager().getEventQueueMap().put(queueKey, new TempWorldEventQueue(plugin.getWorldEventManager(),
+            new QueueData(
+                    queueKey,
+                    queueName,
+                    queueDescription,
+                    queueItem,
+                    eventKeys.size()
+            ), eventSet));
+        plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-created",
+                Placeholder.component("queue-name", queueName)));
     }
 
     private boolean validateQueueKey(String queueKey)
