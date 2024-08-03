@@ -9,6 +9,7 @@ import dev.jorel.commandapi.executors.CommandArguments;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.wyne.wutils.i18n.I18n;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Material;
@@ -57,20 +58,19 @@ public class WorldEventsCommand {
                                                                         .executes(this::executeEventCommand))
                                                         )))))
                 .then(new LiteralArgument("create")
-                        .withPermission("wevent.queuecreate")
+                        .withPermission("wevents.queuecreate")
                         .then(new StringArgument("queueKey")
-                                .replaceSuggestions(ArgumentSuggestions.strings("<your new queue key>"))
-                                .then(new StringArgument("queueName")
-                                        .replaceSuggestions(ArgumentSuggestions.strings("<queue name (optional)>")).setOptional(true))
-                                .then(new TextArgument("queueDescription")
-                                        .replaceSuggestions(ArgumentSuggestions.strings("<queue description (optional)>")).setOptional(true))
-                                .then(new ItemStackArgument("queueItem")
-                                        .replaceSuggestions(ArgumentSuggestions.strings("<queue item (optional)>")).setOptional(true))
-                                .then(new ListArgumentBuilder<String>("eventKeys")
-                                        .allowDuplicates(true)
-                                        .withList(this::getEventKeysList)
-                                        .withStringMapper().buildGreedy()
-                                        .executes(this::executeQueueCreateCommand))))
+                                .replaceSuggestions(ArgumentSuggestions.strings("<queue key>"))
+                                .then(new TextArgument("queueName")
+                                        .replaceSuggestions(ArgumentSuggestions.strings("<queue name>"))
+                                        .then(new TextArgument("queueDescription")
+                                                .replaceSuggestions(ArgumentSuggestions.strings("<queue description>"))
+                                                .then(new ItemStackArgument("queueItem")
+                                                        .then(new ListArgumentBuilder<String>("eventKeys")
+                                                                .allowDuplicates(true)
+                                                                .withList(this::getEventKeysList)
+                                                                .withStringMapper().buildGreedy()
+                                                                .executes(this::executeQueueCreateCommand)))))))
 
                 .register();
     }
@@ -234,12 +234,14 @@ public class WorldEventsCommand {
     private void executeQueueCreateCommand(CommandSender sender, CommandArguments args) throws WrapperCommandSyntaxException
     {
         String queueKey = args.getOrDefaultRaw("queueKey", "new-queue");
-        Component queueName = MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), args.getOrDefaultRaw("queueName", "<!i>New queue")));
-        List<Component> queueDescription = Arrays.stream(((String) args.getOrDefault("queueDescription", "")).split("(?i)<br\\s*/?>"))
-                .map(s -> MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), s)))
+        Component queueName = MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), args.getOrDefaultRaw("queueName", "<!i>New queue").replaceAll("\"", ""))).decoration(TextDecoration.ITALIC, false);
+        List<Component> queueDescription = args.getOrDefaultRaw("queueDescription", "").equalsIgnoreCase("") ?
+                new ArrayList<>() :
+                Arrays.stream(args.getOrDefaultRaw("queueDescription", "")
+                                .replaceAll("\"", "")
+                                .split("(?i)<br\\s*/?>"))
+                .map(s -> MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), s)).decoration(TextDecoration.ITALIC, false))
                 .toList();
-        if (queueDescription.get(0).children().isEmpty())
-            queueDescription = new ArrayList<>();
         Material queueItem = ((ItemStack) args.getOrDefault("queueItem", new ItemStack(Material.NETHER_STAR))).getType();
         List<String> eventKeys = (List<String>) args.getOrDefault("eventKeys", new ArrayList<String>());
 
