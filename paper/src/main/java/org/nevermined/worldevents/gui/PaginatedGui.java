@@ -4,17 +4,18 @@ import dev.triumphteam.gui.guis.GuiItem;
 import org.bukkit.entity.Player;
 import org.javatuples.Pair;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
+import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
 
 public abstract class PaginatedGui extends BaseGui<dev.triumphteam.gui.guis.PaginatedGui> {
 
     protected void buildNavigation(BaseGui previousGui, CommonGuiConfigApi config, Player player)
     {
-        Pair<Integer, GuiItem> navigationBack = config.getNavigationBack(event -> previousGui.openGui(player));
-        Pair<Integer, GuiItem> navigationPrevious = config.getNavigationPrevious(event -> gui.previous());
-        Pair<Integer, GuiItem> navigationNext = config.getNavigationNext(event -> gui.next());
-        gui.setItem(navigationBack.getValue0(), navigationBack.getValue1());
-        gui.setItem(navigationPrevious.getValue0(), navigationPrevious.getValue1());
-        gui.setItem(navigationNext.getValue0(), navigationNext.getValue1());
+        GuiItem navigationBack = config.getNavigationBack().applyPlaceholders(player).build(event -> previousGui.openGui(player));
+        GuiItem navigationPrevious = config.getNavigationPrevious().applyPlaceholders(player).build(event -> gui.previous());
+        GuiItem navigationNext = config.getNavigationNext().applyPlaceholders(player).build(event -> gui.next());
+        gui.setItem(config.getNavigationBack().getSlot(), navigationBack);
+        gui.setItem(config.getNavigationPrevious().getSlot(), navigationPrevious);
+        gui.setItem(config.getNavigationNext().getSlot(), navigationNext);
     }
 
 }

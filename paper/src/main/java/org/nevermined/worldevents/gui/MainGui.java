@@ -5,8 +5,8 @@ import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.wyne.wutils.i18n.I18n;
 import org.bukkit.entity.Player;
-import org.javatuples.Pair;
 import org.nevermined.worldevents.WorldEvents;
+import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
 
 public class MainGui extends BaseGui<Gui> {
 
@@ -23,10 +23,12 @@ public class MainGui extends BaseGui<Gui> {
 
     private void buildQueuesItem(WorldEvents plugin, Player player)
     {
-        Pair<Integer, GuiItem> queuesItem = plugin.getGlobalConfig().mainGuiConfig().getQueuesItem(event -> {
-            new QueuesGui(this, plugin.getGlobalConfig(), plugin.getWorldEventManager(), player).openGui(player);
-        });
-        gui.setItem(queuesItem.getValue0(), queuesItem.getValue1());
+        GuiItemConfigurableApi queuesConfig = plugin.getGlobalConfig().mainGuiConfig().getQueuesItem();
+        GuiItem queuesItem = queuesConfig
+                .applyPlaceholders(player)
+                .build(event ->
+                        new QueuesGui(this, plugin.getGlobalConfig(), plugin.getWorldEventManager(), player).openGui(player));
+        gui.setItem(queuesConfig.getSlot(), queuesItem);
     }
 
 }

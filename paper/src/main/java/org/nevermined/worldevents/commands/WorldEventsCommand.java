@@ -19,6 +19,8 @@ import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.QueueData;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
 import org.nevermined.worldevents.api.core.WorldEventSelfFactoryApi;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 import org.nevermined.worldevents.core.TempWorldEventQueue;
 import org.nevermined.worldevents.gui.MainGui;
 
@@ -160,18 +162,20 @@ public class WorldEventsCommand {
 
         switch (action) {
             case "start" -> {
-                if (!queue.isActive()) {
+                try {
                     queue.startNext();
-                    plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-activated", Placeholder.component("queue-name", queue.getQueueData().name())));
-                } else {
+                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-activated", Placeholder.component("queue-name", queue.getQueueData().name())));
+                } catch (AlreadyActiveException e)
+                {
                     throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-already-active", Placeholder.component("queue-name", queue.getQueueData().name())));
                 }
             }
             case "stop" -> {
-                if (queue.isActive()) {
+                try {
                     queue.stopCurrent();
-                    plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-deactivated", Placeholder.component("queue-name", queue.getQueueData().name())));
-                } else {
+                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-deactivated", Placeholder.component("queue-name", queue.getQueueData().name())));
+                } catch (AlreadyInactiveException e)
+                {
                     throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-already-inactive", Placeholder.component("queue-name", queue.getQueueData().name())));
                 }
             }
@@ -180,15 +184,15 @@ public class WorldEventsCommand {
                     Component eventName = queue.peekEvent().getEventData().name();
                     queue.stopCurrent();
                     queue.startNext();
-                    plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-skipped", Placeholder.component("event-name", eventName)));
+                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-skipped", Placeholder.component("event-name", eventName)));
                 } else {
                     Component eventName = queue.pollEvent().getEventData().name();
                     queue.startNext();
-                    plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-skipped", Placeholder.component("event-name", eventName)));
+                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-skipped", Placeholder.component("event-name", eventName)));
                 }
             }
             case "info" ->
-                    plugin.adventure().sender(sender).sendMessage(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), I18n.reduceString(I18n.global.getStringList(I18n.toLocale(sender), "info-queue")).replace("<queue-key>", queueKey))));
+                    WorldEvents.adventure().sender(sender).sendMessage(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), I18n.reduceString(I18n.global.getStringList(I18n.toLocale(sender), "info-queue")).replace("<queue-key>", queueKey))));
         }
     }
 
@@ -216,12 +220,12 @@ public class WorldEventsCommand {
         switch (eventAction) {
             case "swap" -> {
                 queue.replaceEvent(eventIndex, eventFactory.get().create());
-                plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender,"success-event-type-swapped",
+                WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender,"success-event-type-swapped",
                         Placeholder.unparsed("event-index", String.valueOf(eventIndex)),
                         Placeholder.component("event-name", eventFactory.get().getEventData().name())));
             }
             case "info" -> {
-                plugin.adventure().sender(sender).sendMessage(MiniMessage.miniMessage().deserialize(
+                WorldEvents.adventure().sender(sender).sendMessage(MiniMessage.miniMessage().deserialize(
                         PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), I18n.reduceString(I18n.global.getStringList(I18n.toLocale(sender), "info-event"))
                                 .replace("<event-key>", queue.getEventQueueAsList().get(eventIndex).getEventData().key())
                                 .replace("<queue-key>", queueKey)
@@ -268,7 +272,7 @@ public class WorldEventsCommand {
                     queueItem,
                     eventKeys.size()
             ), eventSet));
-        plugin.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-created",
+        WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-created",
                 Placeholder.component("queue-name", queueName)));
     }
 

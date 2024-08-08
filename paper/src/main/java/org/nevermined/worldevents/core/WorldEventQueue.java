@@ -6,6 +6,8 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.nevermined.worldevents.api.core.*;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -51,8 +53,11 @@ public class WorldEventQueue implements WorldEventQueueApi {
     }
 
     @Override
-    public void startNext()
+    public void startNext() throws AlreadyActiveException
     {
+        if (isActive)
+            throw new AlreadyActiveException("Queue " + queueData.key() + " is already active");
+
         WorldEventApi event = peekEvent();
         event.startEvent(this);
         isActive = true;
@@ -63,8 +68,11 @@ public class WorldEventQueue implements WorldEventQueueApi {
     }
 
     @Override
-    public void stopCurrent()
+    public void stopCurrent() throws AlreadyInactiveException
     {
+        if (!isActive)
+            throw new AlreadyInactiveException("Queue " + queueData.key() + " is already inactive");
+
         WorldEventApi event = pollEvent();
         event.stopEvent(this);
         isActive = false;

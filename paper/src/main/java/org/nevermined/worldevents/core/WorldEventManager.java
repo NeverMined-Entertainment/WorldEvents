@@ -9,6 +9,8 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.nevermined.worldevents.api.core.*;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,14 +32,31 @@ public class WorldEventManager implements WorldEventManagerApi {
     public void startEventQueues()
     {
         eventQueueMap.keySet()
+                .stream()
+                .filter(queueKey -> !eventQueueMap.get(queueKey).isActive())
                 .forEach(this::startEventQueue);
     }
 
     @Override
-    public void startEventQueue(String queueKey)
+    public void startEventQueue(String queueKey) throws AlreadyActiveException
     {
         eventQueueMap.get(queueKey)
                 .startNext();
+    }
+
+    @Override
+    public void stopEventQueues() {
+        eventQueueMap.keySet()
+                .stream()
+                .filter(queueKey -> eventQueueMap.get(queueKey).isActive())
+                .forEach(this::stopEventQueue);
+    }
+
+    @Override
+    public void stopEventQueue(String queueKey) throws AlreadyInactiveException
+    {
+        eventQueueMap.get(queueKey)
+                .stopCurrent();
     }
 
     @Override

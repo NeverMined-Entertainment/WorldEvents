@@ -6,6 +6,7 @@ import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.wyne.wutils.config.Config;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.i18n.language.validation.EmptyValidator;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
@@ -39,7 +40,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     private WorldEventManagerApi worldEventManager;
 
-    private BukkitAudiences adventure;
+    private static BukkitAudiences adventure;
 
     @Override
     protected void load() {
@@ -49,7 +50,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     @Override
     public void enable() {
         CommandAPI.onEnable();
-        this.adventure = BukkitAudiences.create(this);
+        adventure = BukkitAudiences.create(this);
 
         saveDefaultConfig();
         initializeLogger();
@@ -127,13 +128,14 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         I18n.global.loadLanguage("lang/ru.yml", this);
         I18n.global.loadDefaultPluginLanguage(this);
         I18n.global.setDefaultLanguage(I18n.getDefaultLanguageFile(this));
+        I18n.global.setStringValidator(new EmptyValidator());
     }
 
-    public BukkitAudiences adventure() {
-        if(this.adventure == null) {
+    public static BukkitAudiences adventure() {
+        if(adventure == null) {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
-        return this.adventure;
+        return adventure;
     }
 
     public GlobalConfigApi getGlobalConfig() {

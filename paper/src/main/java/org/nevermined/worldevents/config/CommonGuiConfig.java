@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.javatuples.Pair;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
+import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
 import org.nevermined.worldevents.config.configurables.GuiItemConfigurable;
 import org.nevermined.worldevents.config.configurables.MaterialConfigurable;
 
@@ -23,7 +24,7 @@ public class CommonGuiConfig implements CommonGuiConfigApi {
     private GuiItemConfigurable navigationPrevious = new GuiItemConfigurable(
             48,
             Material.PAPER,
-            "<!i>< Назад",
+            "common-gui-previous",
             new ArrayList<>(),
             null, null
     );
@@ -32,7 +33,7 @@ public class CommonGuiConfig implements CommonGuiConfigApi {
     private GuiItemConfigurable navigationNext = new GuiItemConfigurable(
             50,
             Material.PAPER,
-            "<!i>Вперед >",
+            "common-gui-next",
             new ArrayList<>(),
             null, null
     );
@@ -41,7 +42,7 @@ public class CommonGuiConfig implements CommonGuiConfigApi {
     private GuiItemConfigurable navigationBack = new GuiItemConfigurable(
             53,
             Material.RED_STAINED_GLASS_PANE,
-            "<!i><b><red>Назад",
+            "common-gui-back",
             new ArrayList<>(),
             null, null
     );
@@ -51,21 +52,21 @@ public class CommonGuiConfig implements CommonGuiConfigApi {
     }
 
     @Override
-    public Pair<Integer, GuiItem> getNavigationPrevious(GuiAction<InventoryClickEvent> action)
+    public GuiItemConfigurableApi getNavigationPrevious()
     {
-        return new Pair<>(navigationPrevious.getSlot(), navigationPrevious.build(action));
+        return navigationPrevious;
     }
 
     @Override
-    public Pair<Integer, GuiItem> getNavigationNext(GuiAction<InventoryClickEvent> action)
+    public GuiItemConfigurableApi getNavigationNext()
     {
-        return new Pair<>(navigationNext.getSlot(), navigationNext.build(action));
+        return navigationNext;
     }
 
     @Override
-    public Pair<Integer, GuiItem> getNavigationBack(GuiAction<InventoryClickEvent> action)
+    public GuiItemConfigurableApi getNavigationBack()
     {
-        return new Pair<>(navigationBack.getSlot(), navigationBack.build(action));
+        return navigationBack;
     }
 
 }
