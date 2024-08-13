@@ -11,9 +11,6 @@ import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.config.MainGuiConfigApi;
@@ -86,9 +83,9 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     @Override
     protected void disable() {
         CommandAPI.onDisable();
-        if(this.adventure != null) {
-            this.adventure.close();
-            this.adventure = null;
+        if(adventure != null) {
+            adventure.close();
+            adventure = null;
         }
     }
 
@@ -129,6 +126,13 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         I18n.global.loadDefaultPluginLanguage(this);
         I18n.global.setDefaultLanguage(I18n.getDefaultLanguageFile(this));
         I18n.global.setStringValidator(new EmptyValidator());
+    }
+
+    public void reload()
+    {
+        reloadConfig();
+        Config.global.reloadConfig(getConfig());
+        initializeI18n();
     }
 
     public static BukkitAudiences adventure() {

@@ -46,6 +46,12 @@ public class WorldEventsCommand {
                 })
                 .then(new LiteralArgument("queue")
                         .withPermission("wevents.queuecontrol")
+                        .then(new LiteralArgument("reload")
+                                .withPermission(CommandPermission.OP)
+                                .executes(((sender, args) -> {
+                                    plugin.getWorldEventManager().reloadEventQueues(plugin.getConfig());
+                                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queues-reloaded"));
+                                })))
                         .then(new StringArgument("queueKey")
                                 .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> plugin.getWorldEventManager().getEventQueueMap().keySet()))
                                 .then(new StringArgument("queueAction")
@@ -73,7 +79,12 @@ public class WorldEventsCommand {
                                                                 .withList(this::getEventKeysList)
                                                                 .withStringMapper().buildGreedy()
                                                                 .executes(this::executeQueueCreateCommand)))))))
-
+                .then(new LiteralArgument("reload")
+                        .withPermission(CommandPermission.OP)
+                        .executes(((sender, args) -> {
+                            plugin.reload();
+                            WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-plugin-reloaded"));
+                        })))
                 .register();
     }
 

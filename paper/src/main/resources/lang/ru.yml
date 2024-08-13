@@ -64,6 +64,8 @@ success-queue-deactivated: "<green>Очередь <queue-name> деактиви�
 success-queue-created: "<green>Очередь <queue-name> создана!"
 success-event-skipped: "<green>Ивент <event-name> пропущен!"
 success-event-type-swapped: "<green>Ивент <event-index> изменен на <event-name>!"
+success-plugin-reloaded: "<green>Плагин перезагружен!"
+success-queues-reloaded: "<green>Потоки перезагружены!"
 
 ## Errors
 error-queue-not-found: "<red>Очередь <queue-key> не существует!"
