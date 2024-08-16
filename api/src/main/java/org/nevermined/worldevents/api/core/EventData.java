@@ -5,5 +5,5 @@ import org.bukkit.Material;
 
 import java.util.List;
 
-public record EventData(Component name, List<Component> description, Material item, int chancePercent, long durationSeconds, long cooldownSeconds) {
+public record EventData(String key, Component name, List<Component> description, Material item, int chancePercent, long durationSeconds, long cooldownSeconds) {
 }

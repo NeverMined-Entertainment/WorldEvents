@@ -6,9 +6,12 @@ import org.nevermined.worldevents.api.core.EventData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 import org.nevermined.worldevents.api.events.WorldEventStop;
 import org.nevermined.worldevents.api.events.WorldEventStart;
 
+import javax.management.OperationsException;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -36,10 +39,10 @@ public class WorldEvent implements WorldEventApi {
     }
 
     @Override
-    public void startEvent(WorldEventQueueApi queue)
+    public void startEvent(WorldEventQueueApi queue) throws AlreadyActiveException
     {
         if (isActive)
-            return;
+            throw new AlreadyActiveException("Event " + eventData.key() + " is already active");
 
         WorldEventStart startEvent = new WorldEventStart(this, queue);
         startEvent.callEvent();
@@ -52,15 +55,17 @@ public class WorldEvent implements WorldEventApi {
     }
 
     @Override
-    public void stopEvent(WorldEventQueueApi queue)
+    public void stopEvent(WorldEventQueueApi queue) throws AlreadyInactiveException
     {
         if (!isActive)
-            return;
+            throw new AlreadyInactiveException("Event " + eventData.key() + " is already inactive");
 
         WorldEventStop stopEvent = new WorldEventStop(this, queue);
         stopEvent.callEvent();
         action.stopEvent(eventData);
         isActive = false;
+        if (stopPromise != null && !stopPromise.isClosed())
+            stopPromise.closeSilently();
     }
 
     @Override

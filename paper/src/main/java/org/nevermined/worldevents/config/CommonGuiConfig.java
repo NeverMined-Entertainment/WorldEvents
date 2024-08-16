@@ -7,65 +7,66 @@ import me.wyne.wutils.config.ConfigEntry;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.javatuples.Pair;
-import org.nevermined.worldevents.api.config.QueuesGuiConfigApi;
+import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
+import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
 import org.nevermined.worldevents.config.configurables.GuiItemConfigurable;
 import org.nevermined.worldevents.config.configurables.MaterialConfigurable;
 
 import java.util.ArrayList;
 
 @Singleton
-public class QueuesGuiConfig implements QueuesGuiConfigApi {
+public class CommonGuiConfig implements CommonGuiConfigApi {
 
-    @ConfigEntry(section = "GUI.Queues Gui", path = "queues-gui-border")
+    @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-border")
     private MaterialConfigurable border = new MaterialConfigurable(Material.CYAN_STAINED_GLASS_PANE);
 
-    @ConfigEntry(section = "GUI.Queues Gui", path = "queues-gui-previous")
+    @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-previous")
     private GuiItemConfigurable navigationPrevious = new GuiItemConfigurable(
             48,
             Material.PAPER,
-            "<!i>< Назад",
+            "common-gui-previous",
             new ArrayList<>(),
             null, null
     );
 
-    @ConfigEntry(section = "GUI.Queues Gui", path = "queues-gui-next")
+    @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-next")
     private GuiItemConfigurable navigationNext = new GuiItemConfigurable(
             50,
             Material.PAPER,
-            "<!i>Вперед >",
+            "common-gui-next",
             new ArrayList<>(),
             null, null
     );
 
-    @ConfigEntry(section = "GUI.Queues Gui", path = "queues-gui-back")
+    @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-back")
     private GuiItemConfigurable navigationBack = new GuiItemConfigurable(
             53,
             Material.RED_STAINED_GLASS_PANE,
-            "<!i><b><red>Назад",
+            "common-gui-back",
             new ArrayList<>(),
             null, null
     );
 
-    @Override
     public Material getBorder() {
         return border.getMaterial();
     }
 
     @Override
-    public Pair<Integer, GuiItem> getNavigationPrevious(GuiAction<InventoryClickEvent> action)
+    public GuiItemConfigurableApi getNavigationPrevious()
     {
-        return new Pair<>(navigationPrevious.getSlot(), navigationPrevious.build(action));
+        return navigationPrevious;
     }
 
     @Override
-    public Pair<Integer, GuiItem> getNavigationNext(GuiAction<InventoryClickEvent> action)
+    public GuiItemConfigurableApi getNavigationNext()
     {
-        return new Pair<>(navigationNext.getSlot(), navigationNext.build(action));
+        return navigationNext;
     }
 
     @Override
-    public Pair<Integer, GuiItem> getNavigationBack(GuiAction<InventoryClickEvent> action)
+    public GuiItemConfigurableApi getNavigationBack()
     {
-        return new Pair<>(navigationBack.getSlot(), navigationBack.build(action));
+        return navigationBack;
     }
+
 }

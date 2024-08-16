@@ -6,22 +6,26 @@ import dev.triumphteam.gui.guis.GuiItem;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.wyne.wutils.config.ConfigEntry;
 import me.wyne.wutils.config.Configurable;
+import me.wyne.wutils.i18n.I18n;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.Nullable;
+import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-public class GuiItemConfigurable implements Configurable {
+public class GuiItemConfigurable implements Configurable, GuiItemConfigurableApi {
 
     private int slot;
     private Material material;
@@ -85,21 +89,23 @@ public class GuiItemConfigurable implements Configurable {
         if (configurationSection.contains("sound")) sound = Sound.sound(Key.key(configurationSection.getString("sound")), Sound.Source.MASTER, 1f, 1f);
     }
 
+    @Override
     public GuiItemConfigurable applyPlaceholders(Player player)
     {
-        String newName = PlaceholderAPI.setPlaceholders(player, name);
+        String newName = I18n.global.getPlaceholderString(player.locale(), player, name);
         List<String> newLore =
-                new ArrayList<>(lore.stream().map(s -> PlaceholderAPI.setPlaceholders(player, s)).toList());
+                new ArrayList<>(lore.stream().map(s -> I18n.global.getPlaceholderString(player.locale(), player, s)).toList());
         String newPrint = print;
-        if (print != null) newPrint = PlaceholderAPI.setPlaceholders(player, print);
+        if (print != null) newPrint = I18n.global.getPlaceholderString(player.locale(), player, print);
         return new GuiItemConfigurable(slot, material, newName, newLore, newPrint, sound);
     }
 
-    public GuiItemConfigurable applyTagResolvers(TagResolver... tagResolvers)
-    {
-        return new GuiItemConfigurable(slot, material, name, lore, print, sound, Arrays.stream(tagResolvers).toList());
+    @Override
+    public GuiItemConfigurableApi applyReplacements(Map<String, Component> replacements) {
+        return new GuiItemConfigurable(slot, material, name, lore, print, sound, replacements.keySet().stream().map(key -> (TagResolver)Placeholder.component(key, replacements.get(key))).toList());
     }
 
+    @Override
     public GuiItem build()
     {
         return ItemBuilder.from(material).name(getName()).lore(getLore())
@@ -111,6 +117,7 @@ public class GuiItemConfigurable implements Configurable {
                 });
     }
 
+    @Override
     public GuiItem build(GuiAction<InventoryClickEvent> action)
     {
         return ItemBuilder.from(material).name(getName()).lore(getLore())
@@ -123,6 +130,7 @@ public class GuiItemConfigurable implements Configurable {
                 });
     }
 
+    @Override
     public int getSlot() {
         return slot;
     }
@@ -131,25 +139,29 @@ public class GuiItemConfigurable implements Configurable {
         return material;
     }
 
+    @Override
     public Component getName() {
         return MiniMessage.miniMessage().deserialize(name, tagResolvers.toArray(new TagResolver[0]));
     }
 
+    @Override
     public List<Component> getLore() {
         return new ArrayList<>(lore.stream()
-                .map(component -> MiniMessage.miniMessage().deserialize(component, tagResolvers.toArray(new TagResolver[0])))
+                .map(component -> MiniMessage.miniMessage().deserialize(component, tagResolvers.toArray(TagResolver[]::new)))
                 .toList());
     }
 
+    @Override
+    @Nullable
     public Component getPrint() {
         if (print == null)
             return null;
-        return MiniMessage.miniMessage().deserialize(print, tagResolvers.toArray(new TagResolver[0]));
+        return MiniMessage.miniMessage().deserialize(print, tagResolvers.toArray(TagResolver[]::new));
     }
 
+    @Override
+    @Nullable
     public Sound getSound() {
-        if (sound == null)
-            return null;
         return sound;
     }
 

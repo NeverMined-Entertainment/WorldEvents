@@ -1,11 +1,76 @@
 ### Format
-event-expire-format: "%2dч:%2dм:%2dс"
+
+## Event
+event-expire-time-format: "dd.MM.yyyy HHч:mmм:ssс"
+event-chance-format: "<!i>Шанс: %worldevents_event_<queue-key>_<event-index>_chance%"
+event-duration-format: "<!i>Продолжительность: %worldevents_event_<queue-key>_<event-index>_duration%"
+event-cooldown-format: "<!i>Задержка: %worldevents_event_<queue-key>_<event-index>_cooldown%"
+event-expire-format: "<!i>Окончание: %worldevents_event_<queue-key>_<event-index>_expire%"
+event-active-format: "<!i>Активен: %worldevents_event_<queue-key>_<event-index>_active%"
+
+## Queue
 queue-capacity-format: "<!i>Вместительность: %worldevents_queue_<queue-key>_capacity%"
+queue-active-format: "<!i>Активен: %worldevents_queue_<queue-key>_active%"
 
 ### GUI
 
+## Common Gui
+common-gui-previous: "<!i>< Назад"
+common-gui-next: "<!i>Вперед >"
+common-gui-back: "<!i><b><red>Назад"
+
 ## Main Gui
 main-gui-header: "Ивенты"
+main-gui-queues: "<!i>Очереди ивентов"
 
 ## Queues Gui
 queues-gui-header: "Очереди ивентов"
+
+## Queue Gui
+queue-gui-header: "Очередь %worldevents_queue_<queue-key>_name%"
+queue-gui-activate: "<!i><b><green>Запустить"
+queue-gui-deactivate: "<!i><b><red>Остановить"
+event-lore-order:
+  - "event-chance-format"
+  - "event-duration-format"
+  - "event-cooldown-format"
+  - "event-expire-format"
+  - "event-active-format"
+
+
+### Messages
+
+## Info
+info-queue:
+  - "Ключ: <queue-key>"
+  - "Название: %worldevents_queue_<queue-key>_name%"
+  - "Описание: %worldevents_queue_<queue-key>_description%"
+  - "Вместительность: %worldevents_queue_<queue-key>_capacity%"
+  - "Активен: %worldevents_queue_<queue-key>_active%"
+
+info-event:
+  - "Ключ: <event-key>"
+  - "Название: %worldevents_event_<queue-key>_<event-index>_name%"
+  - "Описание: %worldevents_event_<queue-key>_<event-index>_description%"
+  - "Шанс: %worldevents_event_<queue-key>_<event-index>_chance%"
+  - "Продолжительность: %worldevents_event_<queue-key>_<event-index>_duration%"
+  - "Задержка: %worldevents_event_<queue-key>_<event-index>_cooldown%"
+  - "Окончание: %worldevents_event_<queue-key>_<event-index>_expire%"
+  - "Активен: %worldevents_event_<queue-key>_<event-index>_active%"
+
+## Success
+success-queue-activated: "<green>Очередь <queue-name> активирована!"
+success-queue-deactivated: "<green>Очередь <queue-name> деактивирована!"
+success-queue-created: "<green>Очередь <queue-name> создана!"
+success-event-skipped: "<green>Ивент <event-name> пропущен!"
+success-event-type-swapped: "<green>Ивент <event-index> изменен на <event-name>!"
+
+## Errors
+error-queue-not-found: "<red>Очередь <queue-key> не существует!"
+error-queue-already-active: "<red>Очередь <queue-name> уже активна!"
+error-queue-already-inactive: "<red>Очередь <queue-name> уже отключена!"
+error-queue-already-exists: "<red>Очередь <queue-key> уже существует!"
+error-queue-not-enough-events: "<red>Недостаточно ивентов для создания потока!"
+error-event-not-found: "<red>Ивент с индексом <event-index> не существует!"
+error-event-key-not-found: "<red>Ивент <event-key> не существует!"
+error-event-active-swap: "<red>Активный ивент невозможно изменить!"

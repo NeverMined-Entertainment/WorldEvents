@@ -2,8 +2,12 @@ name: WorldEvents
 version: '${version}'
 main: org.nevermined.worldevents.WorldEvents
 api-version: '1.16'
-depend: [ CommandAPI ]
 softdepend: [ PlaceholderAPI ]
-authors: [ Wyne ]
+author: Wyne
 description: Manages gameplay events
 website: https://github.com/NeverMined-Entertainment/WorldEvents
+permissions:
+  wevents.queuecontrol:
+    description: 'Allows to start/stop event queues'
+  wevents.queuecreate:
+    description: 'Allows to create independent temporary queues'

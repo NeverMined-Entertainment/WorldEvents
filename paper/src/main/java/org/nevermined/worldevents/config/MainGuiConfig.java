@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.javatuples.Pair;
 import org.nevermined.worldevents.api.config.MainGuiConfigApi;
+import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
 import org.nevermined.worldevents.config.configurables.GuiItemConfigurable;
 import org.nevermined.worldevents.config.configurables.MaterialConfigurable;
 
@@ -23,7 +24,7 @@ public class MainGuiConfig implements MainGuiConfigApi {
     private GuiItemConfigurable queuesItem = new GuiItemConfigurable(
             4,
             Material.CHEST,
-            "<!i>Очереди ивентов",
+            "main-gui-queues",
             new ArrayList<>(),
             null, null
     );
@@ -34,7 +35,7 @@ public class MainGuiConfig implements MainGuiConfigApi {
     }
 
     @Override
-    public Pair<Integer, GuiItem> getQueuesItem(GuiAction<InventoryClickEvent> action) {
-        return new Pair<>(queuesItem.getSlot(), queuesItem.build(action));
+    public GuiItemConfigurableApi getQueuesItem() {
+        return queuesItem;
     }
 }
