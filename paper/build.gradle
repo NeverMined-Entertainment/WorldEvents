@@ -33,6 +33,8 @@ dependencies {
 shadowJar {
     archiveBaseName.set("WorldEvents")
     archiveClassifier.set("")
+    def outputDir = project.hasProperty('shadowJarOutputDir') ? project.shadowJarOutputDir : "${buildDir}/libs"
+    destinationDirectory = file(outputDir)
     minimize()
     relocate "org.javatuples", "org.nevermined.worldevents.shadow.javatuples"
     relocate "me.lucko.helper", "org.nevermined.worldevents.shadow.lucko.helper"

@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.nevermined.worldevents.WorldEvents;
+import org.nevermined.worldevents.api.WorldEventsApi;
 
 public class PluginModule extends AbstractModule {
 
@@ -20,6 +21,8 @@ public class PluginModule extends AbstractModule {
                 .toInstance(plugin);
         bind(WorldEvents.class)
                 .toInstance(plugin);
+        bind(WorldEventsApi.class)
+                .toInstance(new org.nevermined.worldevents.WorldEventsApi(plugin));
         bind(FileConfiguration.class)
                 .toInstance(plugin.getConfig());
     }

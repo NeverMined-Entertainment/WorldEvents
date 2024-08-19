@@ -3,12 +3,12 @@ package org.nevermined.worldevents.core;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.wyne.wutils.log.Log;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
@@ -22,15 +22,6 @@ import java.util.Map;
 public class WorldEventManager implements WorldEventManagerApi {
 
     private final Map<String, WorldEventQueueApi> eventQueueMap = new HashMap<>();
-
-    private final Map<String, WorldEventAction> actionTypeMap;
-
-    @Inject
-    public WorldEventManager(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap)
-    {
-        this.actionTypeMap = actionTypeMap;
-        loadEventQueues(config, actionTypeMap);
-    }
 
     @Override
     public void startEventQueues()
@@ -106,9 +97,10 @@ public class WorldEventManager implements WorldEventManagerApi {
         }
     }
 
-    @Override
-    public void reloadEventQueues(FileConfiguration config) {
+    @Inject
+    private void reloadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap) {
         stopEventQueues();
+        actionTypeMap.keySet().forEach(s -> Log.global.warn("Reload: " + s));
         loadEventQueues(config, actionTypeMap);
     }
 }
