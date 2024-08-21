@@ -52,6 +52,7 @@ public class Placeholders extends PlaceholderExpansion {
         createEventActiveParser();
         createQueueActiveParser();
         createQueueCapacityParser();
+        register();
     }
 
     @Override

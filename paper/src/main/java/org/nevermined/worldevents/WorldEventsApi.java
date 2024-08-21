@@ -2,6 +2,7 @@ package org.nevermined.worldevents;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventAction;
@@ -19,6 +20,7 @@ public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEvent
     {
         this.plugin = plugin;
         this.expansionRegistry = expansionRegistry;
+        plugin.getServer().getServicesManager().register(org.nevermined.worldevents.api.WorldEventsApi.class, this, plugin, ServicePriority.Normal);
     }
 
     @Override

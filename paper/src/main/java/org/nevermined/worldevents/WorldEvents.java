@@ -10,8 +10,6 @@ import me.wyne.wutils.i18n.language.validation.EmptyValidator;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
-import org.bukkit.plugin.ServicePriority;
-import org.nevermined.worldevents.api.WorldEventsApi;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.config.MainGuiConfigApi;
@@ -23,7 +21,6 @@ import org.nevermined.worldevents.core.WorldEventManager;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
 import org.nevermined.worldevents.expansions.ExpansionLoader;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;
-import org.nevermined.worldevents.hooks.Placeholders;
 import org.nevermined.worldevents.hooks.modules.HooksModule;
 import org.nevermined.worldevents.modules.PluginModule;
 
@@ -74,8 +71,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         initializeConfig();
 
         try {
-            injector.getInstance(Placeholders.class).register();
-            getServer().getServicesManager().register(WorldEventsApi.class, injector.getInstance(WorldEventsApi.class), this, ServicePriority.Normal);
             worldEventManager = injector.getInstance(WorldEventManagerApi.class);
             injector.getInstance(ExpansionLoader.class).loadExpansions(new File(getDataFolder(), "expansions"));
         } catch (ConfigurationException | ProvisionException e)
