@@ -6,21 +6,29 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
+import org.nevermined.worldevents.expansions.ExpansionRegistry;
 
 @Singleton
 public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEventsApi {
 
     private final WorldEvents plugin;
+    private final ExpansionRegistry expansionRegistry;
 
     @Inject
-    public WorldEventsApi(WorldEvents plugin)
+    public WorldEventsApi(WorldEvents plugin, ExpansionRegistry expansionRegistry)
     {
         this.plugin = plugin;
+        this.expansionRegistry = expansionRegistry;
     }
 
     @Override
     public void registerWorldEventAction(String key, WorldEventAction action) {
-        plugin.getExpansionRegistry().registerExpansion(key, action);
+        expansionRegistry.registerExpansion(key, action);
+    }
+
+    @Override
+    public void unregisterWorldEventAction(String key) {
+        expansionRegistry.unregisterExpansion(key);
     }
 
     @Override

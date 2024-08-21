@@ -26,9 +26,43 @@ public class ExpansionRegistry {
 
     public void registerExpansion(String key, WorldEventAction action)
     {
+        if (registeredExpansions.containsKey(key))
+        {
+            Log.global.error("Can not register expansion '" + key + "' because expansion with this key already exists!");
+            return;
+        }
+
         registeredExpansions.put(key, action);
         plugin.reloadEventQueues();
-        Log.global.info("Registered WorldEvent expansion " + key);
+        Log.global.info("Registered expansion '" + key + "'");
+    }
+
+    public void registerExpansions(Map<String, WorldEventAction> expansions)
+    {
+        expansions.forEach((key, action) -> {
+            if (registeredExpansions.containsKey(key))
+            {
+                Log.global.error("Can not register expansion '" + key + "' because expansion with this key already exists!");
+                return;
+            }
+
+            registeredExpansions.put(key, action);
+            Log.global.info("Registered expansion '" + key + "'");
+        });
+        plugin.reloadEventQueues();
+    }
+
+    public void unregisterExpansion(String key)
+    {
+        if (!registeredExpansions.containsKey(key))
+        {
+            Log.global.warn("Can not unregister expansion '" + key + "' because it wasn't registered!");
+            return;
+        }
+
+        registeredExpansions.remove(key);
+        plugin.reloadEventQueues();
+        Log.global.info("Unregistered expansion '" + key + "'");
     }
 
     public Map<String, WorldEventAction> getRegisteredExpansions() {

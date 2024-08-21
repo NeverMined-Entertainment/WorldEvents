@@ -22,7 +22,7 @@ public class PluginModule extends AbstractModule {
         bind(WorldEvents.class)
                 .toInstance(plugin);
         bind(WorldEventsApi.class)
-                .toInstance(new org.nevermined.worldevents.WorldEventsApi(plugin));
+                .to(org.nevermined.worldevents.WorldEventsApi.class);
         bind(FileConfiguration.class)
                 .toInstance(plugin.getConfig());
     }

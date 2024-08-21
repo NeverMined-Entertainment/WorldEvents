@@ -7,6 +7,7 @@ import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 
 public interface WorldEventsApi {
     void registerWorldEventAction(String key, WorldEventAction action);
+    void unregisterWorldEventAction(String key);
 
     JavaPlugin getPlugin();
     WorldEventManagerApi getWorldEventManager();

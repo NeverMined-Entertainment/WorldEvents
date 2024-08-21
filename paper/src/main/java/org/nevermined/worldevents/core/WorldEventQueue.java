@@ -2,6 +2,7 @@ package org.nevermined.worldevents.core;
 
 import me.lucko.helper.promise.Promise;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.log.Log;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.nevermined.worldevents.api.core.*;
@@ -138,6 +139,10 @@ public class WorldEventQueue implements WorldEventQueueApi {
         {
             if (RESERVED_CONFIG_NAMES.stream().anyMatch(reserved -> reserved.equalsIgnoreCase(eventKey)))
                 continue;
+            if (!actionTypeMap.containsKey(queueSection.getConfigurationSection(eventKey).getString("type"))) {
+                Log.global.warn("Loading event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "' that wasn't registered yet.");
+                Log.global.warn("It still may be registered by other plugins using WorldEvents api.");
+            }
             
             ConfigurationSection eventSection = queueSection.getConfigurationSection(eventKey);
             EventData eventData = new EventData(

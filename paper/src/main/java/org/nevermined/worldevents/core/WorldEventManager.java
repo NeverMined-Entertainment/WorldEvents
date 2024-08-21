@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
+import org.nevermined.worldevents.expansions.ExpansionRegistry;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +21,13 @@ import java.util.Map;
 public class WorldEventManager implements WorldEventManagerApi {
 
     private final Map<String, WorldEventQueueApi> eventQueueMap = new HashMap<>();
+
+    private final ExpansionRegistry expansionRegistry;
+
+    @Inject
+    public WorldEventManager(ExpansionRegistry expansionRegistry) {
+        this.expansionRegistry = expansionRegistry;
+    }
 
     @Override
     public void startEventQueues()
@@ -92,9 +100,8 @@ public class WorldEventManager implements WorldEventManagerApi {
         }
     }
 
-    @Inject
-    private void reloadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap) {
+    public void reloadEventQueues(FileConfiguration config) {
         stopEventQueues();
-        loadEventQueues(config, actionTypeMap);
+        loadEventQueues(config, expansionRegistry.getRegisteredExpansions());
     }
 }
