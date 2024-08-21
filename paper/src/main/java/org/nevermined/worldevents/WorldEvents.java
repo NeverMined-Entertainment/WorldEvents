@@ -23,6 +23,7 @@ import org.nevermined.worldevents.commands.modules.CommandModule;
 import org.nevermined.worldevents.config.modules.ConfigModule;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
 import org.nevermined.worldevents.expansions.DemoExpansion;
+import org.nevermined.worldevents.expansions.ExpansionRegistry;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;
 import org.nevermined.worldevents.hooks.Placeholders;
 import org.nevermined.worldevents.hooks.modules.HooksModule;
@@ -37,10 +38,6 @@ import java.util.concurrent.Executors;
 public final class WorldEvents extends ExtendedJavaPlugin {
 
     private Injector injector;
-    private final Map<String, WorldEventAction> registeredExpansions = new HashMap<>()
-    {
-        { put("Demo", new DemoExpansion()); }
-    };
 
     private GlobalConfigApi globalConfig;
 
@@ -89,12 +86,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     @Override
     protected void disable() {
         CommandAPI.onDisable();
-    }
-
-    public void registerEventTypeExpansion(String key, WorldEventAction action)
-    {
-        registeredExpansions.put(key, action);
-        reloadEventQueues();
     }
 
     private void initializeLogger()
@@ -156,7 +147,8 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         return worldEventManager;
     }
 
-    public Map<String, WorldEventAction> getRegisteredExpansions() {
-        return registeredExpansions;
+    public ExpansionRegistry getExpansionRegistry()
+    {
+        return injector.getInstance(ExpansionRegistry.class);
     }
 }
