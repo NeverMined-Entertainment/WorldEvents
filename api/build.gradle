@@ -1,14 +1,15 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
 }
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
 
-    implementation "org.javatuples:javatuples:1.2"
-    implementation "me.lucko:helper:5.6.14"
-    implementation "dev.triumphteam:triumph-gui:3.1.10"
+    api "me.lucko:helper:5.6.14"
+    api("dev.triumphteam:triumph-gui:3.1.10") {
+        exclude group: "net.kyori"
+    }
 }
 
 def targetJavaVersion = 16

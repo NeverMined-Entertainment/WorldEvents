@@ -2,9 +2,8 @@ package org.nevermined.worldevents.core;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import me.clip.placeholderapi.PlaceholderAPI;
+import me.wyne.wutils.i18n.I18n;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,12 +20,6 @@ import java.util.Map;
 public class WorldEventManager implements WorldEventManagerApi {
 
     private final Map<String, WorldEventQueueApi> eventQueueMap = new HashMap<>();
-
-    @Inject
-    public WorldEventManager(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap)
-    {
-        loadEventQueues(config, actionTypeMap);
-    }
 
     @Override
     public void startEventQueues()
@@ -76,20 +69,17 @@ public class WorldEventManager implements WorldEventManagerApi {
 
     private void loadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap)
     {
-        MiniMessage miniMessage = MiniMessage.miniMessage();
-
         for (String queueKey : config.getConfigurationSection("events").getKeys(false))
         {
             ConfigurationSection queueSection = config.getConfigurationSection("events." + queueKey);
             eventQueueMap.put(queueKey, new WorldEventQueue(new QueueData(
                     queueKey,
                     queueSection.contains("name")
-                            ? miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, queueSection.getString("name")))
+                            ? I18n.global.getLegacyPlaceholderComponent(null, null, queueSection.getString("name"))
                             : Component.text(queueKey),
                     queueSection.contains("description")
                             ? queueSection.getStringList("description").stream()
-                            .map(s -> PlaceholderAPI.setPlaceholders(null, s))
-                            .map(miniMessage::deserialize)
+                            .map(s -> I18n.global.getLegacyPlaceholderComponent(null, null, s))
                             .toList()
                             : Collections.unmodifiableList(new ArrayList<>()),
                     queueSection.contains("item")
@@ -102,4 +92,9 @@ public class WorldEventManager implements WorldEventManagerApi {
         }
     }
 
+    @Inject
+    private void reloadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap) {
+        stopEventQueues();
+        loadEventQueues(config, actionTypeMap);
+    }
 }

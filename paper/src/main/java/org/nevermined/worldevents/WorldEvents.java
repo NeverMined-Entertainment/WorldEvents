@@ -10,37 +10,41 @@ import me.wyne.wutils.i18n.language.validation.EmptyValidator;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
+import org.bukkit.plugin.ServicePriority;
+import org.nevermined.worldevents.api.WorldEventsApi;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.config.MainGuiConfigApi;
 import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
+import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.commands.WorldEventsCommand;
 import org.nevermined.worldevents.commands.modules.CommandModule;
 import org.nevermined.worldevents.config.modules.ConfigModule;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
+import org.nevermined.worldevents.expansions.DemoExpansion;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;
 import org.nevermined.worldevents.hooks.Placeholders;
 import org.nevermined.worldevents.hooks.modules.HooksModule;
 import org.nevermined.worldevents.modules.PluginModule;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 @Singleton
 public final class WorldEvents extends ExtendedJavaPlugin {
 
     private Injector injector;
+    private final Map<String, WorldEventAction> registeredExpansions = new HashMap<>()
+    {
+        { put("Demo", new DemoExpansion()); }
+    };
 
     private GlobalConfigApi globalConfig;
 
     private WorldEventManagerApi worldEventManager;
-
-    private static BukkitAudiences adventure;
 
     @Override
     protected void load() {
@@ -50,7 +54,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     @Override
     public void enable() {
         CommandAPI.onEnable();
-        adventure = BukkitAudiences.create(this);
 
         saveDefaultConfig();
         initializeLogger();
@@ -74,8 +77,8 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
         try {
             injector.getInstance(Placeholders.class).register();
+            getServer().getServicesManager().register(WorldEventsApi.class, injector.getInstance(WorldEventsApi.class), this, ServicePriority.Normal);
             worldEventManager = injector.getInstance(WorldEventManagerApi.class);
-            worldEventManager.startEventQueue("demo-queue-1");
             injector.getInstance(WorldEventsCommand.class);
         } catch (ConfigurationException | ProvisionException e)
         {
@@ -86,10 +89,12 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     @Override
     protected void disable() {
         CommandAPI.onDisable();
-        if(this.adventure != null) {
-            this.adventure.close();
-            this.adventure = null;
-        }
+    }
+
+    public void registerEventTypeExpansion(String key, WorldEventAction action)
+    {
+        registeredExpansions.put(key, action);
+        reloadEventQueues();
     }
 
     private void initializeLogger()
@@ -131,11 +136,16 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         I18n.global.setStringValidator(new EmptyValidator());
     }
 
-    public static BukkitAudiences adventure() {
-        if(adventure == null) {
-            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
-        }
-        return adventure;
+    public void reload()
+    {
+        reloadConfig();
+        Config.global.reloadConfig(getConfig());
+        initializeI18n();
+    }
+
+    public void reloadEventQueues()
+    {
+        injector.injectMembers(worldEventManager);
     }
 
     public GlobalConfigApi getGlobalConfig() {
@@ -144,5 +154,9 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     public WorldEventManagerApi getWorldEventManager() {
         return worldEventManager;
+    }
+
+    public Map<String, WorldEventAction> getRegisteredExpansions() {
+        return registeredExpansions;
     }
 }

@@ -2,10 +2,9 @@ package org.nevermined.worldevents.gui;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.i18n.language.replacement.Placeholder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
@@ -19,7 +18,7 @@ public class QueuesGui extends org.nevermined.worldevents.gui.PaginatedGui {
     public QueuesGui(MainGui mainGui, GlobalConfigApi config, WorldEventManagerApi eventManager, Player player)
     {
         gui = Gui.paginated()
-                .title(I18n.global.getPlaceholderComponent(player.locale(), player, "queues-gui-header"))
+                .title(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queues-gui-header"))
                 .rows(6)
                 .disableAllInteractions()
                 .create();
@@ -35,8 +34,8 @@ public class QueuesGui extends org.nevermined.worldevents.gui.PaginatedGui {
             WorldEventQueueApi queue = eventManager.getEventQueueMap().get(queueKey);
 
             List<Component> lore = new ArrayList<>(queue.getQueueData().description());
-            lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "queue-capacity-format").replace("<queue-key>", queueKey))));
-            lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "queue-active-format").replace("<queue-key>", queueKey))));
+            lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-capacity-format", Placeholder.replace("queue-key", queueKey)));
+            lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-active-format", Placeholder.replace("queue-key", queueKey)));
 
             gui.addItem(ItemBuilder.from(queue.getQueueData().item())
                     .name(queue.getQueueData().name())

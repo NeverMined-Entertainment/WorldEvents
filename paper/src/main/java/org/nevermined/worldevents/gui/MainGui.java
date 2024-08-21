@@ -13,7 +13,7 @@ public class MainGui extends BaseGui<Gui> {
     public MainGui(WorldEvents plugin, Player player)
     {
         gui = Gui.gui()
-                .title(I18n.global.getPlaceholderComponent(player.locale(), player, "main-gui-header"))
+                .title(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "main-gui-header"))
                 .rows(1)
                 .disableAllInteractions()
                 .create();

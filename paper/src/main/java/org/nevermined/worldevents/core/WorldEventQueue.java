@@ -1,8 +1,7 @@
 package org.nevermined.worldevents.core;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucko.helper.promise.Promise;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import me.wyne.wutils.i18n.I18n;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.nevermined.worldevents.api.core.*;
@@ -135,8 +134,6 @@ public class WorldEventQueue implements WorldEventQueueApi {
 
     private void loadEventSet(ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
     {
-        MiniMessage miniMessage = MiniMessage.miniMessage();
-
         for (String eventKey : queueSection.getKeys(false))
         {
             if (RESERVED_CONFIG_NAMES.stream().anyMatch(reserved -> reserved.equalsIgnoreCase(eventKey)))
@@ -145,11 +142,10 @@ public class WorldEventQueue implements WorldEventQueueApi {
             ConfigurationSection eventSection = queueSection.getConfigurationSection(eventKey);
             EventData eventData = new EventData(
                     eventKey,
-                    miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, eventSection.getString("name"))),
+                    I18n.global.getLegacyPlaceholderComponent(null, null, eventSection.getString("name")),
                     eventSection.contains("description")
                             ? eventSection.getStringList("description").stream()
-                            .map(s -> PlaceholderAPI.setPlaceholders(null, s))
-                            .map(miniMessage::deserialize)
+                            .map(s -> I18n.global.getLegacyPlaceholderComponent(null, null, s))
                             .toList()
                             : Collections.unmodifiableList(new ArrayList<>()),
                     eventSection.contains("item")
