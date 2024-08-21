@@ -33,7 +33,7 @@ public class ExpansionRegistry {
         }
 
         registeredExpansions.put(key, action);
-        plugin.reloadEventQueues();
+        plugin.getWorldEventManager().reloadEventQueues();
         Log.global.info("Registered expansion '" + key + "'");
     }
 
@@ -49,7 +49,7 @@ public class ExpansionRegistry {
             registeredExpansions.put(key, action);
             Log.global.info("Registered expansion '" + key + "'");
         });
-        plugin.reloadEventQueues();
+        plugin.getWorldEventManager().reloadEventQueues();
     }
 
     public void unregisterExpansion(String key)
@@ -61,7 +61,7 @@ public class ExpansionRegistry {
         }
 
         registeredExpansions.remove(key);
-        plugin.reloadEventQueues();
+        plugin.getWorldEventManager().reloadEventQueues();
         Log.global.info("Unregistered expansion '" + key + "'");
     }
 

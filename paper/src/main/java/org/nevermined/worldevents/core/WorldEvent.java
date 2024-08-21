@@ -11,7 +11,6 @@ import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 import org.nevermined.worldevents.api.events.WorldEventStop;
 import org.nevermined.worldevents.api.events.WorldEventStart;
 
-import javax.management.OperationsException;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;

@@ -24,8 +24,6 @@ public class ExpansionLoader {
     private final WorldEventsApi api;
     private final ExpansionRegistry expansionRegistry;
 
-    private final Set<WorldEventExpansion> loadedExpansions = new HashSet<>();
-
     @Inject
     public ExpansionLoader(WorldEventsApi api, ExpansionRegistry expansionRegistry)
     {
@@ -57,7 +55,6 @@ public class ExpansionLoader {
                     continue;
                 }
 
-                loadedExpansions.add(expansion);
                 newExpansions.put(expansion.getKey(), expansion.getAction());
             }
         }

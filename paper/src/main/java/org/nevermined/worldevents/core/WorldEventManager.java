@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
@@ -22,10 +23,12 @@ public class WorldEventManager implements WorldEventManagerApi {
 
     private final Map<String, WorldEventQueueApi> eventQueueMap = new HashMap<>();
 
+    private final WorldEvents plugin;
     private final ExpansionRegistry expansionRegistry;
 
     @Inject
-    public WorldEventManager(ExpansionRegistry expansionRegistry) {
+    public WorldEventManager(WorldEvents plugin, ExpansionRegistry expansionRegistry) {
+        this.plugin = plugin;
         this.expansionRegistry = expansionRegistry;
     }
 
@@ -100,8 +103,9 @@ public class WorldEventManager implements WorldEventManagerApi {
         }
     }
 
-    public void reloadEventQueues(FileConfiguration config) {
+    @Override
+    public void reloadEventQueues() {
         stopEventQueues();
-        loadEventQueues(config, expansionRegistry.getRegisteredExpansions());
+        loadEventQueues(plugin.getConfig(), expansionRegistry.getRegisteredExpansions());
     }
 }

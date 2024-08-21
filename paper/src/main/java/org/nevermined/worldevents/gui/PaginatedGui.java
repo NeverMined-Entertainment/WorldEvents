@@ -2,9 +2,7 @@ package org.nevermined.worldevents.gui;
 
 import dev.triumphteam.gui.guis.GuiItem;
 import org.bukkit.entity.Player;
-import org.javatuples.Pair;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
-import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
 
 public abstract class PaginatedGui extends BaseGui<dev.triumphteam.gui.guis.PaginatedGui> {
 

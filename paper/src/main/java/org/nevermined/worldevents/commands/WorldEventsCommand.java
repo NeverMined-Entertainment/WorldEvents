@@ -49,7 +49,7 @@ public class WorldEventsCommand {
                         .then(new LiteralArgument("reload")
                                 .withPermission(CommandPermission.OP)
                                 .executes(((sender, args) -> {
-                                    plugin.reloadEventQueues();
+                                    plugin.getWorldEventManager().reloadEventQueues();
                                     sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-queues-reloaded"));
                                 })))
                         .then(new StringArgument("queueKey")

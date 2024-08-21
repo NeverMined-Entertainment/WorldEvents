@@ -141,7 +141,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
                 continue;
             if (!actionTypeMap.containsKey(queueSection.getConfigurationSection(eventKey).getString("type"))) {
                 Log.global.warn("Loading event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "' that wasn't registered yet.");
-                Log.global.warn("It still may be registered by other plugins using WorldEvents api.");
+                Log.global.warn("It may still be registered by other plugins using WorldEvents api.");
             }
             
             ConfigurationSection eventSection = queueSection.getConfigurationSection(eventKey);

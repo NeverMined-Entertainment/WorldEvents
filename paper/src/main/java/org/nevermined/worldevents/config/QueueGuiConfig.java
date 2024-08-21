@@ -16,7 +16,7 @@ public class QueueGuiConfig implements QueueGuiConfigApi {
     private int queueGuiInfoSlot = 4;
 
     @ConfigEntry(section = "GUI.Queue Gui", path = "queue-gui-activate")
-    private GuiItemConfigurable queueActivate = new GuiItemConfigurable(
+    private GuiItemConfigurableApi queueActivate = new GuiItemConfigurable(
             49,
             Material.GREEN_STAINED_GLASS_PANE,
             "queue-gui-activate",
@@ -25,7 +25,7 @@ public class QueueGuiConfig implements QueueGuiConfigApi {
     );
 
     @ConfigEntry(section = "GUI.Queue Gui", path = "queue-gui-deactivate")
-    private GuiItemConfigurable queueDeactivate = new GuiItemConfigurable(
+    private GuiItemConfigurableApi queueDeactivate = new GuiItemConfigurable(
             49,
             Material.RED_STAINED_GLASS_PANE,
             "queue-gui-deactivate",

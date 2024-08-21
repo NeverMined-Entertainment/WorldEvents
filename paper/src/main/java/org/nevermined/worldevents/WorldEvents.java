@@ -17,7 +17,6 @@ import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.commands.modules.CommandModule;
 import org.nevermined.worldevents.config.modules.ConfigModule;
-import org.nevermined.worldevents.core.WorldEventManager;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
 import org.nevermined.worldevents.expansions.ExpansionLoader;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;
@@ -128,11 +127,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         reloadConfig();
         Config.global.reloadConfig(getConfig());
         initializeI18n();
-    }
-
-    public void reloadEventQueues()
-    {
-        ((WorldEventManager)worldEventManager).reloadEventQueues(getConfig());
     }
 
     public GlobalConfigApi getGlobalConfig() {
