@@ -11,6 +11,7 @@ import me.wyne.wutils.i18n.language.replacement.TextReplacement;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -139,13 +140,13 @@ public class GuiItemConfigurable implements Configurable, GuiItemConfigurableApi
 
     @Override
     public Component getName() {
-        return LegacyComponentSerializer.legacyAmpersand().deserialize(I18n.applyTextReplacements(name, textReplacements.toArray(TextReplacement[]::new)));
+        return Component.empty().decoration(TextDecoration.ITALIC, false).append(LegacyComponentSerializer.legacyAmpersand().deserialize(I18n.applyTextReplacements(name, textReplacements.toArray(TextReplacement[]::new))));
     }
 
     @Override
     public List<Component> getLore() {
         return new ArrayList<>(lore.stream()
-                .map(component -> LegacyComponentSerializer.legacyAmpersand().deserialize(I18n.applyTextReplacements(component, textReplacements.toArray(TextReplacement[]::new))))
+                .map(component -> Component.empty().decoration(TextDecoration.ITALIC, false).append(LegacyComponentSerializer.legacyAmpersand().deserialize(I18n.applyTextReplacements(component, textReplacements.toArray(TextReplacement[]::new)))))
                 .toList());
     }
 
@@ -154,7 +155,7 @@ public class GuiItemConfigurable implements Configurable, GuiItemConfigurableApi
     public Component getPrint() {
         if (print == null)
             return null;
-        return LegacyComponentSerializer.legacyAmpersand().deserialize(I18n.applyTextReplacements(print, textReplacements.toArray(TextReplacement[]::new)));
+        return Component.empty().decoration(TextDecoration.ITALIC, false).append(LegacyComponentSerializer.legacyAmpersand().deserialize(I18n.applyTextReplacements(print, textReplacements.toArray(TextReplacement[]::new))));
     }
 
     @Override

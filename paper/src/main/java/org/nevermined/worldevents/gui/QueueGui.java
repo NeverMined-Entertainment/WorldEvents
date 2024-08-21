@@ -81,7 +81,7 @@ public class QueueGui extends PaginatedGui {
 
         for (String line : lines)
         {
-            lore.add(LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(player, line.replace("<queue-key>", queueKey).replace("<event-index>", eventIndex))));
+            lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, line, Placeholder.replace("queue-key", queueKey), Placeholder.replace("event-index", eventIndex)));
         }
 
         return lore;
