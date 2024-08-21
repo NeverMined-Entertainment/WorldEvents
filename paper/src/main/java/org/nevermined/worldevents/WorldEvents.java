@@ -10,7 +10,6 @@ import me.wyne.wutils.i18n.language.validation.EmptyValidator;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.ServicePriority;
 import org.nevermined.worldevents.api.WorldEventsApi;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
@@ -47,8 +46,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     private WorldEventManagerApi worldEventManager;
 
-    private static BukkitAudiences adventure;
-
     @Override
     protected void load() {
         CommandAPI.onLoad(new CommandAPIBukkitConfig(this));
@@ -57,7 +54,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     @Override
     public void enable() {
         CommandAPI.onEnable();
-        adventure = BukkitAudiences.create(this);
 
         saveDefaultConfig();
         initializeLogger();
@@ -93,10 +89,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     @Override
     protected void disable() {
         CommandAPI.onDisable();
-        if(adventure != null) {
-            adventure.close();
-            adventure = null;
-        }
     }
 
     public void registerEventTypeExpansion(String key, WorldEventAction action)
@@ -154,13 +146,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     public void reloadEventQueues()
     {
         injector.injectMembers(worldEventManager);
-    }
-
-    public static BukkitAudiences adventure() {
-        if(adventure == null) {
-            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
-        }
-        return adventure;
     }
 
     public GlobalConfigApi getGlobalConfig() {

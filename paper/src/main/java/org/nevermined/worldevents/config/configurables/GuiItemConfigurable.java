@@ -3,16 +3,15 @@ package org.nevermined.worldevents.config.configurables;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.components.GuiAction;
 import dev.triumphteam.gui.guis.GuiItem;
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.wyne.wutils.config.ConfigEntry;
 import me.wyne.wutils.config.Configurable;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.i18n.language.replacement.Placeholder;
+import me.wyne.wutils.i18n.language.replacement.TextReplacement;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -21,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +32,7 @@ public class GuiItemConfigurable implements Configurable, GuiItemConfigurableApi
     private String print;
     private Sound sound;
 
-    private List<TagResolver> tagResolvers = new ArrayList<>();
+    private List<TextReplacement> textReplacements = new ArrayList<>();
 
     public GuiItemConfigurable(int slot, Material material, String name, List<String> lore, @Nullable String print, @Nullable Sound sound) {
         this.slot = slot;
@@ -45,14 +43,14 @@ public class GuiItemConfigurable implements Configurable, GuiItemConfigurableApi
         this.sound = sound;
     }
 
-    public GuiItemConfigurable(int slot, Material material, String name, List<String> lore, @Nullable String print, @Nullable Sound sound, List<TagResolver> tagResolvers) {
+    public GuiItemConfigurable(int slot, Material material, String name, List<String> lore, @Nullable String print, @Nullable Sound sound, List<TextReplacement> textReplacements) {
         this.slot = slot;
         this.material = material;
         this.name = name;
         this.lore = lore;
         this.print = print;
         this.sound = sound;
-        this.tagResolvers.addAll(tagResolvers);
+        this.textReplacements.addAll(textReplacements);
     }
 
     @Override
@@ -102,7 +100,7 @@ public class GuiItemConfigurable implements Configurable, GuiItemConfigurableApi
 
     @Override
     public GuiItemConfigurableApi applyReplacements(Map<String, Component> replacements) {
-        return new GuiItemConfigurable(slot, material, name, lore, print, sound, replacements.keySet().stream().map(key -> (TagResolver)Placeholder.component(key, replacements.get(key))).toList());
+        return new GuiItemConfigurable(slot, material, name, lore, print, sound, replacements.keySet().stream().map(key -> Placeholder.legacy(key, replacements.get(key))).toList());
     }
 
     @Override
@@ -141,13 +139,13 @@ public class GuiItemConfigurable implements Configurable, GuiItemConfigurableApi
 
     @Override
     public Component getName() {
-        return MiniMessage.miniMessage().deserialize(name, tagResolvers.toArray(new TagResolver[0]));
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(I18n.applyTextReplacements(name, textReplacements.toArray(TextReplacement[]::new)));
     }
 
     @Override
     public List<Component> getLore() {
         return new ArrayList<>(lore.stream()
-                .map(component -> MiniMessage.miniMessage().deserialize(component, tagResolvers.toArray(TagResolver[]::new)))
+                .map(component -> LegacyComponentSerializer.legacyAmpersand().deserialize(I18n.applyTextReplacements(component, textReplacements.toArray(TextReplacement[]::new))))
                 .toList());
     }
 
@@ -156,7 +154,7 @@ public class GuiItemConfigurable implements Configurable, GuiItemConfigurableApi
     public Component getPrint() {
         if (print == null)
             return null;
-        return MiniMessage.miniMessage().deserialize(print, tagResolvers.toArray(TagResolver[]::new));
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(I18n.applyTextReplacements(print, textReplacements.toArray(TextReplacement[]::new)));
     }
 
     @Override

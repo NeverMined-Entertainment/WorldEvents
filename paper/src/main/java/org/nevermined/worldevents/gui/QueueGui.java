@@ -1,17 +1,14 @@
 package org.nevermined.worldevents.gui;
 
 import dev.triumphteam.gui.builder.item.ItemBuilder;
-import dev.triumphteam.gui.components.GuiAction;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.i18n.language.replacement.Placeholder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventApi;
@@ -28,7 +25,7 @@ public class QueueGui extends PaginatedGui {
     public QueueGui(QueuesGui queuesGui, String queueKey, GlobalConfigApi config, WorldEventManagerApi eventManager, Player player)
     {
         gui = Gui.paginated()
-                .title(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "queue-gui-header").replace("<queue-key>", queueKey))))
+                .title(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-gui-header", Placeholder.replace("queue-key", queueKey)))
                 .rows(6)
                 .disableAllInteractions()
                 .create();
@@ -51,8 +48,8 @@ public class QueueGui extends PaginatedGui {
         WorldEventQueueApi queue = eventManager.getEventQueueMap().get(queueKey);
 
         List<Component> lore = new ArrayList<>(queue.getQueueData().description());
-        lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "queue-capacity-format").replace("<queue-key>", queueKey))));
-        lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, I18n.global.getString(player.locale(), "queue-active-format").replace("<queue-key>", queueKey))));
+        lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-capacity-format", Placeholder.replace("queue-key", queueKey)));
+        lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-active-format", Placeholder.replace("queue-key", queueKey)));
 
         return ItemBuilder.from(queue.getQueueData().item())
                 .name(queue.getQueueData().name())
@@ -84,7 +81,7 @@ public class QueueGui extends PaginatedGui {
 
         for (String line : lines)
         {
-            lore.add(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(player, line.replace("<queue-key>", queueKey).replace("<event-index>", eventIndex))));
+            lore.add(LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(player, line.replace("<queue-key>", queueKey).replace("<event-index>", eventIndex))));
         }
 
         return lore;
@@ -120,8 +117,8 @@ public class QueueGui extends PaginatedGui {
                 updatePage(queueKey, config, eventManager, player);
             } catch (AlreadyActiveException e)
             {
-                WorldEvents.adventure().player(player).sendMessage(I18n.global.getPlaceholderComponent(player.locale(), player, "error-queue-already-active",
-                        Placeholder.component("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name())));
+                player.sendMessage(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "error-queue-already-active",
+                        Placeholder.legacy("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name())));
             }
         }));
     }
@@ -134,8 +131,8 @@ public class QueueGui extends PaginatedGui {
                 updatePage(queueKey, config, eventManager, player);
             } catch (AlreadyInactiveException e)
             {
-                WorldEvents.adventure().player(player).sendMessage(I18n.global.getPlaceholderComponent(player.locale(), player, "error-queue-already-inactive",
-                        Placeholder.component("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name())));
+                player.sendMessage(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "error-queue-already-inactive",
+                        Placeholder.legacy("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name())));
             }
         }));
     }

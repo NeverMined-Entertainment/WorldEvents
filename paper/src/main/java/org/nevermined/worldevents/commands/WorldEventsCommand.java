@@ -8,10 +8,10 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandArguments;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.i18n.language.replacement.Placeholder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -50,7 +50,7 @@ public class WorldEventsCommand {
                                 .withPermission(CommandPermission.OP)
                                 .executes(((sender, args) -> {
                                     plugin.reloadEventQueues();
-                                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queues-reloaded"));
+                                    sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-queues-reloaded"));
                                 })))
                         .then(new StringArgument("queueKey")
                                 .replaceSuggestions(ArgumentSuggestions.stringCollection(info -> plugin.getWorldEventManager().getEventQueueMap().keySet()))
@@ -83,7 +83,7 @@ public class WorldEventsCommand {
                         .withPermission(CommandPermission.OP)
                         .executes(((sender, args) -> {
                             plugin.reload();
-                            WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-plugin-reloaded"));
+                            sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-plugin-reloaded"));
                         })))
                 .register();
     }
@@ -167,7 +167,7 @@ public class WorldEventsCommand {
         String action = args.getOrDefaultRaw("queueAction", "");
 
         if (!validateQueueKey(queueKey))
-            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-not-found", Placeholder.unparsed("queue-key", queueKey)));
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-not-found", Placeholder.replace("queue-key", queueKey)));
 
         WorldEventQueueApi queue = plugin.getWorldEventManager().getEventQueueMap().get(queueKey);
 
@@ -175,19 +175,19 @@ public class WorldEventsCommand {
             case "start" -> {
                 try {
                     queue.startNext();
-                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-activated", Placeholder.component("queue-name", queue.getQueueData().name())));
+                    sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-activated", Placeholder.legacy("queue-name", queue.getQueueData().name())));
                 } catch (AlreadyActiveException e)
                 {
-                    throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-already-active", Placeholder.component("queue-name", queue.getQueueData().name())));
+                    throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-already-active", Placeholder.legacy("queue-name", queue.getQueueData().name())));
                 }
             }
             case "stop" -> {
                 try {
                     queue.stopCurrent();
-                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-deactivated", Placeholder.component("queue-name", queue.getQueueData().name())));
+                    sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-deactivated", Placeholder.legacy("queue-name", queue.getQueueData().name())));
                 } catch (AlreadyInactiveException e)
                 {
-                    throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-already-inactive", Placeholder.component("queue-name", queue.getQueueData().name())));
+                    throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-already-inactive", Placeholder.legacy("queue-name", queue.getQueueData().name())));
                 }
             }
             case "skip" -> {
@@ -195,15 +195,15 @@ public class WorldEventsCommand {
                     Component eventName = queue.peekEvent().getEventData().name();
                     queue.stopCurrent();
                     queue.startNext();
-                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-skipped", Placeholder.component("event-name", eventName)));
+                    sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-skipped", Placeholder.legacy("event-name", eventName)));
                 } else {
                     Component eventName = queue.pollEvent().getEventData().name();
                     queue.startNext();
-                    WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-skipped", Placeholder.component("event-name", eventName)));
+                    sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-skipped", Placeholder.legacy("event-name", eventName)));
                 }
             }
             case "info" ->
-                    WorldEvents.adventure().sender(sender).sendMessage(MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), I18n.reduceString(I18n.global.getStringList(I18n.toLocale(sender), "info-queue")).replace("<queue-key>", queueKey))));
+                    sender.sendMessage(I18n.reduceComponent(I18n.global.getLegacyPlaceholderComponentList(I18n.toLocale(sender), sender, "info-queue", Placeholder.replace("queue-key", queueKey))));
         }
     }
 
@@ -215,32 +215,31 @@ public class WorldEventsCommand {
         String eventKey = args.getOrDefaultRaw("eventKey", "");
 
         if (!validateQueueKey(queueKey))
-            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender,"error-queue-not-found", Placeholder.unparsed("queue-key", queueKey)));
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender,"error-queue-not-found", Placeholder.replace("queue-key", queueKey)));
         if (plugin.getWorldEventManager().getEventQueueMap().size() <= eventIndex)
-            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender,"error-event-not-found", Placeholder.unparsed("event-index", String.valueOf(eventIndex))));
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender,"error-event-not-found", Placeholder.replace("event-index", String.valueOf(eventIndex))));
 
         WorldEventQueueApi queue = plugin.getWorldEventManager().getEventQueueMap().get(queueKey);
 
         Optional<WorldEventSelfFactoryApi> eventFactory = Optional.ofNullable(queue.getEventSet().get(eventKey));
 
         if (eventAction.equalsIgnoreCase("swap") && queue.getEventQueueAsList().get(eventIndex).isActive())
-            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-event-active-swap"));
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-event-active-swap"));
         if (eventAction.equalsIgnoreCase("swap") && eventFactory.isEmpty())
-            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-event-key-not-found", Placeholder.unparsed("event-key", eventKey)));
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-event-key-not-found", Placeholder.replace("event-key", eventKey)));
 
         switch (eventAction) {
             case "swap" -> {
                 queue.replaceEvent(eventIndex, eventFactory.get().create());
-                WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender,"success-event-type-swapped",
-                        Placeholder.unparsed("event-index", String.valueOf(eventIndex)),
-                        Placeholder.component("event-name", eventFactory.get().getEventData().name())));
+                sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender,"success-event-type-swapped",
+                        Placeholder.replace("event-index", String.valueOf(eventIndex)),
+                        Placeholder.legacy("event-name", eventFactory.get().getEventData().name())));
             }
             case "info" -> {
-                WorldEvents.adventure().sender(sender).sendMessage(MiniMessage.miniMessage().deserialize(
-                        PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), I18n.reduceString(I18n.global.getStringList(I18n.toLocale(sender), "info-event"))
-                                .replace("<event-key>", queue.getEventQueueAsList().get(eventIndex).getEventData().key())
-                                .replace("<queue-key>", queueKey)
-                                .replace("<event-index>", String.valueOf(eventIndex)))
+                sender.sendMessage(I18n.reduceComponent(I18n.global.getLegacyPlaceholderComponentList(I18n.toLocale(sender), sender, "info-event",
+                                Placeholder.replace("event-key", queue.getEventQueueAsList().get(eventIndex).getEventData().key()),
+                                Placeholder.replace("queue-key", queueKey),
+                                Placeholder.replace("event-index", String.valueOf(eventIndex)))
                 ));
             }
         }
@@ -249,22 +248,23 @@ public class WorldEventsCommand {
     private void executeQueueCreateCommand(CommandSender sender, CommandArguments args) throws WrapperCommandSyntaxException
     {
         String queueKey = args.getOrDefaultRaw("queueKey", "new-queue");
-        Component queueName = MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), args.getOrDefaultRaw("queueName", "<!i>New queue").replaceAll("\"", ""))).decoration(TextDecoration.ITALIC, false);
+        Component queueName = LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), args.getOrDefaultRaw("queueName", "New queue").replaceAll("\"", ""))).decoration(TextDecoration.ITALIC, false);
         List<Component> queueDescription = args.getOrDefaultRaw("queueDescription", "").equalsIgnoreCase("") ?
                 new ArrayList<>() :
                 Arrays.stream(args.getOrDefaultRaw("queueDescription", "")
                                 .replaceAll("\"", "")
                                 .split("(?i)<br\\s*/?>"))
-                .map(s -> MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), s)).decoration(TextDecoration.ITALIC, false))
+                .map(s -> LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(I18n.toPlayer(sender), s)).decoration(TextDecoration.ITALIC, false))
+                .map(Component::asComponent)
                 .toList();
         Material queueItem = ((ItemStack) args.getOrDefault("queueItem", new ItemStack(Material.NETHER_STAR))).getType();
         List<String> eventKeys = (List<String>) args.getOrDefault("eventKeys", new ArrayList<String>());
 
         if (plugin.getWorldEventManager().getEventQueueMap().containsKey(queueKey))
-            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-already-exists",
-                    Placeholder.unparsed("queue-key", queueKey)));
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-already-exists",
+                    Placeholder.replace("queue-key", queueKey)));
         if (eventKeys.isEmpty())
-            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-not-enough-events"));
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-queue-not-enough-events"));
 
         Map<String, WorldEventSelfFactoryApi> eventSet = new HashMap<>();
 
@@ -283,8 +283,8 @@ public class WorldEventsCommand {
                     queueItem,
                     eventKeys.size()
             ), eventSet));
-        WorldEvents.adventure().sender(sender).sendMessage(I18n.global.getPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-created",
-                Placeholder.component("queue-name", queueName)));
+        sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-created",
+                Placeholder.legacy("queue-name", queueName)));
     }
 
     private boolean validateQueueKey(String queueKey)

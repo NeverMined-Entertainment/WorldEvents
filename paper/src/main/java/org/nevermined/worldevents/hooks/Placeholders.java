@@ -129,7 +129,7 @@ public class Placeholders extends PlaceholderExpansion {
             List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().description()
                     .stream()
-                    .reduce((c1, c2) -> c1.appendNewline().append(c2))
+                    .reduce((c1, c2) -> c1.append(Component.newline()).append(c2))
                     .map(component -> LegacyComponentSerializer.legacyAmpersand().serialize(component))
                     .orElse("");
         });
@@ -141,7 +141,7 @@ public class Placeholders extends PlaceholderExpansion {
             QueueData queueData = worldEventManager.getEventQueueMap().get(queueKey).getQueueData();
             return queueData.description()
                     .stream()
-                    .reduce((c1, c2) -> c1.appendNewline().append(c2))
+                    .reduce((c1, c2) -> c1.append(Component.newline()).append(c2))
                     .map(component -> LegacyComponentSerializer.legacyAmpersand().serialize(component))
                     .orElse("");
         });

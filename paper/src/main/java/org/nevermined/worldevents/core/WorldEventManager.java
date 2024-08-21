@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.wyne.wutils.log.Log;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -71,7 +71,7 @@ public class WorldEventManager implements WorldEventManagerApi {
 
     private void loadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap)
     {
-        MiniMessage miniMessage = MiniMessage.miniMessage();
+        LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
 
         for (String queueKey : config.getConfigurationSection("events").getKeys(false))
         {
@@ -79,12 +79,13 @@ public class WorldEventManager implements WorldEventManagerApi {
             eventQueueMap.put(queueKey, new WorldEventQueue(new QueueData(
                     queueKey,
                     queueSection.contains("name")
-                            ? miniMessage.deserialize(PlaceholderAPI.setPlaceholders(null, queueSection.getString("name")))
+                            ? serializer.deserialize(PlaceholderAPI.setPlaceholders(null, queueSection.getString("name")))
                             : Component.text(queueKey),
                     queueSection.contains("description")
                             ? queueSection.getStringList("description").stream()
                             .map(s -> PlaceholderAPI.setPlaceholders(null, s))
-                            .map(miniMessage::deserialize)
+                            .map(serializer::deserialize)
+                            .map(Component::asComponent)
                             .toList()
                             : Collections.unmodifiableList(new ArrayList<>()),
                     queueSection.contains("item")
@@ -100,7 +101,6 @@ public class WorldEventManager implements WorldEventManagerApi {
     @Inject
     private void reloadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap) {
         stopEventQueues();
-        actionTypeMap.keySet().forEach(s -> Log.global.warn("Reload: " + s));
         loadEventQueues(config, actionTypeMap);
     }
 }

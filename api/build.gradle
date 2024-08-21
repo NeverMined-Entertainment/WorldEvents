@@ -4,10 +4,12 @@ plugins {
 }
 
 dependencies {
-    compileOnlyApi "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
+    compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
 
     api "me.lucko:helper:5.6.14"
-    api "dev.triumphteam:triumph-gui:3.1.10"
+    api("dev.triumphteam:triumph-gui:3.1.10") {
+        exclude group: "net.kyori"
+    }
 }
 
 def targetJavaVersion = 16
