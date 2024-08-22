@@ -2,7 +2,10 @@ package org.nevermined.worldevents.core;
 
 import me.lucko.helper.promise.Promise;
 import org.nevermined.worldevents.api.core.*;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +40,15 @@ public class TempWorldEventQueue implements WorldEventQueueApi {
 
     @Override
     public void startNext() {
+        if (isActive)
+            throw new AlreadyActiveException("Queue " + queueData.key() + " is already active");
+        startNextSilently();
+    }
+
+    private void startNextSilently()
+    {
         WorldEventApi event = peekEvent();
+        setExpireTime();
         event.startEvent(this);
         isActive = true;
         eventCyclePromise = event.getStopPromise().thenRunDelayedSync(() -> {
@@ -49,22 +60,50 @@ public class TempWorldEventQueue implements WorldEventQueueApi {
                     eventCyclePromise.closeSilently();
                 return;
             }
-            startNext();
+            startNextSilently();
         }, event.getEventData().cooldownSeconds(), TimeUnit.SECONDS);
+    }
+
+    private void setExpireTime()
+    {
+        WorldEventApi previousEvent = null;
+
+        for (WorldEventApi event : eventQueue)
+        {
+            if (previousEvent == null)
+                event.setExpireTime(Instant.now().plusSeconds(event.getEventData().durationSeconds()));
+            else
+                event.setExpireTime(previousEvent.getExpireTime().get()
+                        .plusSeconds(previousEvent.getEventData().cooldownSeconds())
+                        .plusSeconds(event.getEventData().durationSeconds()));
+            previousEvent = event;
+        }
     }
 
     @Override
     public void stopCurrent() {
+        if (!isActive)
+            throw new AlreadyInactiveException("Queue " + queueData.key() + " is already inactive");
+
         WorldEventApi event = pollEvent();
+        removeExpireTime();
         event.stopEvent(this);
         isActive = false;
         if (eventCyclePromise != null && !eventCyclePromise.isClosed())
             eventCyclePromise.closeSilently();
+        if (!event.getStopPromise().isClosed())
+            event.getStopPromise().closeSilently();
+    }
+
+    private void removeExpireTime()
+    {
+        eventQueue.forEach(event -> event.setExpireTime(null));
     }
 
     @Override
     public void replaceEvent(int index, WorldEventApi event) {
         getEventQueueAsList().set(index, event);
+        setExpireTime();
     }
 
     @Override
