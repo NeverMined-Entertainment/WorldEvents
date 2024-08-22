@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Singleton
 public class WorldEventManager implements WorldEventManagerApi {
@@ -78,7 +79,7 @@ public class WorldEventManager implements WorldEventManagerApi {
         return eventQueueMap;
     }
 
-    private void loadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap)
+    private void loadEventQueues(FileConfiguration config, Map<String, Supplier<WorldEventAction>> actionTypeMap)
     {
         for (String queueKey : config.getConfigurationSection("events").getKeys(false))
         {

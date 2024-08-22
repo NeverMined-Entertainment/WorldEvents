@@ -12,6 +12,7 @@ import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class WorldEventQueue implements WorldEventQueueApi {
 
@@ -32,7 +33,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     protected boolean isActive = false;
     protected Promise<Void> eventCyclePromise;
 
-    public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
+    public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, Supplier<WorldEventAction>> actionTypeMap)
     {
         this.queueData = queueData;
         loadEventSet(queueSection, actionTypeMap);
@@ -169,7 +170,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
         return null;
     }
 
-    private void loadEventSet(ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
+    private void loadEventSet(ConfigurationSection queueSection, Map<String, Supplier<WorldEventAction>> actionTypeMap)
     {
         for (String eventKey : queueSection.getKeys(false))
         {

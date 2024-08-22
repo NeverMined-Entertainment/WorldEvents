@@ -8,15 +8,16 @@ import org.nevermined.worldevents.api.core.WorldEventAction;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Singleton
 public class ExpansionRegistry {
 
     private final WorldEvents plugin;
 
-    private final Map<String, WorldEventAction> registeredExpansions = new HashMap<>()
+    private final Map<String, Supplier<WorldEventAction>> registeredExpansions = new HashMap<>()
     {
-        { put("Demo", new DemoExpansion()); }
+        { put("Demo", DemoExpansion::new); }
     };
 
     @Inject
@@ -24,7 +25,7 @@ public class ExpansionRegistry {
         this.plugin = plugin;
     }
 
-    public void registerExpansion(String key, WorldEventAction action)
+    public void registerExpansion(String key, Supplier<WorldEventAction> action)
     {
         if (registeredExpansions.containsKey(key))
         {
@@ -37,7 +38,7 @@ public class ExpansionRegistry {
         Log.global.info("Registered expansion '" + key + "'");
     }
 
-    public void registerExpansions(Map<String, WorldEventAction> expansions)
+    public void registerExpansions(Map<String, Supplier<WorldEventAction>> expansions)
     {
         expansions.forEach((key, action) -> {
             if (registeredExpansions.containsKey(key))
@@ -65,7 +66,7 @@ public class ExpansionRegistry {
         Log.global.info("Unregistered expansion '" + key + "'");
     }
 
-    public Map<String, WorldEventAction> getRegisteredExpansions() {
+    public Map<String, Supplier<WorldEventAction>> getRegisteredExpansions() {
         return registeredExpansions;
     }
 

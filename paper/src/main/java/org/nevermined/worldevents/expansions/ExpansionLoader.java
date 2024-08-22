@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -38,7 +39,7 @@ public class ExpansionLoader {
         if (jars == null)
             return;
 
-        Map<String, WorldEventAction> newExpansions = new HashMap<>();
+        Map<String, Supplier<WorldEventAction>> newExpansions = new HashMap<>();
 
         for (File expansionFile : jars)
         {

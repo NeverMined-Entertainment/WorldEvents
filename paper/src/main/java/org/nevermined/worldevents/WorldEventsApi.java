@@ -9,6 +9,8 @@ import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.expansions.ExpansionRegistry;
 
+import java.util.function.Supplier;
+
 @Singleton
 public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEventsApi {
 
@@ -24,7 +26,7 @@ public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEvent
     }
 
     @Override
-    public void registerWorldEventAction(String key, WorldEventAction action) {
+    public void registerWorldEventAction(String key, Supplier<WorldEventAction> action) {
         expansionRegistry.registerExpansion(key, action);
     }
 
