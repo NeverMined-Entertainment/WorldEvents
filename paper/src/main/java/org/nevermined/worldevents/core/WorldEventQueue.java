@@ -22,21 +22,26 @@ public class WorldEventQueue implements WorldEventQueueApi {
         { add("capacity"); }
     };
     
-    private final QueueData queueData;
+    protected final QueueData queueData;
 
-    private final Map<String, WorldEventSelfFactoryApi> eventSet = new HashMap<>();
-    private final Queue<WorldEventApi> eventQueue = new LinkedList<>();
+    protected final Map<String, WorldEventSelfFactoryApi> eventSet = new HashMap<>();
+    protected final Queue<WorldEventApi> eventQueue = new LinkedList<>();
     
     private int totalWeight = 0;
 
-    private boolean isActive = false;
-    private Promise<Void> eventCyclePromise;
+    protected boolean isActive = false;
+    protected Promise<Void> eventCyclePromise;
 
     public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
     {
         this.queueData = queueData;
         loadEventSet(queueSection, actionTypeMap);
         generateInitialQueue();
+    }
+
+    protected WorldEventQueue(QueueData queueData)
+    {
+        this.queueData = queueData;
     }
 
     @Override
@@ -61,7 +66,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
         startNextSilently();
     }
 
-    private void startNextSilently()
+    protected void startNextSilently()
     {
         WorldEventApi event = peekEvent();
         setExpireTime();
@@ -73,7 +78,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
         }, event.getEventData().cooldownSeconds(), TimeUnit.SECONDS);
     }
 
-    private void setExpireTime()
+    protected void setExpireTime()
     {
         WorldEventApi previousEvent = null;
 
@@ -105,7 +110,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
             event.getStopPromise().closeSilently();
     }
 
-    private void removeExpireTime()
+    protected void removeExpireTime()
     {
         eventQueue.forEach(event -> event.setExpireTime(null));
     }
