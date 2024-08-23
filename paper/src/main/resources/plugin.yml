@@ -8,6 +8,8 @@ description: Manages gameplay events
 website: https://github.com/NeverMined-Entertainment/WorldEvents
 permissions:
   wevents.queuecontrol:
-    description: 'Allows to start/stop event queues'
+    description: 'Allows to start/stop event queues, skip and swap events'
   wevents.queuecreate:
     description: 'Allows to create independent temporary queues'
+  wevents.expansioncontrol:
+    description: 'Allows to check and unregister expansions'

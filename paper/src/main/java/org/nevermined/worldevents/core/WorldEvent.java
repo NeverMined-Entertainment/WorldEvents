@@ -2,6 +2,7 @@ package org.nevermined.worldevents.core;
 
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.promise.Promise;
+import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.api.core.EventData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventApi;
@@ -11,7 +12,6 @@ import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 import org.nevermined.worldevents.api.events.WorldEventStop;
 import org.nevermined.worldevents.api.events.WorldEventStart;
 
-import javax.management.OperationsException;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -49,9 +49,15 @@ public class WorldEvent implements WorldEventApi {
         if (startEvent.isCancelled())
             return;
         action.startEvent(eventData);
-        expireTime = Instant.now().plusSeconds(eventData.durationSeconds());
         isActive = true;
-        stopPromise = Schedulers.sync().runLater(() -> stopEvent(queue), eventData.durationSeconds(), TimeUnit.SECONDS);
+        stopPromise = Schedulers.sync().runLater(() -> {
+                if (!isActive && !stopPromise.isClosed()) {
+                    stopPromise.closeSilently();
+                    return;
+                }
+
+                stopEvent(queue);
+            }, eventData.durationSeconds(), TimeUnit.SECONDS);
     }
 
     @Override
@@ -64,8 +70,6 @@ public class WorldEvent implements WorldEventApi {
         stopEvent.callEvent();
         action.stopEvent(eventData);
         isActive = false;
-        if (stopPromise != null && !stopPromise.isClosed())
-            stopPromise.closeSilently();
     }
 
     @Override
@@ -94,7 +98,7 @@ public class WorldEvent implements WorldEventApi {
     }
 
     @Override
-    public void setExpireTime(Instant expireTime) {
+    public void setExpireTime(@Nullable Instant expireTime) {
         this.expireTime = expireTime;
     }
 }

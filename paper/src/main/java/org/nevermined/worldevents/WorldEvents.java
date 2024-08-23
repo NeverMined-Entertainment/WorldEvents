@@ -10,37 +10,26 @@ import me.wyne.wutils.i18n.language.validation.EmptyValidator;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
-import org.bukkit.plugin.ServicePriority;
-import org.nevermined.worldevents.api.WorldEventsApi;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.config.MainGuiConfigApi;
 import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
-import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
-import org.nevermined.worldevents.commands.WorldEventsCommand;
 import org.nevermined.worldevents.commands.modules.CommandModule;
 import org.nevermined.worldevents.config.modules.ConfigModule;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
-import org.nevermined.worldevents.expansions.DemoExpansion;
+import org.nevermined.worldevents.expansions.ExpansionLoader;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;
-import org.nevermined.worldevents.hooks.Placeholders;
 import org.nevermined.worldevents.hooks.modules.HooksModule;
 import org.nevermined.worldevents.modules.PluginModule;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Executors;
 
 @Singleton
 public final class WorldEvents extends ExtendedJavaPlugin {
 
     private Injector injector;
-    private final Map<String, WorldEventAction> registeredExpansions = new HashMap<>()
-    {
-        { put("Demo", new DemoExpansion()); }
-    };
 
     private GlobalConfigApi globalConfig;
 
@@ -56,11 +45,16 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         CommandAPI.onEnable();
 
         saveDefaultConfig();
+        File expansionsFolder = new File(getDataFolder(), "expansions");
+        if (!expansionsFolder.exists())
+            expansionsFolder.mkdir();
+
         initializeLogger();
         initializeI18n();
 
         try {
             injector = Guice.createInjector(
+                    Stage.PRODUCTION,
                     new PluginModule(this),
                     new ConfigModule(),
                     new HooksModule(),
@@ -76,10 +70,8 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         initializeConfig();
 
         try {
-            injector.getInstance(Placeholders.class).register();
-            getServer().getServicesManager().register(WorldEventsApi.class, injector.getInstance(WorldEventsApi.class), this, ServicePriority.Normal);
             worldEventManager = injector.getInstance(WorldEventManagerApi.class);
-            injector.getInstance(WorldEventsCommand.class);
+            injector.getInstance(ExpansionLoader.class).loadExpansions(new File(getDataFolder(), "expansions"));
         } catch (ConfigurationException | ProvisionException e)
         {
             Log.global.exception("Guice configuration/provision exception", e);
@@ -89,12 +81,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     @Override
     protected void disable() {
         CommandAPI.onDisable();
-    }
-
-    public void registerEventTypeExpansion(String key, WorldEventAction action)
-    {
-        registeredExpansions.put(key, action);
-        reloadEventQueues();
     }
 
     private void initializeLogger()
@@ -143,20 +129,11 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         initializeI18n();
     }
 
-    public void reloadEventQueues()
-    {
-        injector.injectMembers(worldEventManager);
-    }
-
     public GlobalConfigApi getGlobalConfig() {
         return globalConfig;
     }
 
     public WorldEventManagerApi getWorldEventManager() {
         return worldEventManager;
-    }
-
-    public Map<String, WorldEventAction> getRegisteredExpansions() {
-        return registeredExpansions;
     }
 }

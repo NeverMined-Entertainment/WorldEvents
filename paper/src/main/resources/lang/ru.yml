@@ -12,12 +12,15 @@ event-active-format: "Активен: %worldevents_event_<queue-key>_<event-inde
 queue-capacity-format: "Вместительность: %worldevents_queue_<queue-key>_capacity%"
 queue-active-format: "Активен: %worldevents_queue_<queue-key>_active%"
 
+## Expansion
+expansion-registry-time-format: "dd.MM.yyyy HHч:mmм:ssс"
+
 ### GUI
 
 ## Common Gui
 common-gui-previous: "< Назад"
 common-gui-next: "Вперед >"
-common-gui-back: "&l&cНазад"
+common-gui-back: "&c&lНазад"
 
 ## Main Gui
 main-gui-header: "Ивенты"
@@ -28,8 +31,8 @@ queues-gui-header: "Очереди ивентов"
 
 ## Queue Gui
 queue-gui-header: "Очередь %worldevents_queue_<queue-key>_name%"
-queue-gui-activate: "&l&aЗапустить"
-queue-gui-deactivate: "&l&cОстановить"
+queue-gui-activate: "&a&lЗапустить"
+queue-gui-deactivate: "&c&lОстановить"
 event-lore-order:
   - "event-chance-format"
   - "event-duration-format"
@@ -58,6 +61,13 @@ info-event:
   - "Окончание: %worldevents_event_<queue-key>_<event-index>_expire%"
   - "Активен: %worldevents_event_<queue-key>_<event-index>_active%"
 
+info-expansion:
+  - "Ключ: <expansion-key>"
+  - "JAR: %worldevents_expansion_<expansion-key>_jar%"
+  - "Class: %worldevents_expansion_<expansion-key>_class%"
+  - "Время регистрации: %worldevents_expansion_<expansion-key>_time%"
+  - "Используется в: %worldevents_expansion_<expansion-key>_usage%"
+
 ## Success
 success-queue-activated: "&aОчередь <queue-name> активирована!"
 success-queue-deactivated: "&aОчередь <queue-name> деактивирована!"
@@ -66,6 +76,7 @@ success-event-skipped: "&aИвент <event-name> пропущен!"
 success-event-type-swapped: "&aИвент <event-index> изменен на <event-name>!"
 success-plugin-reloaded: "&aПлагин перезагружен!"
 success-queues-reloaded: "&aПотоки перезагружены!"
+success-expansion-unregistered: "&aРасширение <expansion-key> отключено!"
 
 ## Errors
 error-queue-not-found: "&cОчередь <queue-key> не существует!"
@@ -76,3 +87,4 @@ error-queue-not-enough-events: "&cНедостаточно ивентов для
 error-event-not-found: "&cИвент с индексом <event-index> не существует!"
 error-event-key-not-found: "&cИвент <event-key> не существует!"
 error-event-active-swap: "&cАктивный ивент невозможно изменить!"
+error-expansion-not-found: "&cРасширение <expansion-key> не существует!"

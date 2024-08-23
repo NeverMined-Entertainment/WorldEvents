@@ -7,9 +7,12 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
+import org.nevermined.worldevents.api.expansions.ExpansionData;
+import org.nevermined.worldevents.api.expansions.ExpansionRegistryApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +23,15 @@ import java.util.Map;
 public class WorldEventManager implements WorldEventManagerApi {
 
     private final Map<String, WorldEventQueueApi> eventQueueMap = new HashMap<>();
+
+    private final WorldEvents plugin;
+    private final ExpansionRegistryApi expansionRegistry;
+
+    @Inject
+    public WorldEventManager(WorldEvents plugin, ExpansionRegistryApi expansionRegistry) {
+        this.plugin = plugin;
+        this.expansionRegistry = expansionRegistry;
+    }
 
     @Override
     public void startEventQueues()
@@ -67,7 +79,7 @@ public class WorldEventManager implements WorldEventManagerApi {
         return eventQueueMap;
     }
 
-    private void loadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap)
+    private void loadEventQueues(FileConfiguration config, Map<String, ExpansionData> registeredExpansions)
     {
         for (String queueKey : config.getConfigurationSection("events").getKeys(false))
         {
@@ -88,13 +100,22 @@ public class WorldEventManager implements WorldEventManagerApi {
                     queueSection.getInt("capacity")
             ),
                     queueSection,
-                    actionTypeMap));
+                    registeredExpansions));
         }
+        clearEventQueues();
     }
 
-    @Inject
-    private void reloadEventQueues(FileConfiguration config, Map<String, WorldEventAction> actionTypeMap) {
+    private void clearEventQueues()
+    {
+        eventQueueMap.keySet().stream()
+                .filter(queueKey -> eventQueueMap.get(queueKey).getEventSet().isEmpty())
+                .toList()
+                .forEach(eventQueueMap::remove);
+    }
+
+    @Override
+    public void reloadEventQueues() {
         stopEventQueues();
-        loadEventQueues(config, actionTypeMap);
+        loadEventQueues(plugin.getConfig(), expansionRegistry.getRegisteredExpansions());
     }
 }

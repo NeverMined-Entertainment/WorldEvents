@@ -1,6 +1,7 @@
 package org.nevermined.worldevents.api.core;
 
 import me.lucko.helper.promise.Promise;
+import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 
@@ -17,6 +18,6 @@ public interface WorldEventApi {
     Promise<Void> getStopPromise();
     boolean isActive();
     Optional<Instant> getExpireTime();
-    void setExpireTime(Instant expireTime);
+    void setExpireTime(@Nullable Instant expireTime);
 
 }

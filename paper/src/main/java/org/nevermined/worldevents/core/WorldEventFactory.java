@@ -3,15 +3,16 @@ package org.nevermined.worldevents.core;
 import org.nevermined.worldevents.api.core.*;
 
 import java.time.Instant;
+import java.util.function.Supplier;
 
 public class WorldEventFactory implements WorldEventSelfFactoryApi {
 
     private final EventData eventData;
-    private final WorldEventAction worldEventAction;
+    private final Supplier<WorldEventAction> worldEventActionSupplier;
 
-    public WorldEventFactory(EventData eventData, WorldEventAction worldEventAction) {
+    public WorldEventFactory(EventData eventData, Supplier<WorldEventAction> worldEventActionSupplier) {
         this.eventData = eventData;
-        this.worldEventAction = worldEventAction;
+        this.worldEventActionSupplier = worldEventActionSupplier;
     }
 
     @Override
@@ -28,13 +29,13 @@ public class WorldEventFactory implements WorldEventSelfFactoryApi {
     @Override
     public WorldEventApi create()
     {
-        return create(eventData, worldEventAction);
+        return create(eventData, worldEventActionSupplier.get());
     }
 
     @Override
     public WorldEventApi create(Instant expireTime)
     {
-        return create(eventData, worldEventAction, expireTime);
+        return create(eventData, worldEventActionSupplier.get(), expireTime);
     }
 
     @Override
@@ -44,6 +45,6 @@ public class WorldEventFactory implements WorldEventSelfFactoryApi {
 
     @Override
     public WorldEventAction getAction() {
-        return worldEventAction;
+        return worldEventActionSupplier.get();
     }
 }

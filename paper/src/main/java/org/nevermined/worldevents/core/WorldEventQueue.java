@@ -2,12 +2,15 @@ package org.nevermined.worldevents.core;
 
 import me.lucko.helper.promise.Promise;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.log.Log;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
+import org.nevermined.worldevents.api.expansions.ExpansionData;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -20,21 +23,33 @@ public class WorldEventQueue implements WorldEventQueueApi {
         { add("capacity"); }
     };
     
-    private final QueueData queueData;
+    protected final QueueData queueData;
 
-    private final Map<String, WorldEventSelfFactoryApi> eventSet = new HashMap<>();
-    private final Queue<WorldEventApi> eventQueue = new LinkedList<>();
+    protected final Map<String, WorldEventSelfFactoryApi> eventSet = new HashMap<>();
+    protected final Queue<WorldEventApi> eventQueue = new LinkedList<>();
     
     private int totalWeight = 0;
 
-    private boolean isActive = false;
-    private Promise<Void> eventCyclePromise;
+    protected boolean isActive = false;
+    protected Promise<Void> eventCyclePromise;
 
-    public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
+    public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, ExpansionData> registeredExpansions)
     {
         this.queueData = queueData;
-        loadEventSet(queueSection, actionTypeMap);
+        loadEventSet(queueSection, registeredExpansions);
+        if (eventSet.isEmpty())
+        {
+            Log.global.warn("Queue '" + queueData.key() + "' was removed because it was empty or none of it events were able to load");
+            Log.global.warn("You can use '/wevents queue reload' to try load queues again");
+            return;
+        }
+
         generateInitialQueue();
+    }
+
+    protected WorldEventQueue(QueueData queueData)
+    {
+        this.queueData = queueData;
     }
 
     @Override
@@ -56,14 +71,35 @@ public class WorldEventQueue implements WorldEventQueueApi {
     {
         if (isActive)
             throw new AlreadyActiveException("Queue " + queueData.key() + " is already active");
+        startNextSilently();
+    }
 
+    protected void startNextSilently()
+    {
         WorldEventApi event = peekEvent();
+        setExpireTime();
         event.startEvent(this);
         isActive = true;
         eventCyclePromise = event.getStopPromise().thenRunDelayedSync(() -> {
             pollEvent();
-            startNext();
+            startNextSilently();
         }, event.getEventData().cooldownSeconds(), TimeUnit.SECONDS);
+    }
+
+    protected void setExpireTime()
+    {
+        WorldEventApi previousEvent = null;
+
+        for (WorldEventApi event : eventQueue)
+        {
+            if (previousEvent == null)
+                event.setExpireTime(Instant.now().plusSeconds(event.getEventData().durationSeconds()));
+            else
+                event.setExpireTime(previousEvent.getExpireTime().get()
+                        .plusSeconds(previousEvent.getEventData().cooldownSeconds())
+                        .plusSeconds(event.getEventData().durationSeconds()));
+            previousEvent = event;
+        }
     }
 
     @Override
@@ -73,15 +109,24 @@ public class WorldEventQueue implements WorldEventQueueApi {
             throw new AlreadyInactiveException("Queue " + queueData.key() + " is already inactive");
 
         WorldEventApi event = pollEvent();
+        removeExpireTime();
         event.stopEvent(this);
         isActive = false;
         if (eventCyclePromise != null && !eventCyclePromise.isClosed())
             eventCyclePromise.closeSilently();
+        if (!event.getStopPromise().isClosed())
+            event.getStopPromise().closeSilently();
+    }
+
+    protected void removeExpireTime()
+    {
+        eventQueue.forEach(event -> event.setExpireTime(null));
     }
 
     @Override
     public void replaceEvent(int index, WorldEventApi event) {
         getEventQueueAsList().set(index, event);
+        setExpireTime();
     }
 
     @Override
@@ -132,16 +177,24 @@ public class WorldEventQueue implements WorldEventQueueApi {
         return null;
     }
 
-    private void loadEventSet(ConfigurationSection queueSection, Map<String, WorldEventAction> actionTypeMap)
+    private void loadEventSet(ConfigurationSection queueSection, Map<String, ExpansionData> registeredExpansions)
     {
         for (String eventKey : queueSection.getKeys(false))
         {
             if (RESERVED_CONFIG_NAMES.stream().anyMatch(reserved -> reserved.equalsIgnoreCase(eventKey)))
                 continue;
+            if (!registeredExpansions.containsKey(queueSection.getConfigurationSection(eventKey).getString("type"))) {
+                Log.global.error("Unable to load event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "'.");
+                Log.global.error("This event type was not registered yet.");
+                Log.global.error("It may still be registered by other plugins using WorldEvent api.");
+                Log.global.error("Prefer using expansions to load event types, they are loaded with WorldEvents plugin.");
+                continue;
+            }
             
             ConfigurationSection eventSection = queueSection.getConfigurationSection(eventKey);
             EventData eventData = new EventData(
                     eventKey,
+                    registeredExpansions.get(eventSection.getString("type")),
                     I18n.global.getLegacyPlaceholderComponent(null, null, eventSection.getString("name")),
                     eventSection.contains("description")
                             ? eventSection.getStringList("description").stream()
@@ -155,7 +208,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
                     eventSection.getLong("duration"),
                     eventSection.getLong("cooldown")
             );
-            eventSet.put(eventKey, new WorldEventFactory(eventData, actionTypeMap.get(eventSection.getString("type"))));
+            eventSet.put(eventKey, new WorldEventFactory(eventData, registeredExpansions.get(eventSection.getString("type")).actionSupplier()));
             totalWeight += eventData.chancePercent();
         }
     }
