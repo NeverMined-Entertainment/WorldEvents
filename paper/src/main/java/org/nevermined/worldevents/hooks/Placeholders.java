@@ -13,6 +13,7 @@ import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.QueueData;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
+import org.nevermined.worldevents.api.expansions.ExpansionRegistryApi;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -20,12 +21,14 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Singleton
 public class Placeholders extends PlaceholderExpansion {
 
     private final WorldEvents plugin;
     private final WorldEventManagerApi worldEventManager;
+    private final ExpansionRegistryApi expansionRegistry;
 
     // Key - data type
     // Value - BiFunction<Queue key, Event queue index, data>
@@ -33,12 +36,14 @@ public class Placeholders extends PlaceholderExpansion {
     // Key - data type
     // Value - Function<Queue key, data>
     private final Map<String, Function<String, String>> queueDataParserMap = new HashMap<>();
+    private final Map<String, Function<String, String>> expansionDataParserMap = new HashMap<>();
 
     @Inject
-    public Placeholders(WorldEvents plugin, WorldEventManagerApi worldEventManager)
+    public Placeholders(WorldEvents plugin, WorldEventManagerApi worldEventManager, ExpansionRegistryApi expansionRegistry)
     {
         this.plugin = plugin;
         this.worldEventManager = worldEventManager;
+        this.expansionRegistry = expansionRegistry;
         createEventNameParser();
         createQueueNameParser();
         createEventDescriptionParser();
@@ -52,6 +57,10 @@ public class Placeholders extends PlaceholderExpansion {
         createEventActiveParser();
         createQueueActiveParser();
         createQueueCapacityParser();
+        createExpansionJarParser();
+        createExpansionClassParser();
+        createExpansionRegistryTimeParser();
+        createExpansionUsageParser();
         register();
     }
 
@@ -80,7 +89,7 @@ public class Placeholders extends PlaceholderExpansion {
         if (params.startsWith("event"))
         {
             // Key word/Queue key/index/data type
-            // event_  demo-queue-1_0  _name
+            // event_  demo-queue-1 _0_  name
 
             String[] args = params.split("_");
             if (args[2].matches("^\\d+$"))
@@ -103,6 +112,15 @@ public class Placeholders extends PlaceholderExpansion {
 
             String[] args = params.split("_");
             return queueDataParserMap.get(args[2]).apply(args[1]);
+        }
+
+        if (params.startsWith("expansion"))
+        {
+            // Key word/Expansion key/data type
+            // expansion_     Demo    _jar
+
+            String[] args = params.split("_");
+            return expansionDataParserMap.get(args[2]).apply(args[1]);
         }
 
         return null;
@@ -158,10 +176,8 @@ public class Placeholders extends PlaceholderExpansion {
 
     private void createQueueItemParser()
     {
-        queueDataParserMap.put("item", queueKey -> {
-            QueueData queueData = worldEventManager.getEventQueueMap().get(queueKey).getQueueData();
-            return queueData.item().toString();
-        });
+        queueDataParserMap.put("item", queueKey ->
+                worldEventManager.getEventQueueMap().get(queueKey).getQueueData().item().toString());
     }
 
     private void createEventChanceParser()
@@ -209,16 +225,45 @@ public class Placeholders extends PlaceholderExpansion {
 
     private void createQueueActiveParser()
     {
-        queueDataParserMap.put("active", queueKey -> {
-            return String.valueOf(worldEventManager.getEventQueueMap().get(queueKey).isActive());
-        });
+        queueDataParserMap.put("active", queueKey ->
+                String.valueOf(worldEventManager.getEventQueueMap().get(queueKey).isActive()));
     }
 
     private void createQueueCapacityParser()
     {
-        queueDataParserMap.put("capacity", queueKey -> {
-            QueueData queueData = worldEventManager.getEventQueueMap().get(queueKey).getQueueData();
-            return String.valueOf(queueData.capacity());
+        queueDataParserMap.put("capacity", queueKey ->
+                String.valueOf(worldEventManager.getEventQueueMap().get(queueKey).getQueueData().capacity()));
+    }
+
+    private void createExpansionJarParser()
+    {
+        expansionDataParserMap.put("jar", expansionKey ->
+                expansionRegistry.getRegisteredExpansions().get(expansionKey).jarName());
+    }
+
+    private void createExpansionClassParser()
+    {
+        expansionDataParserMap.put("class", expansionKey ->
+                expansionRegistry.getRegisteredExpansions().get(expansionKey).className());
+    }
+
+    private void createExpansionRegistryTimeParser()
+    {
+        expansionDataParserMap.put("time", expansionKey ->
+                DateTimeFormatter.ofPattern(I18n.global.getString("expansion-registry-time-format"))
+                        .withZone(ZoneId.systemDefault())
+                        .format(expansionRegistry.getRegisteredExpansions().get(expansionKey).registryTime()));
+    }
+
+    private void createExpansionUsageParser()
+    {
+        expansionDataParserMap.put("usage", expansionKey -> {
+            Stream<String> eventKeysStream = worldEventManager.getEventQueueMap().keySet().stream()
+                    .flatMap(queueKey -> worldEventManager.getEventQueueMap().get(queueKey).getEventSet().values().stream())
+                    .filter(eventFactory -> eventFactory.getEventData().expansionData().key().equals(expansionKey))
+                    .map(eventFactory -> eventFactory.getEventData().key());
+            return eventKeysStream
+                    .reduce((s1, s2) -> s1 + ", " + s2).orElse("");
         });
     }
 

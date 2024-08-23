@@ -8,11 +8,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
+import org.nevermined.worldevents.api.expansions.ExpansionData;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 public class WorldEventQueue implements WorldEventQueueApi {
 
@@ -33,10 +33,17 @@ public class WorldEventQueue implements WorldEventQueueApi {
     protected boolean isActive = false;
     protected Promise<Void> eventCyclePromise;
 
-    public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, Supplier<WorldEventAction>> actionTypeMap)
+    public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, ExpansionData> registeredExpansions)
     {
         this.queueData = queueData;
-        loadEventSet(queueSection, actionTypeMap);
+        loadEventSet(queueSection, registeredExpansions);
+        if (eventSet.isEmpty())
+        {
+            Log.global.warn("Queue '" + queueData.key() + "' was removed because it was empty or none of it events were able to load");
+            Log.global.warn("You can use '/wevents queue reload' to try load queues again");
+            return;
+        }
+
         generateInitialQueue();
     }
 
@@ -170,20 +177,24 @@ public class WorldEventQueue implements WorldEventQueueApi {
         return null;
     }
 
-    private void loadEventSet(ConfigurationSection queueSection, Map<String, Supplier<WorldEventAction>> actionTypeMap)
+    private void loadEventSet(ConfigurationSection queueSection, Map<String, ExpansionData> registeredExpansions)
     {
         for (String eventKey : queueSection.getKeys(false))
         {
             if (RESERVED_CONFIG_NAMES.stream().anyMatch(reserved -> reserved.equalsIgnoreCase(eventKey)))
                 continue;
-            if (!actionTypeMap.containsKey(queueSection.getConfigurationSection(eventKey).getString("type"))) {
-                Log.global.warn("Loading event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "' that wasn't registered yet.");
-                Log.global.warn("It may still be registered by other plugins using WorldEvents api.");
+            if (!registeredExpansions.containsKey(queueSection.getConfigurationSection(eventKey).getString("type"))) {
+                Log.global.error("Unable to load event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "'.");
+                Log.global.error("This event type was not registered yet.");
+                Log.global.error("It may still be registered by other plugins using WorldEvent api.");
+                Log.global.error("Prefer using expansions to load event types, they are loaded with WorldEvents plugin.");
+                continue;
             }
             
             ConfigurationSection eventSection = queueSection.getConfigurationSection(eventKey);
             EventData eventData = new EventData(
                     eventKey,
+                    registeredExpansions.get(eventSection.getString("type")),
                     I18n.global.getLegacyPlaceholderComponent(null, null, eventSection.getString("name")),
                     eventSection.contains("description")
                             ? eventSection.getStringList("description").stream()
@@ -197,7 +208,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
                     eventSection.getLong("duration"),
                     eventSection.getLong("cooldown")
             );
-            eventSet.put(eventKey, new WorldEventFactory(eventData, actionTypeMap.get(eventSection.getString("type"))));
+            eventSet.put(eventKey, new WorldEventFactory(eventData, registeredExpansions.get(eventSection.getString("type")).actionSupplier()));
             totalWeight += eventData.chancePercent();
         }
     }

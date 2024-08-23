@@ -5,8 +5,9 @@ import com.google.inject.Singleton;
 import me.wyne.wutils.log.Log;
 import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.api.WorldEventsApi;
-import org.nevermined.worldevents.api.core.WorldEventAction;
-import org.nevermined.worldevents.api.core.WorldEventExpansion;
+import org.nevermined.worldevents.api.expansions.ExpansionData;
+import org.nevermined.worldevents.api.expansions.ExpansionRegistryApi;
+import org.nevermined.worldevents.api.expansions.WorldEventExpansion;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +15,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.time.Instant;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -23,10 +24,10 @@ import java.util.jar.JarInputStream;
 public class ExpansionLoader {
 
     private final WorldEventsApi api;
-    private final ExpansionRegistry expansionRegistry;
+    private final ExpansionRegistryApi expansionRegistry;
 
     @Inject
-    public ExpansionLoader(WorldEventsApi api, ExpansionRegistry expansionRegistry)
+    public ExpansionLoader(WorldEventsApi api, ExpansionRegistryApi expansionRegistry)
     {
         this.api = api;
         this.expansionRegistry = expansionRegistry;
@@ -39,7 +40,7 @@ public class ExpansionLoader {
         if (jars == null)
             return;
 
-        Map<String, Supplier<WorldEventAction>> newExpansions = new HashMap<>();
+        Map<String, ExpansionData> newExpansions = new HashMap<>();
 
         for (File expansionFile : jars)
         {
@@ -56,7 +57,7 @@ public class ExpansionLoader {
                     continue;
                 }
 
-                newExpansions.put(expansion.getKey(), expansion.getAction());
+                newExpansions.put(expansion.getKey(), new ExpansionData(expansion.getKey(), expansion.getAction(), expansionFile.getName(), expansionClass.getName(), Instant.now()));
             }
         }
 
@@ -65,7 +66,7 @@ public class ExpansionLoader {
 
     private <T> List<Class<? extends T>> findClasses(File file, Class<T> clazz) {
         if (!file.exists()) {
-            return null;
+            return new ArrayList<>();
         }
 
         URL jar = null;

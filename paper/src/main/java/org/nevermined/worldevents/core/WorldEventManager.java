@@ -11,13 +11,13 @@ import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
-import org.nevermined.worldevents.expansions.ExpansionRegistry;
+import org.nevermined.worldevents.api.expansions.ExpansionData;
+import org.nevermined.worldevents.api.expansions.ExpansionRegistryApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 @Singleton
 public class WorldEventManager implements WorldEventManagerApi {
@@ -25,10 +25,10 @@ public class WorldEventManager implements WorldEventManagerApi {
     private final Map<String, WorldEventQueueApi> eventQueueMap = new HashMap<>();
 
     private final WorldEvents plugin;
-    private final ExpansionRegistry expansionRegistry;
+    private final ExpansionRegistryApi expansionRegistry;
 
     @Inject
-    public WorldEventManager(WorldEvents plugin, ExpansionRegistry expansionRegistry) {
+    public WorldEventManager(WorldEvents plugin, ExpansionRegistryApi expansionRegistry) {
         this.plugin = plugin;
         this.expansionRegistry = expansionRegistry;
     }
@@ -79,7 +79,7 @@ public class WorldEventManager implements WorldEventManagerApi {
         return eventQueueMap;
     }
 
-    private void loadEventQueues(FileConfiguration config, Map<String, Supplier<WorldEventAction>> actionTypeMap)
+    private void loadEventQueues(FileConfiguration config, Map<String, ExpansionData> registeredExpansions)
     {
         for (String queueKey : config.getConfigurationSection("events").getKeys(false))
         {
@@ -100,8 +100,17 @@ public class WorldEventManager implements WorldEventManagerApi {
                     queueSection.getInt("capacity")
             ),
                     queueSection,
-                    actionTypeMap));
+                    registeredExpansions));
         }
+        clearEventQueues();
+    }
+
+    private void clearEventQueues()
+    {
+        eventQueueMap.keySet().stream()
+                .filter(queueKey -> eventQueueMap.get(queueKey).getEventSet().isEmpty())
+                .toList()
+                .forEach(eventQueueMap::remove);
     }
 
     @Override
