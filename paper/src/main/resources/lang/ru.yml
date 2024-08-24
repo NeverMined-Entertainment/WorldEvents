@@ -74,6 +74,8 @@ success-queue-deactivated: "&aОчередь <queue-name> деактивиров
 success-queue-created: "&aОчередь <queue-name> создана!"
 success-event-skipped: "&aИвент <event-name> пропущен!"
 success-event-type-swapped: "&aИвент <event-index> изменен на <event-name>!"
+success-event-queued: "&aИвент <event-name> добавлен в очередь <queue-name>"
+success-event-removed: "&aИвент <event-name> удален из очереди <queue-name>"
 success-plugin-reloaded: "&aПлагин перезагружен!"
 success-queues-reloaded: "&aПотоки перезагружены!"
 success-expansion-unregistered: "&aРасширение <expansion-key> отключено!"

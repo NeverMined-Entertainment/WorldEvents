@@ -124,6 +124,19 @@ public class WorldEventQueue implements WorldEventQueueApi {
     }
 
     @Override
+    public void queueEvent(WorldEventApi event) {
+        eventQueue.add(event);
+    }
+
+    @Override
+    public WorldEventApi removeEvent(int index) {
+        WorldEventApi event = getEventQueueAsList().remove(index);
+        if (eventQueue.size() < queueData.capacity())
+            eventQueue.add(selectRandomEvent());
+        return event;
+    }
+
+    @Override
     public void replaceEvent(int index, WorldEventApi event) {
         getEventQueueAsList().set(index, event);
         setExpireTime();

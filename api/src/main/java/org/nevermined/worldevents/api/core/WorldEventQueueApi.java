@@ -6,7 +6,6 @@ import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 
 public interface WorldEventQueueApi {
 
@@ -15,6 +14,8 @@ public interface WorldEventQueueApi {
     void startNext() throws AlreadyActiveException;
     void stopCurrent() throws AlreadyInactiveException;
 
+    void queueEvent(WorldEventApi event);
+    WorldEventApi removeEvent(int index);
     void replaceEvent(int index, WorldEventApi event);
 
     boolean isActive();
