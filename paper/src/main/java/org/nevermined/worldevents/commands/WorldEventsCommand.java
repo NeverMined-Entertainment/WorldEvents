@@ -45,6 +45,8 @@ public class WorldEventsCommand {
     {
         new CommandTree("wevents")
                 .executesPlayer((sender, args) -> {
+                    if (!sender.hasPermission("wevents.queuegui"))
+                        return;
                     new MainGui(plugin, sender).openGui(sender);
                 })
                 .then(new LiteralArgument("queue")
