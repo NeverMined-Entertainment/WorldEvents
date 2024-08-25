@@ -3,6 +3,7 @@
 ## Event
 event-expire-time-format: "dd.MM.yyyy HHч:mmм:ssс"
 event-chance-format: "Шанс: %worldevents_event_<queue-key>_<event-index>_chance%"
+event-type-format: "Тип: %worldevents_event_<queue-key>_<event-index>_type%"
 event-duration-format: "Продолжительность: %worldevents_event_<queue-key>_<event-index>_duration%"
 event-cooldown-format: "Задержка: %worldevents_event_<queue-key>_<event-index>_cooldown%"
 event-expire-format: "Окончание: %worldevents_event_<queue-key>_<event-index>_expire%"
@@ -35,6 +36,7 @@ queue-gui-activate: "&a&lЗапустить"
 queue-gui-deactivate: "&c&lОстановить"
 event-lore-order:
   - "event-chance-format"
+  - "event-type-format"
   - "event-duration-format"
   - "event-cooldown-format"
   - "event-expire-format"
@@ -55,6 +57,7 @@ info-event:
   - "Ключ: <event-key>"
   - "Название: %worldevents_event_<queue-key>_<event-index>_name%"
   - "Описание: %worldevents_event_<queue-key>_<event-index>_description%"
+  - "Тип: %worldevents_event_<queue-key>_<event-index>_type%"
   - "Шанс: %worldevents_event_<queue-key>_<event-index>_chance%"
   - "Продолжительность: %worldevents_event_<queue-key>_<event-index>_duration%"
   - "Задержка: %worldevents_event_<queue-key>_<event-index>_cooldown%"

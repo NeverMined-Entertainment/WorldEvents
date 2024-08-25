@@ -122,6 +122,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     private void initializeI18n()
     {
         I18n.global.loadLanguage("lang/ru.yml", this);
+        I18n.global.loadLanguage("lang/en.yml", this);
         I18n.global.loadDefaultPluginLanguage(this);
         I18n.global.setDefaultLanguage(I18n.getDefaultLanguageFile(this));
         I18n.global.setStringValidator(new EmptyValidator());

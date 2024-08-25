@@ -1,0 +1,97 @@
+### Format
+
+## Event
+event-expire-time-format: "dd.MM.yyyy HHh:mmm:sss"
+event-chance-format: "Chance: %worldevents_event_<queue-key>_<event-index>_chance%"
+event-type-format: "Type: %worldevents_event_<queue-key>_<event-index>_type%"
+event-duration-format: "Duration: %worldevents_event_<queue-key>_<event-index>_duration%"
+event-cooldown-format: "Cooldown: %worldevents_event_<queue-key>_<event-index>_cooldown%"
+event-expire-format: "Finish: %worldevents_event_<queue-key>_<event-index>_expire%"
+event-active-format: "Active: %worldevents_event_<queue-key>_<event-index>_active%"
+
+## Queue
+queue-capacity-format: "Capacity: %worldevents_queue_<queue-key>_capacity%"
+queue-active-format: "Active: %worldevents_queue_<queue-key>_active%"
+
+## Expansion
+expansion-registry-time-format: "dd.MM.yyyy HHh:mmm:sss"
+
+### GUI
+
+## Common Gui
+common-gui-previous: "< Backward"
+common-gui-next: "Forward >"
+common-gui-back: "&c&lBack"
+
+## Main Gui
+main-gui-header: "Events"
+main-gui-queues: "Event queues"
+
+## Queues Gui
+queues-gui-header: "Event queues"
+
+## Queue Gui
+queue-gui-header: "Queue %worldevents_queue_<queue-key>_name%"
+queue-gui-activate: "&a&lStart"
+queue-gui-deactivate: "&c&lStop"
+event-lore-order:
+  - "event-chance-format"
+  - "event-type-format"
+  - "event-duration-format"
+  - "event-cooldown-format"
+  - "event-expire-format"
+  - "event-active-format"
+
+
+### Messages
+
+## Info
+info-queue:
+  - "Key: <queue-key>"
+  - "Name: %worldevents_queue_<queue-key>_name%"
+  - "Description: %worldevents_queue_<queue-key>_description%"
+  - "Capacity: %worldevents_queue_<queue-key>_capacity%"
+  - "Active: %worldevents_queue_<queue-key>_active%"
+
+info-event:
+  - "Key: <event-key>"
+  - "Name: %worldevents_event_<queue-key>_<event-index>_name%"
+  - "Description: %worldevents_event_<queue-key>_<event-index>_description%"
+  - "Type: %worldevents_event_<queue-key>_<event-index>_type%"
+  - "Chance: %worldevents_event_<queue-key>_<event-index>_chance%"
+  - "Duration: %worldevents_event_<queue-key>_<event-index>_duration%"
+  - "Cooldown: %worldevents_event_<queue-key>_<event-index>_cooldown%"
+  - "Finish: %worldevents_event_<queue-key>_<event-index>_expire%"
+  - "Active: %worldevents_event_<queue-key>_<event-index>_active%"
+
+info-expansion:
+  - "Key: <expansion-key>"
+  - "JAR: %worldevents_expansion_<expansion-key>_jar%"
+  - "Class: %worldevents_expansion_<expansion-key>_class%"
+  - "Registration time: %worldevents_expansion_<expansion-key>_time%"
+  - "Used in: %worldevents_expansion_<expansion-key>_usage%"
+
+## Success
+success-queue-activated: "&aQueue <queue-name> activated!"
+success-queue-deactivated: "&aQueue <queue-name> deactivated!"
+success-queue-created: "&aQueue <queue-name> created!"
+success-queue-removed: "&aQueue <queue-name> removed!"
+success-event-skipped: "&aEvent <event-name> skipped!"
+success-event-type-swapped: "&aEvent <event-index> swapped to <event-name>!"
+success-event-queued: "&aEvent <event-name> added to queue <queue-name>"
+success-event-removed: "&aEvent <event-name> removed from queue <queue-name>"
+success-plugin-reloaded: "&aPlugin reloaded!"
+success-queues-reloaded: "&aQueues reloaded!"
+success-expansion-unregistered: "&aExpansion <expansion-key> unregistered!"
+success-expansions-reloaded: "&aExpansions reloaded!"
+
+## Errors
+error-queue-not-found: "&cQueue <queue-key> doesn't exist!"
+error-queue-already-active: "&cQueue <queue-name> is already active!"
+error-queue-already-inactive: "&cQueue <queue-name> is already inactive!"
+error-queue-already-exists: "&cQueue <queue-key> already exists!"
+error-queue-not-enough-events: "&cNot enough events for queue creation!"
+error-event-not-found: "&cEvent with index <event-index> doesn't exist!"
+error-event-key-not-found: "&cИвент <event-key> doesn't exist!"
+error-event-active-swap: "&cActive event can't be swapped!"
+error-expansion-not-found: "&cExpansion <expansion-key> doesn't exist!"

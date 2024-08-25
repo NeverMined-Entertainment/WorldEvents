@@ -45,6 +45,7 @@ public class Placeholders extends PlaceholderExpansion {
         this.worldEventManager = worldEventManager;
         this.expansionRegistry = expansionRegistry;
         createEventNameParser();
+        createEventTypeParser();
         createQueueNameParser();
         createEventDescriptionParser();
         createQueueDescriptionParser();
@@ -131,6 +132,14 @@ public class Placeholders extends PlaceholderExpansion {
         eventDataParserMap.put("name", (queueKey, eventIndex) -> {
             List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return LegacyComponentSerializer.legacyAmpersand().serialize(queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().name());
+        });
+    }
+
+    private void createEventTypeParser()
+    {
+        eventDataParserMap.put("type", (queueKey, eventIndex) -> {
+            List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
+            return queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().expansionData().key();
         });
     }
 
