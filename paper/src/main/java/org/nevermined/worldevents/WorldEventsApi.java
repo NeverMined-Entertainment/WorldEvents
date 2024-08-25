@@ -38,6 +38,11 @@ public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEvent
     }
 
     @Override
+    public void registerWorldEventExpansion(ExpansionData expansionData) {
+        expansionRegistry.registerExpansion(expansionData.key(), expansionData);
+    }
+
+    @Override
     public void unregisterWorldEventAction(String key) {
         expansionRegistry.unregisterExpansion(key);
     }
