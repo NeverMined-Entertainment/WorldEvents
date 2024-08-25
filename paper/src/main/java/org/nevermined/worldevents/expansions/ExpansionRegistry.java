@@ -1,9 +1,7 @@
 package org.nevermined.worldevents.expansions;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.wyne.wutils.log.Log;
-import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.exceptions.ExpansionRegistryException;
 import org.nevermined.worldevents.api.expansions.ExpansionData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
@@ -17,17 +15,10 @@ import java.util.function.Supplier;
 @Singleton
 public class ExpansionRegistry implements ExpansionRegistryApi {
 
-    private final WorldEvents plugin;
-
     private final Map<String, ExpansionData> registeredExpansions = new HashMap<>()
     {
         { put("Demo", new ExpansionData("Demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now())); }
     };
-
-    @Inject
-    public ExpansionRegistry(WorldEvents plugin) {
-        this.plugin = plugin;
-    }
 
     @Override
     public void registerExpansion(String key, ExpansionData expansion) throws ExpansionRegistryException
@@ -36,7 +27,6 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
             throw new ExpansionRegistryException("Can not register expansion '" + key + "' because expansion with this key already exists!");
 
         registeredExpansions.put(key, expansion);
-        plugin.getWorldEventManager().reloadEventQueues();
         Log.global.info("Registered expansion '" + key + "'");
     }
 
@@ -50,7 +40,6 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
             registeredExpansions.put(key, action);
             Log.global.info("Registered expansion '" + key + "'");
         });
-        plugin.getWorldEventManager().reloadEventQueues();
     }
 
     @Override
@@ -60,7 +49,6 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
             throw new ExpansionRegistryException("Can not unregister expansion '" + key + "' because it wasn't registered!");
 
         registeredExpansions.remove(key);
-        plugin.getWorldEventManager().reloadEventQueues();
         Log.global.info("Unregistered expansion '" + key + "'");
     }
 

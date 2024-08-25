@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.nevermined.worldevents.api.WorldEventsApi;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 
+import java.io.File;
+import java.time.Instant;
 import java.util.function.Supplier;
 
 public abstract class WorldEventExpansion {
@@ -20,6 +22,14 @@ public abstract class WorldEventExpansion {
 
     @NotNull
     public abstract Supplier<WorldEventAction> getAction();
+
+    @NotNull
+    public ExpansionData getExpansionData() {
+        return new ExpansionData(getKey(), getAction(),
+                new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile()).getName(),
+                getClass().getName(),
+                Instant.now());
+    }
 
     public WorldEventsApi getApi() {
         return api;
