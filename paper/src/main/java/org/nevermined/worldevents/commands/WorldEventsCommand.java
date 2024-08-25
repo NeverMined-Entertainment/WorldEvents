@@ -16,10 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.nevermined.worldevents.WorldEvents;
-import org.nevermined.worldevents.api.core.QueueData;
-import org.nevermined.worldevents.api.core.WorldEventManagerApi;
-import org.nevermined.worldevents.api.core.WorldEventQueueApi;
-import org.nevermined.worldevents.api.core.WorldEventSelfFactoryApi;
+import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
 import org.nevermined.worldevents.api.expansions.ExpansionRegistryApi;
@@ -48,6 +45,8 @@ public class WorldEventsCommand {
     {
         new CommandTree("wevents")
                 .executesPlayer((sender, args) -> {
+                    if (!sender.hasPermission("wevents.queuegui"))
+                        return;
                     new MainGui(plugin, sender).openGui(sender);
                 })
                 .then(new LiteralArgument("queue")
@@ -64,7 +63,7 @@ public class WorldEventsCommand {
                                         .replaceSuggestions(ArgumentSuggestions.stringCollection(this::getQueueActionSuggestions))
                                         .executes(this::executeQueueCommand)
                                         .then(new IntegerArgument("eventIndex", 0)
-                                                .replaceSafeSuggestions(SafeSuggestions.suggestCollection(this::getEventIndexSuggestions))
+                                                .includeSafeSuggestions(SafeSuggestions.suggestCollection(this::getEventIndexSuggestions))
                                                 .then(new MultiLiteralArgument("eventAction", getEventActionSuggestions())
                                                         .executes(this::executeEventCommand)
                                                                 .then(new StringArgument("eventKey")
@@ -86,6 +85,12 @@ public class WorldEventsCommand {
                                                                 .executes(this::executeQueueCreateCommand)))))))
                 .then(new LiteralArgument("expansion")
                         .withPermission("wevents.expansioncontrol")
+                        .then(new LiteralArgument("reload")
+                                .withPermission(CommandPermission.OP)
+                                .executes((sender, args) -> {
+                                    plugin.reloadExpansions();
+                                    sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-expansions-reloaded"));
+                                }))
                         .then(new MultiLiteralArgument("expansionAction", getExpansionActionSuggestions())
                                 .then(new StringArgument("expansionKey")
                                         .replaceSuggestions(ArgumentSuggestions.stringCollection(this::getExpansionKeySuggestions))
@@ -116,6 +121,7 @@ public class WorldEventsCommand {
         suggestions.add("skip");
         suggestions.add("event");
         suggestions.add("info");
+        suggestions.add("remove");
 
         return suggestions;
     }
@@ -124,6 +130,8 @@ public class WorldEventsCommand {
     {
         Set<String> suggestions = new HashSet<>();
         suggestions.add("swap");
+        suggestions.add("add");
+        suggestions.add("remove");
         suggestions.add("info");
         return suggestions.toArray(String[]::new);
     }
@@ -159,12 +167,14 @@ public class WorldEventsCommand {
         Set<String> suggestions = new HashSet<>();
 
         String queueKey = info.previousArgs().getOrDefaultRaw("queueKey", "");
+        String eventAction = (String)info.previousArgs().getOrDefault("eventAction", "");
 
         if (!validateQueueKey(queueKey))
             return suggestions;
         if (!(info.previousArgs().getOrDefaultRaw("queueAction", "")).equalsIgnoreCase("event"))
             return suggestions;
-        if (!((String)(info.previousArgs().getOrDefault("eventAction", ""))).equalsIgnoreCase("swap"))
+        if (!eventAction.equalsIgnoreCase("swap") &&
+                !eventAction.equalsIgnoreCase("add"))
             return suggestions;
 
         WorldEventQueueApi queue = worldEventManager.getEventQueueMap().get(queueKey);
@@ -225,6 +235,12 @@ public class WorldEventsCommand {
                     sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-skipped", Placeholder.legacy("event-name", eventName)));
                 }
             }
+            case "remove" -> {
+                if (queue.isActive())
+                    queue.stopCurrent();
+                worldEventManager.getEventQueueMap().remove(queueKey);
+                sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-queue-removed", Placeholder.legacy("queue-name", queue.getQueueData().name())));
+            }
             case "info" ->
                     sender.sendMessage(I18n.reduceComponent(I18n.global.getLegacyPlaceholderComponentList(I18n.toLocale(sender), sender, "info-queue", Placeholder.replace("queue-key", queueKey))));
         }
@@ -239,16 +255,17 @@ public class WorldEventsCommand {
 
         if (!validateQueueKey(queueKey))
             throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender,"error-queue-not-found", Placeholder.replace("queue-key", queueKey)));
-        if (worldEventManager.getEventQueueMap().size() <= eventIndex)
-            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender,"error-event-not-found", Placeholder.replace("event-index", String.valueOf(eventIndex))));
 
         WorldEventQueueApi queue = worldEventManager.getEventQueueMap().get(queueKey);
+
+        if (queue.getEventQueue().size() <= eventIndex)
+            throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender,"error-event-not-found", Placeholder.replace("event-index", String.valueOf(eventIndex))));
 
         Optional<WorldEventSelfFactoryApi> eventFactory = Optional.ofNullable(queue.getEventSet().get(eventKey));
 
         if (eventAction.equalsIgnoreCase("swap") && queue.getEventQueueAsList().get(eventIndex).isActive())
             throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-event-active-swap"));
-        if (eventAction.equalsIgnoreCase("swap") && eventFactory.isEmpty())
+        if ((eventAction.equalsIgnoreCase("swap") || eventAction.equalsIgnoreCase("add")) && eventFactory.isEmpty())
             throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-event-key-not-found", Placeholder.replace("event-key", eventKey)));
 
         switch (eventAction) {
@@ -257,6 +274,18 @@ public class WorldEventsCommand {
                 sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender,"success-event-type-swapped",
                         Placeholder.replace("event-index", String.valueOf(eventIndex)),
                         Placeholder.legacy("event-name", eventFactory.get().getEventData().name())));
+            }
+            case "add" -> {
+                queue.queueEvent(eventFactory.get().create());
+                sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-queued",
+                        Placeholder.legacy("event-name", eventFactory.get().getEventData().name()),
+                        Placeholder.legacy("queue-name", queue.getQueueData().name())));
+            }
+            case "remove" -> {
+                WorldEventApi removedEvent = queue.removeEvent(eventIndex);
+                sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-event-removed",
+                        Placeholder.legacy("event-name", removedEvent.getEventData().name()),
+                        Placeholder.legacy("queue-name", queue.getQueueData().name())));
             }
             case "info" -> {
                 sender.sendMessage(I18n.reduceComponent(I18n.global.getLegacyPlaceholderComponentList(I18n.toLocale(sender), sender, "info-event",
@@ -314,7 +343,8 @@ public class WorldEventsCommand {
         String action = (String) args.getOrDefault("expansionAction", "info");
         String expansionKey = args.getOrDefaultRaw("expansionKey", "");
 
-        if (!expansionRegistry.getRegisteredExpansions().containsKey(expansionKey))
+        if ((action.equalsIgnoreCase("unregister") || action.equalsIgnoreCase("info")) &&
+                !expansionRegistry.getRegisteredExpansions().containsKey(expansionKey))
             throw CommandAPIBukkit.failWithAdventureComponent(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "error-expansion-not-found",
                     Placeholder.replace("expansion-key", expansionKey)));
 

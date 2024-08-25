@@ -114,13 +114,35 @@ public class WorldEventQueue implements WorldEventQueueApi {
         isActive = false;
         if (eventCyclePromise != null && !eventCyclePromise.isClosed())
             eventCyclePromise.closeSilently();
-        if (!event.getStopPromise().isClosed())
+        if (event.getStopPromise() != null && !event.getStopPromise().isClosed())
             event.getStopPromise().closeSilently();
     }
 
     protected void removeExpireTime()
     {
         eventQueue.forEach(event -> event.setExpireTime(null));
+    }
+
+    @Override
+    public void queueEvent(WorldEventApi event) {
+        eventQueue.add(event);
+    }
+
+    @Override
+    public WorldEventApi removeEvent(int index) {
+        WorldEventApi event = getEventQueueAsList().get(index);
+
+        if (event.isActive())
+        {
+            stopCurrent();
+            startNextSilently();
+            return event;
+        }
+
+        getEventQueueAsList().remove(index);
+        if (eventQueue.size() < queueData.capacity())
+            eventQueue.add(selectRandomEvent());
+        return event;
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.nevermined.worldevents.api.expansions.ExpansionData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.api.expansions.ExpansionRegistryApi;
+import org.nevermined.worldevents.api.expansions.WorldEventExpansion;
 
 import java.io.File;
 import java.time.Instant;
@@ -35,6 +36,16 @@ public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEvent
                 new File(actionClass.getProtectionDomain().getCodeSource().getLocation().getFile()).getName(),
                 actionClass.getName(),
                 Instant.now()));
+    }
+
+    @Override
+    public void registerWorldEventExpansion(ExpansionData expansionData) {
+        expansionRegistry.registerExpansion(expansionData.key(), expansionData);
+    }
+
+    @Override
+    public void registerWorldEventExpansion(WorldEventExpansion worldEventExpansion) {
+        expansionRegistry.registerExpansion(worldEventExpansion.getKey(), worldEventExpansion.getExpansionData());
     }
 
     @Override

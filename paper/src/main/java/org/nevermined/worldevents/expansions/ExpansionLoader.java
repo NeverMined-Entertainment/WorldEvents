@@ -15,7 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.time.Instant;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -56,8 +55,12 @@ public class ExpansionLoader {
                     Log.global.error("Can not register expansion in class '" + expansionClass.getName() + "' because action is not specified!");
                     continue;
                 }
+                if (expansion.getExpansionData() == null) {
+                    Log.global.error("Can not register expansion in class '" + expansionClass.getName() + "' because expansion data is not specified!");
+                    continue;
+                }
 
-                newExpansions.put(expansion.getKey(), new ExpansionData(expansion.getKey(), expansion.getAction(), expansionFile.getName(), expansionClass.getName(), Instant.now()));
+                newExpansions.put(expansion.getKey(), expansion.getExpansionData());
             }
         }
 

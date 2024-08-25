@@ -15,15 +15,19 @@ import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.config.MainGuiConfigApi;
 import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
+import org.nevermined.worldevents.api.expansions.ExpansionData;
+import org.nevermined.worldevents.api.expansions.ExpansionRegistryApi;
 import org.nevermined.worldevents.commands.modules.CommandModule;
 import org.nevermined.worldevents.config.modules.ConfigModule;
 import org.nevermined.worldevents.core.modules.WorldEventManagerModule;
+import org.nevermined.worldevents.expansions.DemoExpansion;
 import org.nevermined.worldevents.expansions.ExpansionLoader;
 import org.nevermined.worldevents.expansions.modules.ExpansionModule;
 import org.nevermined.worldevents.hooks.modules.HooksModule;
 import org.nevermined.worldevents.modules.PluginModule;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.concurrent.Executors;
 
 @Singleton
@@ -72,6 +76,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         try {
             worldEventManager = injector.getInstance(WorldEventManagerApi.class);
             injector.getInstance(ExpansionLoader.class).loadExpansions(new File(getDataFolder(), "expansions"));
+            worldEventManager.reloadEventQueues();
         } catch (ConfigurationException | ProvisionException e)
         {
             Log.global.exception("Guice configuration/provision exception", e);
@@ -117,6 +122,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     private void initializeI18n()
     {
         I18n.global.loadLanguage("lang/ru.yml", this);
+        I18n.global.loadLanguage("lang/en.yml", this);
         I18n.global.loadDefaultPluginLanguage(this);
         I18n.global.setDefaultLanguage(I18n.getDefaultLanguageFile(this));
         I18n.global.setStringValidator(new EmptyValidator());
@@ -127,6 +133,13 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         reloadConfig();
         Config.global.reloadConfig(getConfig());
         initializeI18n();
+    }
+
+    public void reloadExpansions()
+    {
+        injector.getInstance(ExpansionRegistryApi.class).getRegisteredExpansions().clear();
+        injector.getInstance(ExpansionRegistryApi.class).getRegisteredExpansions().put("Demo", new ExpansionData("Demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now()));
+        injector.getInstance(ExpansionLoader.class).loadExpansions(new File(getDataFolder(), "expansions"));
     }
 
     public GlobalConfigApi getGlobalConfig() {
