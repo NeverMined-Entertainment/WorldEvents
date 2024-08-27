@@ -22,7 +22,7 @@ dependencies {
 
     implementation "me.wyne:WUtils-config:2.5.3"
     implementation "me.wyne:WUtils-log:3.0.3"
-    implementation("me.wyne:WUtils-i18n:2.3.6") {
+    implementation("me.wyne:WUtils-i18n:2.3.7") {
         exclude group: "net.kyori"
     }
 
