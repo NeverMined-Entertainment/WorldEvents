@@ -78,7 +78,8 @@ public class WorldEventQueue implements WorldEventQueueApi {
     {
         WorldEventApi event = peekEvent();
         setExpireTime();
-        event.startEvent(this);
+        if (!event.isActive())
+            event.startEvent(this);
         isActive = true;
         eventCyclePromise = event.getStopPromise().thenRunDelayedSync(() -> {
             pollEvent();
@@ -110,7 +111,8 @@ public class WorldEventQueue implements WorldEventQueueApi {
 
         WorldEventApi event = pollEvent();
         removeExpireTime();
-        event.stopEvent(this);
+        if (event.isActive())
+            event.stopEvent(this);
         isActive = false;
         if (eventCyclePromise != null && !eventCyclePromise.isClosed())
             eventCyclePromise.closeSilently();

@@ -1,7 +1,7 @@
 ### Format
 
 ## Event
-event-expire-time-format: "dd.MM.yyyy HHh:mmm:sss"
+event-expire-time-format: "dd.MM.yyyy HH'h':mm'm':ss's'"
 event-chance-format: "Chance: %worldevents_event_<queue-key>_<event-index>_chance%"
 event-type-format: "Type: %worldevents_event_<queue-key>_<event-index>_type%"
 event-duration-format: "Duration: %worldevents_event_<queue-key>_<event-index>_duration%"
