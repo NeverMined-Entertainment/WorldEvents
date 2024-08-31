@@ -2,47 +2,47 @@ lang: 'en.yml'
 
 events:
   demo-queue-1:
-    name: "Demo queue 1"
+    name: 'Demo queue 1'
     description:
-      - "Demo queue 1 description"
+      - 'Demo queue 1 description'
     item: STONE
     capacity: 2
     demo-event-1-1:
-      name: "Demo 1-1"
+      name: 'Demo 1-1'
       description:
-        - "Demo 1-1 description"
+        - 'Demo 1-1 description'
       item: NETHER_STAR
-      type: "Demo"
+      type: 'Demo'
       chance: 50
       duration: 60
       cooldown: 60
     demo-event-1-2:
-      name: "Demo 1-2"
+      name: 'Demo 1-2'
       description:
-        - "Demo 1-2 description"
-      type: "Demo"
+        - 'Demo 1-2 description'
+      type: 'Demo'
       chance: 50
       duration: 60
       cooldown: 60
   demo-queue-2:
-    name: "Demo queue 2"
+    name: 'Demo queue 2'
     description:
-      - "Demo queue 2 description"
+      - 'Demo queue 2 description'
     item: GRASS_BLOCK
     capacity: 2
     demo-event-2-1:
-      name: "Demo 2-1"
+      name: 'Demo 2-1'
       description:
-        - "Demo 2-1 description"
-      type: "Demo"
+        - 'Demo 2-1 description'
+      type: 'Demo'
       chance: 50
       duration: 120
       cooldown: 120
     demo-event-2-2:
-      name: "Demo 2-2"
+      name: 'Demo 2-2'
       description:
-        - "Demo 2-2 description"
-      type: "Demo"
+        - 'Demo 2-2 description'
+      type: 'Demo'
       chance: 50
       duration: 120
       cooldown: 120

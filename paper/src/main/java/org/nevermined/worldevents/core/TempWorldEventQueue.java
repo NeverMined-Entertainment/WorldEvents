@@ -35,7 +35,8 @@ public class TempWorldEventQueue extends WorldEventQueue {
 
         WorldEventApi event = peekEvent();
         setExpireTime();
-        event.startEvent(this);
+        if (!event.isActive())
+            event.startEvent(this);
         isActive = true;
         eventCyclePromise = event.getStopPromise().thenRunDelayedSync(() -> {
             pollEvent();
