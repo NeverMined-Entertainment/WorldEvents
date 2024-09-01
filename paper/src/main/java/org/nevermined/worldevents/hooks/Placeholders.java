@@ -94,24 +94,24 @@ public class Placeholders extends PlaceholderExpansion {
             // event_  demo-queue-1 _0_  name
 
             String[] args = params.split("_");
-            try {
-                if (args[2].matches("^\\d+$"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], Integer.valueOf(args[2]));
-                else
-                {
-                    if (args[2].equalsIgnoreCase("current"))
-                        return eventDataParserMap.get(args[3]).apply(args[1], 0);
-                    if (args[2].equalsIgnoreCase("next"))
-                        return eventDataParserMap.get(args[3]).apply(args[1], 1);
-                    if (args[2].equalsIgnoreCase("last"))
-                        return eventDataParserMap.get(args[3]).apply(args[1], worldEventManager.getEventQueueMap().get(args[1]).getEventQueue().size() - 1);
-                }
-            } catch (NullPointerException e)
+
+            if (!eventDataParserMap.containsKey(args[3]))
             {
-                Log.global.exception("Event placeholder type '" + args[3] + "' not found!", e);
+                Log.global.error("Event placeholder type '" + args[3] + "' not found!");
                 return null;
             }
 
+            if (args[2].matches("^\\d+$"))
+                return eventDataParserMap.get(args[3]).apply(args[1], Integer.valueOf(args[2]));
+            else
+            {
+                if (args[2].equalsIgnoreCase("current"))
+                    return eventDataParserMap.get(args[3]).apply(args[1], 0);
+                if (args[2].equalsIgnoreCase("next"))
+                    return eventDataParserMap.get(args[3]).apply(args[1], 1);
+                if (args[2].equalsIgnoreCase("last"))
+                    return eventDataParserMap.get(args[3]).apply(args[1], worldEventManager.getEventQueueMap().get(args[1]).getEventQueue().size() - 1);
+            }
         }
 
         if (params.startsWith("queue"))
@@ -120,13 +120,14 @@ public class Placeholders extends PlaceholderExpansion {
             // queue_  demo-queue-1  _name
 
             String[] args = params.split("_");
-            try {
-                return queueDataParserMap.get(args[2]).apply(args[1]);
-            } catch (NullPointerException e)
+
+            if (!eventDataParserMap.containsKey(args[3]))
             {
-                Log.global.exception("Queue placeholder type '" + args[2] + "' not found!", e);
+                Log.global.error("Queue placeholder type '" + args[3] + "' not found!");
                 return null;
             }
+
+            return queueDataParserMap.get(args[2]).apply(args[1]);
         }
 
         if (params.startsWith("expansion"))
@@ -135,13 +136,14 @@ public class Placeholders extends PlaceholderExpansion {
             // expansion_     Demo    _jar
 
             String[] args = params.split("_");
-            try {
-                return expansionDataParserMap.get(args[2]).apply(args[1]);
-            } catch (NullPointerException e)
+
+            if (!eventDataParserMap.containsKey(args[3]))
             {
-                Log.global.exception("Expansion placeholder type '" + args[2] + "' not found!", e);
+                Log.global.error("Expansion placeholder type '" + args[3] + "' not found!");
                 return null;
             }
+
+            return expansionDataParserMap.get(args[2]).apply(args[1]);
         }
 
         return null;
