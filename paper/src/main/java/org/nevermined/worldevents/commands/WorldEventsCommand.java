@@ -91,9 +91,9 @@ public class WorldEventsCommand {
                                     plugin.reloadExpansions();
                                     sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-expansions-reloaded"));
                                 }))
-                        .then(new MultiLiteralArgument("expansionAction", getExpansionActionSuggestions())
-                                .then(new StringArgument("expansionKey")
-                                        .replaceSuggestions(ArgumentSuggestions.stringCollection(this::getExpansionKeySuggestions))
+                        .then(new StringArgument("expansionKey")
+                                .replaceSuggestions(ArgumentSuggestions.stringCollection(this::getExpansionKeySuggestions))
+                                .then(new MultiLiteralArgument("expansionAction", getExpansionActionSuggestions())
                                         .executes(this::executeExpansionCommand))))
                 .then(new LiteralArgument("reload")
                         .withPermission(CommandPermission.OP)

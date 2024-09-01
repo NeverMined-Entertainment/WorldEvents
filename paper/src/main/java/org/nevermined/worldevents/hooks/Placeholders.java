@@ -267,8 +267,8 @@ public class Placeholders extends PlaceholderExpansion {
     private void createExpansionUsageParser()
     {
         expansionDataParserMap.put("usage", expansionKey -> {
-            Stream<String> eventKeysStream = worldEventManager.getEventQueueMap().keySet().stream()
-                    .flatMap(queueKey -> worldEventManager.getEventQueueMap().get(queueKey).getEventSet().values().stream())
+            Stream<String> eventKeysStream = worldEventManager.getEventQueueMap().values().stream()
+                    .flatMap(queue -> queue.getEventSet().values().stream())
                     .filter(eventFactory -> eventFactory.getEventData().expansionData().key().equals(expansionKey))
                     .map(eventFactory -> eventFactory.getEventData().key());
             return eventKeysStream
