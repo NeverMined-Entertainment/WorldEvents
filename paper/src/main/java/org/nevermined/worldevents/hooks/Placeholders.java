@@ -109,7 +109,7 @@ public class Placeholders extends PlaceholderExpansion {
             } catch (NullPointerException e)
             {
                 Log.global.exception("Event placeholder type '" + args[3] + "' not found!", e);
-                return params;
+                return null;
             }
 
         }
@@ -125,7 +125,7 @@ public class Placeholders extends PlaceholderExpansion {
             } catch (NullPointerException e)
             {
                 Log.global.exception("Queue placeholder type '" + args[2] + "' not found!", e);
-                return params;
+                return null;
             }
         }
 
@@ -140,11 +140,11 @@ public class Placeholders extends PlaceholderExpansion {
             } catch (NullPointerException e)
             {
                 Log.global.exception("Expansion placeholder type '" + args[2] + "' not found!", e);
-                return params;
+                return null;
             }
         }
 
-        return params;
+        return null;
     }
 
     private void createEventNameParser()
