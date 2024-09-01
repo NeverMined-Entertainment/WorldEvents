@@ -101,16 +101,22 @@ public class Placeholders extends PlaceholderExpansion {
                 return null;
             }
 
-            if (args[2].matches("^\\d+$"))
-                return eventDataParserMap.get(args[3]).apply(args[1], Integer.valueOf(args[2]));
-            else
+            try {
+                if (args[2].matches("^\\d+$"))
+                    return eventDataParserMap.get(args[3]).apply(args[1], Integer.valueOf(args[2]));
+                else
+                {
+                    if (args[2].equalsIgnoreCase("current"))
+                        return eventDataParserMap.get(args[3]).apply(args[1], 0);
+                    if (args[2].equalsIgnoreCase("next"))
+                        return eventDataParserMap.get(args[3]).apply(args[1], 1);
+                    if (args[2].equalsIgnoreCase("last"))
+                        return eventDataParserMap.get(args[3]).apply(args[1], worldEventManager.getEventQueueMap().get(args[1]).getEventQueue().size() - 1);
+                }
+            } catch (NullPointerException e)
             {
-                if (args[2].equalsIgnoreCase("current"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], 0);
-                if (args[2].equalsIgnoreCase("next"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], 1);
-                if (args[2].equalsIgnoreCase("last"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], worldEventManager.getEventQueueMap().get(args[1]).getEventQueue().size() - 1);
+                Log.global.exception(e);
+                return null;
             }
         }
 
@@ -127,7 +133,14 @@ public class Placeholders extends PlaceholderExpansion {
                 return null;
             }
 
-            return queueDataParserMap.get(args[2]).apply(args[1]);
+            try {
+                return queueDataParserMap.get(args[2]).apply(args[1]);
+            } catch (NullPointerException e)
+            {
+                Log.global.exception(e);
+                return null;
+            }
+
         }
 
         if (params.startsWith("expansion"))
@@ -143,7 +156,13 @@ public class Placeholders extends PlaceholderExpansion {
                 return null;
             }
 
-            return expansionDataParserMap.get(args[2]).apply(args[1]);
+            try {
+                return expansionDataParserMap.get(args[2]).apply(args[1]);
+            } catch (NullPointerException e)
+            {
+                Log.global.exception(e);
+                return null;
+            }
         }
 
         return null;
