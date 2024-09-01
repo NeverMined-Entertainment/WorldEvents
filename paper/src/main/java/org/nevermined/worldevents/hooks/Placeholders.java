@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.log.Log;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
@@ -93,17 +94,24 @@ public class Placeholders extends PlaceholderExpansion {
             // event_  demo-queue-1 _0_  name
 
             String[] args = params.split("_");
-            if (args[2].matches("^\\d+$"))
-                return eventDataParserMap.get(args[3]).apply(args[1], Integer.valueOf(args[2]));
-            else
+            try {
+                if (args[2].matches("^\\d+$"))
+                    return eventDataParserMap.get(args[3]).apply(args[1], Integer.valueOf(args[2]));
+                else
+                {
+                    if (args[2].equalsIgnoreCase("current"))
+                        return eventDataParserMap.get(args[3]).apply(args[1], 0);
+                    if (args[2].equalsIgnoreCase("next"))
+                        return eventDataParserMap.get(args[3]).apply(args[1], 1);
+                    if (args[2].equalsIgnoreCase("last"))
+                        return eventDataParserMap.get(args[3]).apply(args[1], worldEventManager.getEventQueueMap().get(args[1]).getEventQueue().size() - 1);
+                }
+            } catch (NullPointerException e)
             {
-                if (args[2].equalsIgnoreCase("current"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], 0);
-                if (args[2].equalsIgnoreCase("next"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], 1);
-                if (args[2].equalsIgnoreCase("last"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], worldEventManager.getEventQueueMap().get(args[1]).getEventQueue().size() - 1);
+                Log.global.exception("Event placeholder type '" + args[2] + "' not found!", e);
+                return params;
             }
+
         }
 
         if (params.startsWith("queue"))
@@ -112,7 +120,13 @@ public class Placeholders extends PlaceholderExpansion {
             // queue_  demo-queue-1  _name
 
             String[] args = params.split("_");
-            return queueDataParserMap.get(args[2]).apply(args[1]);
+            try {
+                return queueDataParserMap.get(args[2]).apply(args[1]);
+            } catch (NullPointerException e)
+            {
+                Log.global.exception("Queue placeholder type '" + args[2] + "' not found!", e);
+                return params;
+            }
         }
 
         if (params.startsWith("expansion"))
@@ -121,10 +135,16 @@ public class Placeholders extends PlaceholderExpansion {
             // expansion_     Demo    _jar
 
             String[] args = params.split("_");
-            return expansionDataParserMap.get(args[2]).apply(args[1]);
+            try {
+                return expansionDataParserMap.get(args[2]).apply(args[1]);
+            } catch (NullPointerException e)
+            {
+                Log.global.exception("Expansion placeholder type '" + args[2] + "' not found!", e);
+                return params;
+            }
         }
 
-        return null;
+        return params;
     }
 
     private void createEventNameParser()
