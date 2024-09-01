@@ -108,7 +108,7 @@ public class Placeholders extends PlaceholderExpansion {
                 }
             } catch (NullPointerException e)
             {
-                Log.global.exception("Event placeholder type '" + args[2] + "' not found!", e);
+                Log.global.exception("Event placeholder type '" + args[3] + "' not found!", e);
                 return params;
             }
 
