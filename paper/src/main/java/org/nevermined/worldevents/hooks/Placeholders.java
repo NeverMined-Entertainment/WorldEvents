@@ -121,7 +121,7 @@ public class Placeholders extends PlaceholderExpansion {
 
             String[] args = params.split("_");
 
-            if (!eventDataParserMap.containsKey(args[3]))
+            if (!eventDataParserMap.containsKey(args[2]))
             {
                 Log.global.error("Queue placeholder type '" + args[3] + "' not found!");
                 return null;
@@ -137,7 +137,7 @@ public class Placeholders extends PlaceholderExpansion {
 
             String[] args = params.split("_");
 
-            if (!eventDataParserMap.containsKey(args[3]))
+            if (!eventDataParserMap.containsKey(args[2]))
             {
                 Log.global.error("Expansion placeholder type '" + args[3] + "' not found!");
                 return null;
