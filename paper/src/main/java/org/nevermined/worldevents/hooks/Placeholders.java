@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.log.Log;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
@@ -93,16 +94,29 @@ public class Placeholders extends PlaceholderExpansion {
             // event_  demo-queue-1 _0_  name
 
             String[] args = params.split("_");
-            if (args[2].matches("^\\d+$"))
-                return eventDataParserMap.get(args[3]).apply(args[1], Integer.valueOf(args[2]));
-            else
+
+            if (!eventDataParserMap.containsKey(args[3]))
             {
-                if (args[2].equalsIgnoreCase("current"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], 0);
-                if (args[2].equalsIgnoreCase("next"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], 1);
-                if (args[2].equalsIgnoreCase("last"))
-                    return eventDataParserMap.get(args[3]).apply(args[1], worldEventManager.getEventQueueMap().get(args[1]).getEventQueue().size() - 1);
+                Log.global.error("Event placeholder type '" + args[3] + "' not found!");
+                return null;
+            }
+
+            try {
+                if (args[2].matches("^\\d+$"))
+                    return eventDataParserMap.get(args[3]).apply(args[1], Integer.valueOf(args[2]));
+                else
+                {
+                    if (args[2].equalsIgnoreCase("current"))
+                        return eventDataParserMap.get(args[3]).apply(args[1], 0);
+                    if (args[2].equalsIgnoreCase("next"))
+                        return eventDataParserMap.get(args[3]).apply(args[1], 1);
+                    if (args[2].equalsIgnoreCase("last"))
+                        return eventDataParserMap.get(args[3]).apply(args[1], worldEventManager.getEventQueueMap().get(args[1]).getEventQueue().size() - 1);
+                }
+            } catch (NullPointerException e)
+            {
+                Log.global.exception(e);
+                return null;
             }
         }
 
@@ -112,7 +126,21 @@ public class Placeholders extends PlaceholderExpansion {
             // queue_  demo-queue-1  _name
 
             String[] args = params.split("_");
-            return queueDataParserMap.get(args[2]).apply(args[1]);
+
+            if (!queueDataParserMap.containsKey(args[2]))
+            {
+                Log.global.error("Queue placeholder type '" + args[3] + "' not found!");
+                return null;
+            }
+
+            try {
+                return queueDataParserMap.get(args[2]).apply(args[1]);
+            } catch (NullPointerException e)
+            {
+                Log.global.exception(e);
+                return null;
+            }
+
         }
 
         if (params.startsWith("expansion"))
@@ -121,7 +149,20 @@ public class Placeholders extends PlaceholderExpansion {
             // expansion_     Demo    _jar
 
             String[] args = params.split("_");
-            return expansionDataParserMap.get(args[2]).apply(args[1]);
+
+            if (!expansionDataParserMap.containsKey(args[2]))
+            {
+                Log.global.error("Expansion placeholder type '" + args[3] + "' not found!");
+                return null;
+            }
+
+            try {
+                return expansionDataParserMap.get(args[2]).apply(args[1]);
+            } catch (NullPointerException e)
+            {
+                Log.global.exception(e);
+                return null;
+            }
         }
 
         return null;
@@ -267,8 +308,8 @@ public class Placeholders extends PlaceholderExpansion {
     private void createExpansionUsageParser()
     {
         expansionDataParserMap.put("usage", expansionKey -> {
-            Stream<String> eventKeysStream = worldEventManager.getEventQueueMap().keySet().stream()
-                    .flatMap(queueKey -> worldEventManager.getEventQueueMap().get(queueKey).getEventSet().values().stream())
+            Stream<String> eventKeysStream = worldEventManager.getEventQueueMap().values().stream()
+                    .flatMap(queue -> queue.getEventSet().values().stream())
                     .filter(eventFactory -> eventFactory.getEventData().expansionData().key().equals(expansionKey))
                     .map(eventFactory -> eventFactory.getEventData().key());
             return eventKeysStream

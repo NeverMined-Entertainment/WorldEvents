@@ -6,7 +6,7 @@ plugins {
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
     compileOnly "me.clip:placeholderapi:2.11.6"
-    implementation "dev.jorel:commandapi-bukkit-shade:9.4.1"
+    implementation "dev.jorel:commandapi-bukkit-shade:9.5.3"
 
     implementation project(":api")
 
@@ -21,7 +21,7 @@ dependencies {
     implementation "net.kyori:adventure-text-serializer-plain:4.7.0"
 
     implementation "me.wyne:WUtils-config:2.5.3"
-    implementation "me.wyne:WUtils-log:3.0.3"
+    implementation "me.wyne:WUtils-log:3.0.5"
     implementation("me.wyne:WUtils-i18n:2.3.7") {
         exclude group: "net.kyori"
     }
