@@ -129,7 +129,7 @@ public class Placeholders extends PlaceholderExpansion {
 
             if (!queueDataParserMap.containsKey(args[2]))
             {
-                Log.global.error("Queue placeholder type '" + args[3] + "' not found!");
+                Log.global.error("Queue placeholder type '" + args[2] + "' not found!");
                 return null;
             }
 
@@ -152,7 +152,7 @@ public class Placeholders extends PlaceholderExpansion {
 
             if (!expansionDataParserMap.containsKey(args[2]))
             {
-                Log.global.error("Expansion placeholder type '" + args[3] + "' not found!");
+                Log.global.error("Expansion placeholder type '" + args[2] + "' not found!");
                 return null;
             }
 
