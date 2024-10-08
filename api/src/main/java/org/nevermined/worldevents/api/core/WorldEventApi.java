@@ -2,8 +2,8 @@ package org.nevermined.worldevents.api.core;
 
 import me.lucko.helper.promise.Promise;
 import org.jetbrains.annotations.Nullable;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
 
 import java.time.Instant;
 import java.util.Optional;

@@ -6,11 +6,11 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.nevermined.worldevents.api.WEApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
-import org.nevermined.worldevents.api.expansions.ExpansionData;
+import org.nevermined.worldevents.api.expansion.ExpansionData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
-import org.nevermined.worldevents.api.expansions.ExpansionRegistryApi;
-import org.nevermined.worldevents.api.expansions.WorldEventExpansion;
+import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
+import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 
 import java.io.File;
 import java.time.Instant;

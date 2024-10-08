@@ -2,12 +2,12 @@ package org.nevermined.worldevents.config;
 
 import com.google.inject.Singleton;
 import me.wyne.wutils.config.ConfigEntry;
+import me.wyne.wutils.config.configurables.GuiItemConfigurable;
+import me.wyne.wutils.config.configurables.MaterialConfigurable;
 import org.bukkit.Material;
 import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
-import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
-import org.nevermined.worldevents.api.config.configurables.MaterialConfigurableApi;
-import org.nevermined.worldevents.config.configurables.GuiItemConfigurable;
-import org.nevermined.worldevents.config.configurables.MaterialConfigurable;
+import org.nevermined.worldevents.api.config.configurable.GuiItemConfigurableApi;
+import org.nevermined.worldevents.config.configurable.GuiItemConfigurableWrapper;
 
 import java.util.ArrayList;
 
@@ -15,31 +15,34 @@ import java.util.ArrayList;
 public class CommonGuiConfig implements CommonGuiConfigApi {
 
     @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-border")
-    private MaterialConfigurableApi border = new MaterialConfigurable(Material.CYAN_STAINED_GLASS_PANE);
+    private MaterialConfigurable border = new MaterialConfigurable(Material.CYAN_STAINED_GLASS_PANE);
 
     @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-previous")
-    private GuiItemConfigurableApi navigationPrevious = new GuiItemConfigurable(
-            48,
-            Material.PAPER,
+    private GuiItemConfigurable navigationPrevious = new GuiItemConfigurable(
             "common-gui-previous",
+            Material.PAPER,
+            48,
+            -1,
             new ArrayList<>(),
             null, null
     );
 
     @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-next")
-    private GuiItemConfigurableApi navigationNext = new GuiItemConfigurable(
-            50,
-            Material.PAPER,
+    private GuiItemConfigurable navigationNext = new GuiItemConfigurable(
             "common-gui-next",
+            Material.PAPER,
+            50,
+            -1,
             new ArrayList<>(),
             null, null
     );
 
     @ConfigEntry(section = "GUI.Common Gui", path = "common-gui-back")
-    private GuiItemConfigurableApi navigationBack = new GuiItemConfigurable(
-            53,
-            Material.RED_STAINED_GLASS_PANE,
+    private GuiItemConfigurable navigationBack = new GuiItemConfigurable(
             "common-gui-back",
+            Material.RED_STAINED_GLASS_PANE,
+            53,
+            -1,
             new ArrayList<>(),
             null, null
     );
@@ -51,17 +54,32 @@ public class CommonGuiConfig implements CommonGuiConfigApi {
     @Override
     public GuiItemConfigurableApi getNavigationPrevious()
     {
+        return new GuiItemConfigurableWrapper(navigationPrevious);
+    }
+
+    public GuiItemConfigurable getNavigationPreviousImpl()
+    {
         return navigationPrevious;
     }
 
     @Override
     public GuiItemConfigurableApi getNavigationNext()
     {
+        return new GuiItemConfigurableWrapper(navigationNext);
+    }
+
+    public GuiItemConfigurable getNavigationNextImpl()
+    {
         return navigationNext;
     }
 
     @Override
     public GuiItemConfigurableApi getNavigationBack()
+    {
+        return new GuiItemConfigurableWrapper(navigationBack);
+    }
+
+    public GuiItemConfigurable getNavigationBackImpl()
     {
         return navigationBack;
     }

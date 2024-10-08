@@ -1,8 +1,7 @@
 package org.nevermined.worldevents.api.core;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
 
 import java.util.Map;
 

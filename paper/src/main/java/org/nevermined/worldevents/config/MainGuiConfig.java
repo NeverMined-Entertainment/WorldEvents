@@ -2,12 +2,12 @@ package org.nevermined.worldevents.config;
 
 import com.google.inject.Singleton;
 import me.wyne.wutils.config.ConfigEntry;
+import me.wyne.wutils.config.configurables.GuiItemConfigurable;
+import me.wyne.wutils.config.configurables.MaterialConfigurable;
 import org.bukkit.Material;
 import org.nevermined.worldevents.api.config.MainGuiConfigApi;
-import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
-import org.nevermined.worldevents.api.config.configurables.MaterialConfigurableApi;
-import org.nevermined.worldevents.config.configurables.GuiItemConfigurable;
-import org.nevermined.worldevents.config.configurables.MaterialConfigurable;
+import org.nevermined.worldevents.api.config.configurable.GuiItemConfigurableApi;
+import org.nevermined.worldevents.config.configurable.GuiItemConfigurableWrapper;
 
 import java.util.ArrayList;
 
@@ -15,13 +15,14 @@ import java.util.ArrayList;
 public class MainGuiConfig implements MainGuiConfigApi {
 
     @ConfigEntry(section = "GUI.Main Gui", path = "main-gui-filler")
-    private MaterialConfigurableApi filler = new MaterialConfigurable(Material.CYAN_STAINED_GLASS_PANE);
+    private MaterialConfigurable filler = new MaterialConfigurable(Material.CYAN_STAINED_GLASS_PANE);
 
     @ConfigEntry(section = "GUI.Main Gui", path = "main-gui-queues")
-    private GuiItemConfigurableApi queuesItem = new GuiItemConfigurable(
-            4,
-            Material.CHEST,
+    private GuiItemConfigurable queuesItem = new GuiItemConfigurable(
             "main-gui-queues",
+            Material.CHEST,
+            4,
+            -1,
             new ArrayList<>(),
             null, null
     );
@@ -33,6 +34,10 @@ public class MainGuiConfig implements MainGuiConfigApi {
 
     @Override
     public GuiItemConfigurableApi getQueuesItem() {
+        return new GuiItemConfigurableWrapper(queuesItem);
+    }
+
+    public GuiItemConfigurable getQueuesItemImpl() {
         return queuesItem;
     }
 }

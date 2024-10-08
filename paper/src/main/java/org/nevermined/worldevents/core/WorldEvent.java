@@ -7,10 +7,10 @@ import org.nevermined.worldevents.api.core.EventData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
-import org.nevermined.worldevents.api.events.WorldEventStop;
-import org.nevermined.worldevents.api.events.WorldEventStart;
+import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
+import org.nevermined.worldevents.api.event.WorldEventStop;
+import org.nevermined.worldevents.api.event.WorldEventStart;
 
 import java.time.Instant;
 import java.util.Optional;

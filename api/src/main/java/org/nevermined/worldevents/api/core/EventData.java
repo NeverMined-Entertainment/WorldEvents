@@ -2,7 +2,7 @@ package org.nevermined.worldevents.api.core;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.nevermined.worldevents.api.expansions.ExpansionData;
+import org.nevermined.worldevents.api.expansion.ExpansionData;
 
 import java.util.List;
 

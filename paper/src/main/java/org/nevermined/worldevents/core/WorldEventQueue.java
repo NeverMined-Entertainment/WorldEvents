@@ -6,9 +6,9 @@ import me.wyne.wutils.log.Log;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.nevermined.worldevents.api.core.*;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
-import org.nevermined.worldevents.api.expansions.ExpansionData;
+import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
+import org.nevermined.worldevents.api.expansion.ExpansionData;
 
 import java.time.Instant;
 import java.util.*;
