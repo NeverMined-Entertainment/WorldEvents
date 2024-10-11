@@ -10,34 +10,22 @@ import me.wyne.wutils.i18n.language.validation.EmptyValidator;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
-import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
-import org.nevermined.worldevents.api.config.GlobalConfigApi;
-import org.nevermined.worldevents.api.config.MainGuiConfigApi;
-import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
-import org.nevermined.worldevents.api.expansion.ExpansionData;
-import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
 import org.nevermined.worldevents.command.module.CommandModule;
 import org.nevermined.worldevents.config.module.ConfigModule;
 import org.nevermined.worldevents.core.module.WorldEventManagerModule;
-import org.nevermined.worldevents.expansion.DemoExpansion;
 import org.nevermined.worldevents.expansion.ExpansionLoader;
 import org.nevermined.worldevents.expansion.module.ExpansionModule;
 import org.nevermined.worldevents.hook.module.HooksModule;
 import org.nevermined.worldevents.module.PluginModule;
 
 import java.io.File;
-import java.time.Instant;
 import java.util.concurrent.Executors;
 
 @Singleton
 public final class WorldEvents extends ExtendedJavaPlugin {
 
     private Injector injector;
-
-    private GlobalConfigApi globalConfig;
-
-    private WorldEventManagerApi worldEventManager;
 
     @Override
     protected void load() {
@@ -62,7 +50,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
                     new PluginModule(this),
                     new ConfigModule(),
                     new HooksModule(),
-                    new ExpansionModule(),
+                    new ExpansionModule(expansionsFolder),
                     new WorldEventManagerModule(),
                     new CommandModule()
             );
@@ -74,8 +62,8 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         initializeConfig();
 
         try {
-            worldEventManager = injector.getInstance(WorldEventManagerApi.class);
-            injector.getInstance(ExpansionLoader.class).loadExpansions(new File(getDataFolder(), "expansions"));
+            WorldEventManagerApi worldEventManager = injector.getInstance(WorldEventManagerApi.class);
+            injector.getInstance(ExpansionLoader.class).reloadExpansions();
             worldEventManager.reloadEventQueues();
         } catch (ConfigurationException | ProvisionException e)
         {
@@ -100,19 +88,6 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     private void initializeConfig()
     {
-        try {
-            MainGuiConfigApi mainGuiConfig = injector.getInstance(MainGuiConfigApi.class);
-            CommonGuiConfigApi commonGuiConfig = injector.getInstance(CommonGuiConfigApi.class);
-            QueueGuiConfigApi queuesGuiConfig = injector.getInstance(QueueGuiConfigApi.class);
-            globalConfig = injector.getInstance(GlobalConfigApi.class);
-            Config.global.registerConfigObject(mainGuiConfig);
-            Config.global.registerConfigObject(commonGuiConfig);
-            Config.global.registerConfigObject(queuesGuiConfig);
-        } catch (ConfigurationException | ProvisionException e)
-        {
-            Log.global.exception("Guice exception while creating configuration", e);
-        }
-
         Config.global.setConfigGenerator(this, "config.yml");
         Config.global.generateConfig(getDescription().getVersion());
         reloadConfig();
@@ -134,20 +109,5 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         reloadConfig();
         Config.global.reloadConfig(getConfig());
         initializeI18n();
-    }
-
-    public void reloadExpansions()
-    {
-        injector.getInstance(ExpansionRegistryApi.class).getRegisteredExpansions().clear();
-        injector.getInstance(ExpansionRegistryApi.class).getRegisteredExpansions().put("Demo", new ExpansionData("Demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now()));
-        injector.getInstance(ExpansionLoader.class).loadExpansions(new File(getDataFolder(), "expansions"));
-    }
-
-    public GlobalConfigApi getGlobalConfig() {
-        return globalConfig;
-    }
-
-    public WorldEventManagerApi getWorldEventManager() {
-        return worldEventManager;
     }
 }

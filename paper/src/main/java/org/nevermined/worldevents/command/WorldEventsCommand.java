@@ -16,11 +16,13 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.nevermined.worldevents.WorldEvents;
+import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
 import org.nevermined.worldevents.core.TempWorldEventQueue;
+import org.nevermined.worldevents.expansion.ExpansionLoader;
 import org.nevermined.worldevents.gui.MainGui;
 
 import java.util.*;
@@ -29,15 +31,19 @@ import java.util.*;
 public class WorldEventsCommand {
 
     private final WorldEvents plugin;
+    private final GlobalConfigApi globalConfig;
     private final WorldEventManagerApi worldEventManager;
     private final ExpansionRegistryApi expansionRegistry;
+    private final ExpansionLoader expansionLoader;
 
     @Inject
-    public WorldEventsCommand(WorldEvents plugin, WorldEventManagerApi worldEventManager, ExpansionRegistryApi expansionRegistry)
+    public WorldEventsCommand(WorldEvents plugin, GlobalConfigApi globalConfig, WorldEventManagerApi worldEventManager, ExpansionRegistryApi expansionRegistry, ExpansionLoader expansionLoader)
     {
         this.plugin = plugin;
+        this.globalConfig = globalConfig;
         this.worldEventManager = worldEventManager;
         this.expansionRegistry = expansionRegistry;
+        this.expansionLoader = expansionLoader;
         registerMainCommand();
     }
 
@@ -47,7 +53,7 @@ public class WorldEventsCommand {
                 .executesPlayer((sender, args) -> {
                     if (!sender.hasPermission("wevents.queuegui"))
                         return;
-                    new MainGui(plugin, sender).openGui(sender);
+                    new MainGui(globalConfig, worldEventManager, sender).openGui(sender); // TODO Might do assisted inject
                 })
                 .then(new LiteralArgument("queue")
                         .withPermission("wevents.queuecontrol")
@@ -88,7 +94,7 @@ public class WorldEventsCommand {
                         .then(new LiteralArgument("reload")
                                 .withPermission(CommandPermission.OP)
                                 .executes((sender, args) -> {
-                                    plugin.reloadExpansions();
+                                    expansionLoader.reloadExpansions();
                                     sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-expansions-reloaded"));
                                 }))
                         .then(new StringArgument("expansionKey")
