@@ -15,7 +15,7 @@ public interface WorldEventApi {
 
     EventData getEventData();
     WorldEventAction getAction();
-    PromiseWrapper<Void> getStopPromise();
+    @Nullable PromiseWrapper<Void> getStopPromise();
     boolean isActive();
     Optional<Instant> getExpireTime();
     void setExpireTime(@Nullable Instant expireTime);

@@ -84,6 +84,7 @@ public class WorldEvent implements WorldEventApi {
     }
 
     @Override
+    @Nullable
     public PromiseWrapper<Void> getStopPromise() {
         return new PromiseWrapperImpl<>(stopPromise);
     }

@@ -5,10 +5,13 @@ import me.wyne.wutils.i18n.I18n;
 import me.wyne.wutils.log.Log;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
 import org.nevermined.worldevents.api.expansion.ExpansionData;
+import org.nevermined.worldevents.api.wrapper.PromiseWrapper;
+import org.nevermined.worldevents.wrapper.PromiseWrapperImpl;
 
 import java.time.Instant;
 import java.util.*;
@@ -172,6 +175,12 @@ public class WorldEventQueue implements WorldEventQueueApi {
     @Override
     public List<WorldEventApi> getEventQueueAsList() {
         return (LinkedList<WorldEventApi>)eventQueue;
+    }
+
+    @Override
+    @Nullable
+    public PromiseWrapper<Void> getEventCyclePromise() {
+        return new PromiseWrapperImpl<>(eventCyclePromise);
     }
 
     @Override

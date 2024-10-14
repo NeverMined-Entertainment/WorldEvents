@@ -12,7 +12,14 @@ public interface WorldEventManagerApi {
     void stopEventQueues();
     void stopEventQueue(String queueKey) throws AlreadyInactiveException;
     void reloadEventQueues();
+
+    /**
+     * @return Key - Queue Key, Value - World event
+     */
     Map<String, WorldEventApi> getCurrentEvents();
+    /**
+     * @return Key - Queue Key, Value - World event queue
+     */
     Map<String, WorldEventQueueApi> getEventQueueMap();
 
 }
