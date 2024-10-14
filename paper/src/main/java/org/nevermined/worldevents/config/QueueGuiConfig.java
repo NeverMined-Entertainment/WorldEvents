@@ -2,10 +2,11 @@ package org.nevermined.worldevents.config;
 
 import com.google.inject.Singleton;
 import me.wyne.wutils.config.ConfigEntry;
+import me.wyne.wutils.config.configurables.GuiItemConfigurable;
 import org.bukkit.Material;
 import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
-import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
-import org.nevermined.worldevents.config.configurables.GuiItemConfigurable;
+import org.nevermined.worldevents.api.config.configurable.GuiItemConfigurableApi;
+import org.nevermined.worldevents.config.configurable.GuiItemConfigurableWrapper;
 
 import java.util.ArrayList;
 
@@ -16,19 +17,21 @@ public class QueueGuiConfig implements QueueGuiConfigApi {
     private int queueGuiInfoSlot = 4;
 
     @ConfigEntry(section = "GUI.Queue Gui", path = "queue-gui-activate")
-    private GuiItemConfigurableApi queueActivate = new GuiItemConfigurable(
-            49,
-            Material.GREEN_STAINED_GLASS_PANE,
+    private GuiItemConfigurable queueActivate = new GuiItemConfigurable(
             "queue-gui-activate",
+            Material.GREEN_STAINED_GLASS_PANE,
+            49,
+            -1,
             new ArrayList<>(),
             null, null
     );
 
     @ConfigEntry(section = "GUI.Queue Gui", path = "queue-gui-deactivate")
-    private GuiItemConfigurableApi queueDeactivate = new GuiItemConfigurable(
-            49,
-            Material.RED_STAINED_GLASS_PANE,
+    private GuiItemConfigurable queueDeactivate = new GuiItemConfigurable(
             "queue-gui-deactivate",
+            Material.RED_STAINED_GLASS_PANE,
+            49,
+            -1,
             new ArrayList<>(),
             null, null
     );
@@ -40,11 +43,20 @@ public class QueueGuiConfig implements QueueGuiConfigApi {
 
     @Override
     public GuiItemConfigurableApi getQueueActivate() {
+        return new GuiItemConfigurableWrapper(queueActivate);
+    }
+
+    public GuiItemConfigurable getQueueActivateImpl() {
         return queueActivate;
     }
 
     @Override
     public GuiItemConfigurableApi getQueueDeactivate() {
+        return new GuiItemConfigurableWrapper(queueDeactivate);
+    }
+
+    public GuiItemConfigurable getQueueDeactivateImpl() {
         return queueDeactivate;
     }
+
 }

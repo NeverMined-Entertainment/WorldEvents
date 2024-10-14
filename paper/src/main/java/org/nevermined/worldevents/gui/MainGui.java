@@ -3,10 +3,11 @@ package org.nevermined.worldevents.gui;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
+import me.wyne.wutils.config.configurables.GuiItemConfigurable;
 import me.wyne.wutils.i18n.I18n;
 import org.bukkit.entity.Player;
 import org.nevermined.worldevents.WorldEvents;
-import org.nevermined.worldevents.api.config.configurables.GuiItemConfigurableApi;
+import org.nevermined.worldevents.config.MainGuiConfig;
 
 public class MainGui extends BaseGui<Gui> {
 
@@ -23,11 +24,11 @@ public class MainGui extends BaseGui<Gui> {
 
     private void buildQueuesItem(WorldEvents plugin, Player player)
     {
-        GuiItemConfigurableApi queuesConfig = plugin.getGlobalConfig().mainGuiConfig().getQueuesItem();
-        GuiItem queuesItem = queuesConfig
-                .applyPlaceholders(player)
-                .build(event ->
-                        new QueuesGui(this, plugin.getGlobalConfig(), plugin.getWorldEventManager(), player).openGui(player));
+        MainGuiConfig mainGuiConfig = (MainGuiConfig)plugin.getGlobalConfig().mainGuiConfig();
+        GuiItemConfigurable queuesConfig = mainGuiConfig.getQueuesItemImpl();
+        GuiItem queuesItem = queuesConfig.buildLegacyGuiItem(event ->
+                        new QueuesGui(this, plugin.getGlobalConfig(), plugin.getWorldEventManager(), player).openGui(player),
+                        player);
         gui.setItem(queuesConfig.getSlot(), queuesItem);
     }
 

@@ -12,8 +12,9 @@ import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
+import org.nevermined.worldevents.config.QueueGuiConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +110,8 @@ public class QueueGui extends PaginatedGui {
 
     private void buildQueueActivator(QueueGuiConfigApi config, String queueKey, WorldEventManagerApi eventManager, Player player)
     {
-        gui.updateItem(config.getQueueActivate().getSlot(), config.getQueueActivate().applyPlaceholders(player).build(event -> {
+        QueueGuiConfig queueGuiConfig = (QueueGuiConfig) config;
+        gui.updateItem(config.getQueueActivate().getSlot(), queueGuiConfig.getQueueActivateImpl().buildLegacyGuiItem(event -> {
             try {
                 eventManager.startEventQueue(queueKey);
                 updatePage(queueKey, config, eventManager, player);
@@ -118,12 +120,13 @@ public class QueueGui extends PaginatedGui {
                 player.sendMessage(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "error-queue-already-active",
                         Placeholder.legacy("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name())));
             }
-        }));
+        }, player));
     }
 
     private void buildQueueDeactivator(QueueGuiConfigApi config, String queueKey, WorldEventManagerApi eventManager, Player player)
     {
-        gui.updateItem(config.getQueueDeactivate().getSlot(), config.getQueueDeactivate().applyPlaceholders(player).build(event -> {
+        QueueGuiConfig queueGuiConfig = (QueueGuiConfig) config;
+        gui.updateItem(config.getQueueDeactivate().getSlot(), queueGuiConfig.getQueueDeactivateImpl().buildLegacyGuiItem(event -> {
             try {
                 eventManager.stopEventQueue(queueKey);
                 updatePage(queueKey, config, eventManager, player);
@@ -132,6 +135,6 @@ public class QueueGui extends PaginatedGui {
                 player.sendMessage(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "error-queue-already-inactive",
                         Placeholder.legacy("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name())));
             }
-        }));
+        }, player));
     }
 }

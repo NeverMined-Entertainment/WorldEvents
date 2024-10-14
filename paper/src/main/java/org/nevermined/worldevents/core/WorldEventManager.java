@@ -9,10 +9,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.*;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
-import org.nevermined.worldevents.api.expansions.ExpansionData;
-import org.nevermined.worldevents.api.expansions.ExpansionRegistryApi;
+import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
+import org.nevermined.worldevents.api.expansion.ExpansionData;
+import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
 
 import java.util.ArrayList;
 import java.util.Collections;

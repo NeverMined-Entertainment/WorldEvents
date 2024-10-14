@@ -7,10 +7,12 @@ import org.nevermined.worldevents.api.core.EventData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyActiveException;
-import org.nevermined.worldevents.api.core.exceptions.AlreadyInactiveException;
-import org.nevermined.worldevents.api.events.WorldEventStop;
-import org.nevermined.worldevents.api.events.WorldEventStart;
+import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
+import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
+import org.nevermined.worldevents.api.event.WorldEventStop;
+import org.nevermined.worldevents.api.event.WorldEventStart;
+import org.nevermined.worldevents.api.wrapper.PromiseWrapper;
+import org.nevermined.worldevents.wrapper.PromiseWrapperImpl;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -48,16 +50,15 @@ public class WorldEvent implements WorldEventApi {
         startEvent.callEvent();
         if (startEvent.isCancelled())
             return;
-        action.startEvent(eventData);
         isActive = true;
         stopPromise = Schedulers.sync().runLater(() -> {
-                if (!isActive && !stopPromise.isClosed()) {
-                    stopPromise.closeSilently();
-                    return;
-                }
-
-                stopEvent(queue);
-            }, eventData.durationSeconds(), TimeUnit.SECONDS);
+            if (!isActive && !stopPromise.isClosed()) {
+                stopPromise.closeSilently();
+                return;
+            }
+            stopEvent(queue);
+        }, eventData.durationSeconds(), TimeUnit.SECONDS);
+        action.startEvent(this, queue);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class WorldEvent implements WorldEventApi {
 
         WorldEventStop stopEvent = new WorldEventStop(this, queue);
         stopEvent.callEvent();
-        action.stopEvent(eventData);
+        action.stopEvent(this, queue);
         isActive = false;
     }
 
@@ -83,8 +84,9 @@ public class WorldEvent implements WorldEventApi {
     }
 
     @Override
-    public Promise<Void> getStopPromise() {
-        return stopPromise;
+    @Nullable
+    public PromiseWrapper<Void> getStopPromise() {
+        return new PromiseWrapperImpl<>(stopPromise);
     }
 
     @Override
