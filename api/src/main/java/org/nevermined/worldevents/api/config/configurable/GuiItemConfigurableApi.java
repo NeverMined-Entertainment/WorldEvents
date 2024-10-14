@@ -28,5 +28,6 @@ public interface GuiItemConfigurableApi {
     Optional<String> getPrint();
     Optional<Component> getPrint(@Nullable Player player, TextReplacementWrapper... textReplacements);
     Optional<Sound> getSound();
+    Object getGuiItemConfigurable();
 
 }

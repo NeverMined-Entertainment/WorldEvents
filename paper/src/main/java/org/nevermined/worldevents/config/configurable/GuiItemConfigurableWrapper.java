@@ -88,4 +88,8 @@ public class GuiItemConfigurableWrapper implements GuiItemConfigurableApi {
         return guiItemConfigurable.getSound();
     }
 
+    @Override
+    public Object getGuiItemConfigurable() {
+        return guiItemConfigurable;
+    }
 }

@@ -31,4 +31,9 @@ public class TerminableWrapperImpl implements TerminableWrapper {
     public void closeAndReportException() {
         terminable.closeAndReportException();
     }
+
+    @Override
+    public Object getTerminable() {
+        return terminable;
+    }
 }

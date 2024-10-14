@@ -11,6 +11,8 @@ import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
 import org.nevermined.worldevents.api.event.WorldEventStop;
 import org.nevermined.worldevents.api.event.WorldEventStart;
+import org.nevermined.worldevents.api.wrapper.PromiseWrapper;
+import org.nevermined.worldevents.wrapper.PromiseWrapperImpl;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -55,7 +57,6 @@ public class WorldEvent implements WorldEventApi {
                     stopPromise.closeSilently();
                     return;
                 }
-
                 stopEvent(queue);
             }, eventData.durationSeconds(), TimeUnit.SECONDS);
     }
@@ -83,8 +84,8 @@ public class WorldEvent implements WorldEventApi {
     }
 
     @Override
-    public Promise<Void> getStopPromise() {
-        return stopPromise;
+    public PromiseWrapper<Void> getStopPromise() {
+        return new PromiseWrapperImpl<>(stopPromise);
     }
 
     @Override

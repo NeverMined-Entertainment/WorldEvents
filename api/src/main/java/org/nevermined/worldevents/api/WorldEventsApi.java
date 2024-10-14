@@ -7,6 +7,7 @@ import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.api.expansion.ExpansionData;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
 import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
+import org.nevermined.worldevents.api.wrapper.PromiseProvider;
 
 import java.util.function.Supplier;
 
@@ -20,4 +21,5 @@ public interface WorldEventsApi {
     WorldEventManagerApi getWorldEventManager();
     ExpansionRegistryApi getExpansionRegistry();
     GlobalConfigApi getGlobalConfig();
+    PromiseProvider getPromiseProvider();
 }

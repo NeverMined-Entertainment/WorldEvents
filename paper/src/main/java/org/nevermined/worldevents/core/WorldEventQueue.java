@@ -81,7 +81,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
         if (!event.isActive())
             event.startEvent(this);
         isActive = true;
-        eventCyclePromise = event.getStopPromise().thenRunDelayedSync(() -> {
+        eventCyclePromise = ((Promise<Void>) event.getStopPromise().getPromise()).thenRunDelayedSync(() -> {
             pollEvent();
             startNextSilently();
         }, event.getEventData().cooldownSeconds(), TimeUnit.SECONDS);
