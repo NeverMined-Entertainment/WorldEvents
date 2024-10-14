@@ -1,5 +1,6 @@
 package org.nevermined.worldevents.core;
 
+import me.lucko.helper.promise.Promise;
 import org.nevermined.worldevents.api.core.*;
 
 import java.util.*;
@@ -38,7 +39,7 @@ public class TempWorldEventQueue extends WorldEventQueue {
         if (!event.isActive())
             event.startEvent(this);
         isActive = true;
-        eventCyclePromise = event.getStopPromise().thenRunDelayedSync(() -> {
+        eventCyclePromise = ((Promise<Void>) event.getStopPromise()).thenRunDelayedSync(() -> {
             pollEvent();
             startNextSilently();
         }, event.getEventData().cooldownSeconds(), TimeUnit.SECONDS);

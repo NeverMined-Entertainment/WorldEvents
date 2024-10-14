@@ -50,15 +50,15 @@ public class WorldEvent implements WorldEventApi {
         startEvent.callEvent();
         if (startEvent.isCancelled())
             return;
-        action.startEvent(eventData);
         isActive = true;
         stopPromise = Schedulers.sync().runLater(() -> {
-                if (!isActive && !stopPromise.isClosed()) {
-                    stopPromise.closeSilently();
-                    return;
-                }
-                stopEvent(queue);
-            }, eventData.durationSeconds(), TimeUnit.SECONDS);
+            if (!isActive && !stopPromise.isClosed()) {
+                stopPromise.closeSilently();
+                return;
+            }
+            stopEvent(queue);
+        }, eventData.durationSeconds(), TimeUnit.SECONDS);
+        action.startEvent(this, queue);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class WorldEvent implements WorldEventApi {
 
         WorldEventStop stopEvent = new WorldEventStop(this, queue);
         stopEvent.callEvent();
-        action.stopEvent(eventData);
+        action.stopEvent(this, queue);
         isActive = false;
     }
 

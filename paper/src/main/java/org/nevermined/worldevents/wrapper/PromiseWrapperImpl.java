@@ -84,6 +84,11 @@ public class PromiseWrapperImpl<V> implements PromiseWrapper<V> {
     }
 
     @Override
+    public Object getTerminable() {
+        return promise;
+    }
+
+    @Override
     public Promise<V> getPromise() {
         return promise;
     }

@@ -38,12 +38,12 @@ shadowJar {
     def outputDir = project.hasProperty('shadowJarOutputDir') ? project.shadowJarOutputDir : "${buildDir}/libs"
     destinationDirectory = file(outputDir)
     minimize()
+    relocate "dev.jorel.commandapi", "org.nevermined.worldevents.shadow.commandapi"
     relocate "org.javatuples", "org.nevermined.worldevents.shadow.javatuples"
     relocate "me.lucko.helper", "org.nevermined.worldevents.shadow.lucko.helper"
     relocate "dev.triumphteam.gui", "org.nevermined.worldevents.shadow.triumphteam.gui"
     relocate "com.google.inject", "org.nevermined.worldevents.shadow.google.guice"
     relocate "com.google.common", "org.nevermined.worldevents.shadow.google.common"
-    relocate "dev.jorel.commandapi", "org.nevermined.worldevents.shadow.commandapi"
     relocate "me.wyne.wutils", "org.nevermined.worldevents.shadow.wutils"
 }
 
