@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.nevermined.worldevents.api.WEApi;
+import org.nevermined.worldevents.api.config.ConfigProviderApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.expansion.ExpansionData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
@@ -21,14 +22,16 @@ public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEvent
 
     private final WorldEvents plugin;
     private final GlobalConfigApi globalConfig;
+    private final ConfigProviderApi configProvider;
     private final WorldEventManagerApi worldEventManager;
     private final ExpansionRegistryApi expansionRegistry;
 
     @Inject
-    public WorldEventsApi(WorldEvents plugin, GlobalConfigApi globalConfig, WorldEventManagerApi worldEventManager, ExpansionRegistryApi expansionRegistry)
+    public WorldEventsApi(WorldEvents plugin, GlobalConfigApi globalConfig, ConfigProviderApi configProvider, WorldEventManagerApi worldEventManager, ExpansionRegistryApi expansionRegistry)
     {
         this.plugin = plugin;
         this.globalConfig = globalConfig;
+        this.configProvider = configProvider;
         this.worldEventManager = worldEventManager;
         this.expansionRegistry = expansionRegistry;
         plugin.getServer().getServicesManager().register(org.nevermined.worldevents.api.WorldEventsApi.class, this, plugin, ServicePriority.Normal);
@@ -77,5 +80,10 @@ public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEvent
     @Override
     public GlobalConfigApi getGlobalConfig() {
         return globalConfig;
+    }
+
+    @Override
+    public ConfigProviderApi getConfigProvider() {
+        return configProvider;
     }
 }

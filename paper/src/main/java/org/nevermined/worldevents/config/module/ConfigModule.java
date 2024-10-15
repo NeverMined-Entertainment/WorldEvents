@@ -1,14 +1,8 @@
 package org.nevermined.worldevents.config.module;
 
 import com.google.inject.AbstractModule;
-import org.nevermined.worldevents.api.config.CommonGuiConfigApi;
-import org.nevermined.worldevents.api.config.GlobalConfigApi;
-import org.nevermined.worldevents.api.config.MainGuiConfigApi;
-import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
-import org.nevermined.worldevents.config.CommonGuiConfig;
-import org.nevermined.worldevents.config.GlobalConfig;
-import org.nevermined.worldevents.config.MainGuiConfig;
-import org.nevermined.worldevents.config.QueueGuiConfig;
+import org.nevermined.worldevents.api.config.*;
+import org.nevermined.worldevents.config.*;
 
 public class ConfigModule extends AbstractModule {
 
@@ -18,5 +12,6 @@ public class ConfigModule extends AbstractModule {
         bind(CommonGuiConfigApi.class).to(CommonGuiConfig.class);
         bind(QueueGuiConfigApi.class).to(QueueGuiConfig.class);
         bind(GlobalConfigApi.class).to(GlobalConfig.class);
+        bind(ConfigProviderApi.class).to(ConfigProvider.class);
     }
 }
