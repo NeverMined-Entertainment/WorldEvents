@@ -217,10 +217,10 @@ public class WorldEventQueue implements WorldEventQueueApi {
             if (RESERVED_CONFIG_NAMES.stream().anyMatch(reserved -> reserved.equalsIgnoreCase(eventKey)))
                 continue;
             if (!registeredExpansions.containsKey(queueSection.getConfigurationSection(eventKey).getString("type"))) {
-                Log.global.error("Unable to load event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "'.");
-                Log.global.error("This event type was not registered yet.");
-                Log.global.error("It may still be registered by other plugins using WorldEvent api.");
-                Log.global.error("Prefer using expansions to load event types, they are loaded with WorldEvents plugin.");
+                Log.global.error("Unable to load event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "'");
+                Log.global.error("This event type was not registered yet");
+                Log.global.error("It may still be registered by other plugins using WorldEvent api");
+                Log.global.error("Prefer using expansions to load event types, they are loaded with WorldEvents plugin");
                 continue;
             }
             
