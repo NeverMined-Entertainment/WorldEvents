@@ -10,6 +10,7 @@ import me.wyne.wutils.i18n.language.validation.EmptyValidator;
 import me.wyne.wutils.log.BasicLogConfig;
 import me.wyne.wutils.log.ConfigurableLogConfig;
 import me.wyne.wutils.log.Log;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.command.module.CommandModule;
 import org.nevermined.worldevents.config.module.ConfigModule;
@@ -37,6 +38,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         CommandAPI.onEnable();
 
         saveDefaultConfig();
+        getConfig().setDefaults(new MemoryConfiguration());
         File expansionDirectory = new File(getDataFolder(), "expansions");
         if (!expansionDirectory.exists())
             expansionDirectory.mkdir();
