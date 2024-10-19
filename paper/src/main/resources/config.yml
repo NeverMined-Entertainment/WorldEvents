@@ -12,7 +12,7 @@ events:
       description:
         - 'Demo 1-1 description'
       item: NETHER_STAR
-      type: 'Demo'
+      type: demo
       chance: 50
       duration: 60
       cooldown: 60
@@ -20,7 +20,7 @@ events:
       name: 'Demo 1-2'
       description:
         - 'Demo 1-2 description'
-      type: 'Demo'
+      type: demo
       chance: 50
       duration: 60
       cooldown: 60
@@ -34,7 +34,7 @@ events:
       name: 'Demo 2-1'
       description:
         - 'Demo 2-1 description'
-      type: 'Demo'
+      type: demo
       chance: 50
       duration: 120
       cooldown: 120
@@ -42,7 +42,7 @@ events:
       name: 'Demo 2-2'
       description:
         - 'Demo 2-2 description'
-      type: 'Demo'
+      type: demo
       chance: 50
       duration: 120
       cooldown: 120
