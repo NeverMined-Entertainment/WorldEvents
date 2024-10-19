@@ -37,9 +37,9 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         CommandAPI.onEnable();
 
         saveDefaultConfig();
-        File expansionsFolder = new File(getDataFolder(), "expansions");
-        if (!expansionsFolder.exists())
-            expansionsFolder.mkdir();
+        File expansionDirectory = new File(getDataFolder(), "expansions");
+        if (!expansionDirectory.exists())
+            expansionDirectory.mkdir();
 
         initializeLogger();
         initializeI18n();
@@ -50,7 +50,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
                     new PluginModule(this),
                     new ConfigModule(),
                     new HooksModule(),
-                    new ExpansionModule(expansionsFolder),
+                    new ExpansionModule(expansionDirectory),
                     new WorldEventManagerModule(),
                     new CommandModule()
             );

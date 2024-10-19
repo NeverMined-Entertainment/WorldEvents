@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
@@ -62,6 +63,19 @@ public class WorldEventManager implements WorldEventManagerApi {
     {
         eventQueueMap.get(queueKey)
                 .stopCurrent();
+    }
+
+    @Override
+    @Nullable
+    public ConfigurationSection getQueueConfiguration(String queueKey) {
+        return plugin.getConfig().getConfigurationSection("events." + queueKey);
+    }
+
+    @Override
+    @Nullable
+    public ConfigurationSection getEventConfiguration(String queueKey, String eventKey) {
+        ConfigurationSection queueSection = getQueueConfiguration(queueKey);
+        return queueSection != null ? queueSection.getConfigurationSection(eventKey) : null;
     }
 
     @Override
