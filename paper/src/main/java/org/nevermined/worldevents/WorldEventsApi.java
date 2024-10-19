@@ -20,12 +20,16 @@ import java.util.function.Supplier;
 public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEventsApi {
 
     private final WorldEvents plugin;
+    private final GlobalConfigApi globalConfig;
+    private final WorldEventManagerApi worldEventManager;
     private final ExpansionRegistryApi expansionRegistry;
 
     @Inject
-    public WorldEventsApi(WorldEvents plugin, ExpansionRegistryApi expansionRegistry)
+    public WorldEventsApi(WorldEvents plugin, GlobalConfigApi globalConfig, WorldEventManagerApi worldEventManager, ExpansionRegistryApi expansionRegistry)
     {
         this.plugin = plugin;
+        this.globalConfig = globalConfig;
+        this.worldEventManager = worldEventManager;
         this.expansionRegistry = expansionRegistry;
         plugin.getServer().getServicesManager().register(org.nevermined.worldevents.api.WorldEventsApi.class, this, plugin, ServicePriority.Normal);
         WEApi.setInstance(this);
@@ -62,7 +66,7 @@ public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEvent
 
     @Override
     public WorldEventManagerApi getWorldEventManager() {
-        return plugin.getWorldEventManager();
+        return worldEventManager;
     }
 
     @Override
@@ -72,6 +76,6 @@ public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEvent
 
     @Override
     public GlobalConfigApi getGlobalConfig() {
-        return plugin.getGlobalConfig();
+        return globalConfig;
     }
 }

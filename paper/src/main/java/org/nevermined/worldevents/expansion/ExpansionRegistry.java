@@ -7,6 +7,7 @@ import org.nevermined.worldevents.api.expansion.ExpansionData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
 
+import java.io.File;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +51,13 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
 
         registeredExpansions.remove(key);
         Log.global.info("Unregistered expansion '" + key + "'");
+    }
+
+    @Override
+    public void clearExpansions()
+    {
+        getRegisteredExpansions().clear();
+        getRegisteredExpansions().put("Demo", new ExpansionData("Demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now()));
     }
 
     @Override

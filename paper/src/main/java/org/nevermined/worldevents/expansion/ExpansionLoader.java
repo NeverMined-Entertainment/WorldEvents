@@ -2,6 +2,7 @@ package org.nevermined.worldevents.expansion;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import jakarta.inject.Qualifier;
 import me.wyne.wutils.log.Log;
 import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.api.WorldEventsApi;
@@ -11,6 +12,8 @@ import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,22 +22,38 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 @Singleton
 public class ExpansionLoader {
 
+    @Qualifier
+    @Target({ FIELD, PARAMETER, METHOD })
+    @Retention(RUNTIME)
+    public @interface ExpansionDirectory {}
+
     private final WorldEventsApi api;
     private final ExpansionRegistryApi expansionRegistry;
+    private final File defaultExpansionDirectory;
 
     @Inject
-    public ExpansionLoader(WorldEventsApi api, ExpansionRegistryApi expansionRegistry)
+    public ExpansionLoader(WorldEventsApi api, ExpansionRegistryApi expansionRegistry, @ExpansionDirectory File expansionDirectory)
     {
         this.api = api;
         this.expansionRegistry = expansionRegistry;
+        this.defaultExpansionDirectory = expansionDirectory;
     }
 
-    public void loadExpansions(File expansionFolder)
+    public void reloadExpansions()
     {
-        File[] jars = expansionFolder.listFiles(((dir, name) -> name.endsWith(".jar")));
+        expansionRegistry.clearExpansions();
+        loadExpansions(defaultExpansionDirectory);
+    }
+
+    public void loadExpansions(File expansionDirectory)
+    {
+        File[] jars = expansionDirectory.listFiles(((dir, name) -> name.endsWith(".jar")));
 
         if (jars == null)
             return;
