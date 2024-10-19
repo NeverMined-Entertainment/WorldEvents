@@ -80,7 +80,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     protected void startNextSilently()
     {
         WorldEventApi event = peekEvent();
-        setExpireTime();
+        setTime();
         if (!event.isActive())
             event.startEvent(this);
         isActive = true;
@@ -90,22 +90,6 @@ public class WorldEventQueue implements WorldEventQueueApi {
         }, event.getEventData().cooldownSeconds(), TimeUnit.SECONDS);
     }
 
-    protected void setExpireTime()
-    {
-        WorldEventApi previousEvent = null;
-
-        for (WorldEventApi event : eventQueue)
-        {
-            if (previousEvent == null)
-                event.setExpireTime(Instant.now().plusSeconds(event.getEventData().durationSeconds()));
-            else
-                event.setExpireTime(previousEvent.getExpireTime().get()
-                        .plusSeconds(previousEvent.getEventData().cooldownSeconds())
-                        .plusSeconds(event.getEventData().durationSeconds()));
-            previousEvent = event;
-        }
-    }
-
     @Override
     public void stopCurrent() throws AlreadyInactiveException
     {
@@ -113,7 +97,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
             throw new AlreadyInactiveException("Queue " + queueData.key() + " is already inactive");
 
         WorldEventApi event = pollEvent();
-        removeExpireTime();
+        removeTime();
         if (event.isActive())
             event.stopEvent(this);
         isActive = false;
@@ -123,9 +107,32 @@ public class WorldEventQueue implements WorldEventQueueApi {
             event.getStopPromise().closeSilently();
     }
 
-    protected void removeExpireTime()
+    protected void setTime()
     {
-        eventQueue.forEach(event -> event.setExpireTime(null));
+        WorldEventApi previousEvent = null;
+
+        for (WorldEventApi event : eventQueue)
+        {
+            if (previousEvent == null)
+            {
+                event.setStartTime(Instant.now());
+                event.setExpireTime(Instant.now().plusSeconds(event.getEventData().durationSeconds()));
+            }
+            else
+            {
+                event.setStartTime(previousEvent.getExpireTime().get()
+                        .plusSeconds(previousEvent.getEventData().cooldownSeconds()));
+                event.setExpireTime(previousEvent.getExpireTime().get()
+                        .plusSeconds(previousEvent.getEventData().cooldownSeconds())
+                        .plusSeconds(event.getEventData().durationSeconds()));
+            }
+            previousEvent = event;
+        }
+    }
+
+    protected void removeTime()
+    {
+        eventQueue.forEach(event -> { event.setExpireTime(null); event.setStartTime(null); });
     }
 
     @Override
@@ -153,7 +160,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     @Override
     public void replaceEvent(int index, WorldEventApi event) {
         getEventQueueAsList().set(index, event);
-        setExpireTime();
+        setTime();
     }
 
     @Override

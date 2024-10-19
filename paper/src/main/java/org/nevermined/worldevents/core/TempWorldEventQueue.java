@@ -35,7 +35,7 @@ public class TempWorldEventQueue extends WorldEventQueue {
         }
 
         WorldEventApi event = peekEvent();
-        setExpireTime();
+        setTime();
         if (!event.isActive())
             event.startEvent(this);
         isActive = true;

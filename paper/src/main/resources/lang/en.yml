@@ -1,11 +1,13 @@
 ### Format
 
 ## Event
+event-start-time-format: "dd.MM.yyyy HH'h':mm'm':ss's'"
 event-expire-time-format: "dd.MM.yyyy HH'h':mm'm':ss's'"
 event-chance-format: "Chance: %worldevents_event_<queue-key>_<event-index>_chance%"
 event-type-format: "Type: %worldevents_event_<queue-key>_<event-index>_type%"
 event-duration-format: "Duration: %worldevents_event_<queue-key>_<event-index>_duration%"
 event-cooldown-format: "Cooldown: %worldevents_event_<queue-key>_<event-index>_cooldown%"
+event-start-format: "Start: %worldevents_event_<queue-key>_<event-index>_start%"
 event-expire-format: "Finish: %worldevents_event_<queue-key>_<event-index>_expire%"
 event-active-format: "Active: %worldevents_event_<queue-key>_<event-index>_active%"
 
@@ -39,6 +41,7 @@ event-lore-order:
   - "event-type-format"
   - "event-duration-format"
   - "event-cooldown-format"
+  - "event-start-format"
   - "event-expire-format"
   - "event-active-format"
 
@@ -61,6 +64,7 @@ info-event:
   - "Chance: %worldevents_event_<queue-key>_<event-index>_chance%"
   - "Duration: %worldevents_event_<queue-key>_<event-index>_duration%"
   - "Cooldown: %worldevents_event_<queue-key>_<event-index>_cooldown%"
+  - "Start: %worldevents_event_<queue-key>_<event-index>_start%"
   - "Finish: %worldevents_event_<queue-key>_<event-index>_expire%"
   - "Active: %worldevents_event_<queue-key>_<event-index>_active%"
 

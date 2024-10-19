@@ -54,6 +54,7 @@ public class Placeholders extends PlaceholderExpansion {
         createQueueItemParser();
         createEventChanceParser();
         createEventDurationParser();
+        createEventStartParser();
         createEventExpireParser();
         createEventCooldownParser();
         createEventActiveParser();
@@ -243,6 +244,17 @@ public class Placeholders extends PlaceholderExpansion {
         eventDataParserMap.put("duration", (queueKey, eventIndex) -> {
             List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             return String.valueOf(queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().durationSeconds());
+        });
+    }
+
+    private void createEventStartParser()
+    {
+        eventDataParserMap.put("start", (queueKey, eventIndex) -> {
+            List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
+            AtomicReference<String> startFormatted = new AtomicReference<>("??:??:??");
+            queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getStartTime().ifPresent(instant ->
+                    startFormatted.set(DateTimeFormatter.ofPattern(I18n.global.getString("event-start-time-format")).withZone(ZoneId.systemDefault()).format(instant)));
+            return startFormatted.get();
         });
     }
 

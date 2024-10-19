@@ -18,7 +18,7 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
 
     private final Map<String, ExpansionData> registeredExpansions = new HashMap<>()
     {
-        { put("Demo", new ExpansionData("Demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now())); }
+        { put("Demo", new ExpansionData("demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now())); }
     };
 
     @Override
@@ -57,7 +57,7 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
     public void clearExpansions()
     {
         getRegisteredExpansions().clear();
-        getRegisteredExpansions().put("Demo", new ExpansionData("Demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now()));
+        getRegisteredExpansions().put("demo", new ExpansionData("Demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now()));
     }
 
     @Override
