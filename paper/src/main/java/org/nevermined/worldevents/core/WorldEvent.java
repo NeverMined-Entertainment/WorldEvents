@@ -24,6 +24,7 @@ public class WorldEvent implements WorldEventApi {
     private final WorldEventAction action;
 
     private boolean isActive = false;
+    private Instant startTime;
     private Instant expireTime;
 
     private Promise<Void> stopPromise;
@@ -95,8 +96,18 @@ public class WorldEvent implements WorldEventApi {
     }
 
     @Override
+    public Optional<Instant> getStartTime() {
+        return Optional.ofNullable(startTime);
+    }
+
+    @Override
     public Optional<Instant> getExpireTime() {
         return Optional.ofNullable(expireTime);
+    }
+
+    @Override
+    public void setStartTime(@Nullable Instant startTime) {
+        this.startTime = startTime;
     }
 
     @Override
