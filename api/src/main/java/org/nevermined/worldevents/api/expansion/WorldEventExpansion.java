@@ -108,17 +108,17 @@ public abstract class WorldEventExpansion implements Plugin {
     }
 
     @Override
-    public void onDisable() {
+    public final void onDisable() {
 
     }
 
     @Override
-    public void onLoad() {
+    public final void onLoad() {
 
     }
 
     @Override
-    public void onEnable() {
+    public final void onEnable() {
 
     }
 
@@ -148,12 +148,12 @@ public abstract class WorldEventExpansion implements Plugin {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public final boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         return false;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public final @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         return null;
     }
 }
