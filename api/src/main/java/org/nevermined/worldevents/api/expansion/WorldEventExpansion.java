@@ -47,6 +47,8 @@ public abstract class WorldEventExpansion implements Plugin {
 
     public void onModuleLoad() {}
     public void reload() {}
+    @Override
+    public void onDisable() {}
 
     public DataProvider getDataProvider() {
         return dataProvider;
@@ -107,10 +109,7 @@ public abstract class WorldEventExpansion implements Plugin {
         return WEApi.getInstance().getPlugin().isEnabled();
     }
 
-    @Override
-    public final void onDisable() {
 
-    }
 
     @Override
     public final void onLoad() {

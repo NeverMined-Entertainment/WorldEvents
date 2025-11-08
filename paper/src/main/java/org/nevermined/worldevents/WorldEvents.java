@@ -15,6 +15,8 @@ import me.wyne.wutils.log.Log;
 import me.wyne.wutils.log.Log4jFactory;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
+import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
+import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 import org.nevermined.worldevents.command.module.CommandModule;
 import org.nevermined.worldevents.config.module.ConfigModule;
 import org.nevermined.worldevents.core.module.WorldEventManagerModule;
@@ -92,6 +94,8 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     @Override
     protected void disable() {
         CommandAPI.onDisable();
+        injector.getInstance(ExpansionRegistryApi.class).getRegisteredExpansions()
+                .values().forEach(WorldEventExpansion::onDisable);
     }
 
     private void initializeLogger()
