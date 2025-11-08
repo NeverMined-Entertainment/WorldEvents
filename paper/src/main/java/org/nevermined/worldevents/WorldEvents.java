@@ -6,10 +6,13 @@ import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.wyne.wutils.config.Config;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.i18n.PluginI18nBuilder;
+import me.wyne.wutils.i18n.language.interpretation.ComponentInterpreters;
 import me.wyne.wutils.i18n.language.validation.EmptyValidator;
-import me.wyne.wutils.log.BasicLogConfig;
-import me.wyne.wutils.log.ConfigurableLogConfig;
+import me.wyne.wutils.log.JulLevel;
+import me.wyne.wutils.log.Level;
 import me.wyne.wutils.log.Log;
+import me.wyne.wutils.log.Log4jFactory;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.command.module.CommandModule;
@@ -19,12 +22,16 @@ import org.nevermined.worldevents.expansion.ExpansionLoader;
 import org.nevermined.worldevents.expansion.module.ExpansionModule;
 import org.nevermined.worldevents.hook.module.HooksModule;
 import org.nevermined.worldevents.module.PluginModule;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.concurrent.Executors;
 
 @Singleton
 public final class WorldEvents extends ExtendedJavaPlugin {
+
+    private static WorldEvents instance;
+    private org.slf4j.Logger log;
 
     private Injector injector;
 
@@ -35,6 +42,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
 
     @Override
     public void enable() {
+        instance = this;
         CommandAPI.onEnable();
 
         saveDefaultConfig();
@@ -58,7 +66,7 @@ public final class WorldEvents extends ExtendedJavaPlugin {
             );
         } catch (CreationException e)
         {
-            Log.global.exception("Guice injector creation exception", e);
+            log.error("Guice injector creation exception", e);
         }
 
         initializeConfig();
@@ -69,8 +77,16 @@ public final class WorldEvents extends ExtendedJavaPlugin {
             worldEventManager.reloadEventQueues();
         } catch (ConfigurationException | ProvisionException e)
         {
-            Log.global.exception("Guice configuration/provision exception", e);
+            log.error("Guice configuration/provision exception", e);
         }
+    }
+
+    public static WorldEvents getInstance() {
+        return instance;
+    }
+
+    public Logger getLog() {
+        return log;
     }
 
     @Override
@@ -82,28 +98,43 @@ public final class WorldEvents extends ExtendedJavaPlugin {
     {
         Log.global = Log.builder()
                 .setLogger(getLogger())
-                .setConfig(new ConfigurableLogConfig("Global", Config.global, new BasicLogConfig(true, true, true, true)))
+                .setLevel(JulLevel.valueOf(getConfig().getString("logLevel", "INFO")).getLevel())
                 .setLogDirectory(new File(getDataFolder(), "log"))
                 .setFileWriteExecutor(Executors.newSingleThreadExecutor())
                 .build();
+        Log.global.deleteOlderLogs();
+
+        log = Log4jFactory.createLogger(
+                this,
+                Log4jFactory.DEFAULT_FILE_MESSAGE_PATTERN,
+                Level.valueOf(getConfig().getString("logLevel", "INFO")),
+                new File(getDataFolder(), "log").getPath(),
+                Log.global
+        );
     }
 
     private void initializeConfig()
     {
+        Config.global.log = log;
         Config.global.setConfigGenerator(this, "config.yml");
-        Config.global.generateConfig(getDescription().getVersion());
+        Config.global.generateConfig();
         reloadConfig();
+        getConfig().setDefaults(new MemoryConfiguration());
         Config.global.reloadConfig(getConfig());
     }
 
     private void initializeI18n()
     {
-        I18n.global.loadLanguage("lang/ru.yml", this);
-        I18n.global.loadLanguage("lang/en.yml", this);
-        I18n.global.loadDefaultPluginLanguage(this);
-        I18n.global.setDefaultLanguage(I18n.getDefaultLanguageFile(this));
-        I18n.global.loadLanguages(this);
-        I18n.global.setStringValidator(new EmptyValidator());
+        I18n.global = new PluginI18nBuilder(this)
+                .setComponentInterpreter(
+                        ComponentInterpreters.valueOf(
+                                getConfig().getString("serializer", "LEGACY")
+                        ).get(new EmptyValidator())
+                )
+                .setUsePlayerLanguage(getConfig().getBoolean("userPlayerLanguage", true))
+                .loadLanguage("lang/ru.yml")
+                .loadLanguage("lang/en.yml")
+                .build();
     }
 
     public void reload()

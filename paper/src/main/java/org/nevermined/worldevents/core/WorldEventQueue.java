@@ -2,14 +2,13 @@ package org.nevermined.worldevents.core;
 
 import me.lucko.helper.promise.Promise;
 import me.wyne.wutils.i18n.I18n;
-import me.wyne.wutils.log.Log;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
+import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
-import org.nevermined.worldevents.api.expansion.ExpansionData;
 import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 import org.nevermined.worldevents.api.wrapper.PromiseWrapper;
 import org.nevermined.worldevents.wrapper.PromiseWrapperImpl;
@@ -43,8 +42,8 @@ public class WorldEventQueue implements WorldEventQueueApi {
         loadEventSet(queueSection, registeredExpansions);
         if (eventSet.isEmpty())
         {
-            Log.global.warn("Queue '" + queueData.key() + "' was removed because it was empty or none of it events were able to load");
-            Log.global.warn("You can use '/wevents queue reload' to try load queues again");
+            WorldEvents.getInstance().getLog().warn("Queue '" + queueData.key() + "' was removed because it was empty or none of it events were able to load");
+            WorldEvents.getInstance().getLog().warn("You can use '/wevents queue reload' to try load queues again");
             return;
         }
 
@@ -225,10 +224,10 @@ public class WorldEventQueue implements WorldEventQueueApi {
             if (RESERVED_CONFIG_NAMES.stream().anyMatch(reserved -> reserved.equalsIgnoreCase(eventKey)))
                 continue;
             if (!registeredExpansions.containsKey(queueSection.getConfigurationSection(eventKey).getString("type"))) {
-                Log.global.warn("Unable to load event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "'");
-                Log.global.warn("This event type was not registered yet");
-                Log.global.warn("It may still be registered by other plugins using WorldEvent api");
-                Log.global.warn("Prefer using expansions to load event types, they are loaded with WorldEvents plugin");
+                WorldEvents.getInstance().getLog().warn("Unable to load event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "'");
+                WorldEvents.getInstance().getLog().warn("This event type was not registered yet");
+                WorldEvents.getInstance().getLog().warn("It may still be registered by other plugins using WorldEvent api");
+                WorldEvents.getInstance().getLog().warn("Prefer using expansions to load event types, they are loaded with WorldEvents plugin");
                 continue;
             }
             
@@ -236,10 +235,10 @@ public class WorldEventQueue implements WorldEventQueueApi {
             EventData eventData = new EventData(
                     eventKey,
                     registeredExpansions.get(eventSection.getString("type")),
-                    I18n.global.getLegacyPlaceholderComponent(null, null, eventSection.getString("name")),
+                    I18n.global.accessor(eventSection.getString("name")).getPlaceholderComponent(null).get(),
                     eventSection.contains("description")
                             ? eventSection.getStringList("description").stream()
-                            .map(s -> I18n.global.getLegacyPlaceholderComponent(null, null, s))
+                            .map(s -> I18n.global.accessor(s).getPlaceholderComponent(null).get())
                             .toList()
                             : Collections.unmodifiableList(new ArrayList<>()),
                     eventSection.contains("item")

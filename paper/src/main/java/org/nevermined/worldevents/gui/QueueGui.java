@@ -3,17 +3,19 @@ package org.nevermined.worldevents.gui;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
+import me.wyne.wutils.config.configurables.GuiConfigurable;
+import me.wyne.wutils.config.configurables.gui.attribute.GuiActionAttribute;
 import me.wyne.wutils.i18n.I18n;
+import me.wyne.wutils.i18n.language.component.LocalizedString;
 import me.wyne.wutils.i18n.language.replacement.Placeholder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
-import org.nevermined.worldevents.api.config.GlobalConfigApi;
-import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
 import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
+import org.nevermined.worldevents.config.GlobalConfig;
 import org.nevermined.worldevents.config.QueueGuiConfig;
 
 import java.util.ArrayList;
@@ -21,10 +23,10 @@ import java.util.List;
 
 public class QueueGui extends PaginatedGui {
 
-    public QueueGui(QueuesGui queuesGui, String queueKey, GlobalConfigApi config, WorldEventManagerApi eventManager, Player player)
+    public QueueGui(QueuesGui queuesGui, String queueKey, GlobalConfig config, WorldEventManagerApi eventManager, Player player)
     {
         gui = Gui.paginated()
-                .title(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-gui-header", Placeholder.replace("queue-key", queueKey)))
+                .title(I18n.global.accessor(player.locale(), "queue-gui-header").getPlaceholderComponent(player, Placeholder.replace("queue-key", queueKey)).get())
                 .rows(6)
                 .disableAllInteractions()
                 .create();
@@ -33,7 +35,7 @@ public class QueueGui extends PaginatedGui {
         updatePage(queueKey, config.queueGuiConfig(), eventManager, player);
     }
 
-    private void updatePage(String queueKey, QueueGuiConfigApi config, WorldEventManagerApi eventManager, Player player)
+    private void updatePage(String queueKey, QueueGuiConfig config, WorldEventManagerApi eventManager, Player player)
     {
         gui.updateItem(config.getQueueGuiInfoSlot(), buildQueueInfo(queueKey, eventManager, player));
         buildActivator(config, queueKey, eventManager, player);
@@ -47,8 +49,8 @@ public class QueueGui extends PaginatedGui {
         WorldEventQueueApi queue = eventManager.getEventQueueMap().get(queueKey);
 
         List<Component> lore = new ArrayList<>(queue.getQueueData().description());
-        lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-capacity-format", Placeholder.replace("queue-key", queueKey)));
-        lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-active-format", Placeholder.replace("queue-key", queueKey)));
+        lore.add(I18n.global.accessor(player.locale(), "queue-capacity-format").getPlaceholderComponent(player, Placeholder.replace("queue-key", queueKey)).get());
+        lore.add(I18n.global.accessor(player.locale(), "queue-active-format").getPlaceholderComponent(player, Placeholder.replace("queue-key", queueKey)).get());
 
         return ItemBuilder.from(queue.getQueueData().item())
                 .name(queue.getQueueData().name())
@@ -63,7 +65,7 @@ public class QueueGui extends PaginatedGui {
             WorldEventApi event = eventManager.getEventQueueMap().get(queueKey).getEventQueueAsList().get(i);
 
             List<Component> lore = new ArrayList<>(event.getEventData().description());
-            lore.addAll(getEventLore(queueKey, String.valueOf(i), player, I18n.global.getStringList(player.locale(), "event-lore-order").toArray(String[]::new)));
+            lore.addAll(getEventLore(queueKey, String.valueOf(i), player, I18n.global.accessor(player.locale(), "event-lore-order").getStringList().stream().map(LocalizedString::get).toArray(String[]::new)));
 
             gui.addItem(ItemBuilder.from(event.getEventData().item())
                     .name(event.getEventData().name())
@@ -80,27 +82,27 @@ public class QueueGui extends PaginatedGui {
 
         for (String line : lines)
         {
-            lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, line, Placeholder.replace("queue-key", queueKey), Placeholder.replace("event-index", eventIndex)));
+            lore.add(I18n.global.accessor(player.locale(), line).getPlaceholderComponent(player, Placeholder.replace("queue-key", queueKey), Placeholder.replace("event-index", eventIndex)).get());
         }
 
         return lore;
     }
 
-    private void buildActivator(QueueGuiConfigApi config, String queueKey, WorldEventManagerApi eventManager, Player player)
+    private void buildActivator(QueueGuiConfig config, String queueKey, WorldEventManagerApi eventManager, Player player)
     {
-        if (config.getQueueActivate().getSlot() == config.getQueueDeactivate().getSlot())
+        if (config.getQueueActivateImpl().getSlot() == config.getQueueDeactivateImpl().getSlot())
             buildSingleActivator(config, queueKey, eventManager, player);
         else
             buildDoubleActivator(config, queueKey, eventManager, player);
     }
 
-    private void buildDoubleActivator(QueueGuiConfigApi config, String queueKey, WorldEventManagerApi eventManager, Player player)
+    private void buildDoubleActivator(QueueGuiConfig config, String queueKey, WorldEventManagerApi eventManager, Player player)
     {
         buildQueueActivator(config, queueKey, eventManager, player);
         buildQueueDeactivator(config, queueKey, eventManager, player);
     }
 
-    private void buildSingleActivator(QueueGuiConfigApi config, String queueKey, WorldEventManagerApi eventManager, Player player)
+    private void buildSingleActivator(QueueGuiConfig config, String queueKey, WorldEventManagerApi eventManager, Player player)
     {
         if (eventManager.getEventQueueMap().get(queueKey).isActive())
             buildQueueDeactivator(config, queueKey, eventManager, player);
@@ -108,33 +110,39 @@ public class QueueGui extends PaginatedGui {
             buildQueueActivator(config, queueKey, eventManager, player);
     }
 
-    private void buildQueueActivator(QueueGuiConfigApi config, String queueKey, WorldEventManagerApi eventManager, Player player)
+    private void buildQueueActivator(QueueGuiConfig config, String queueKey, WorldEventManagerApi eventManager, Player player)
     {
-        QueueGuiConfig queueGuiConfig = (QueueGuiConfig) config;
-        gui.updateItem(config.getQueueActivate().getSlot(), queueGuiConfig.getQueueActivateImpl().buildLegacyGuiItem(event -> {
-            try {
-                eventManager.startEventQueue(queueKey);
-                updatePage(queueKey, config, eventManager, player);
-            } catch (AlreadyActiveException e)
-            {
-                player.sendMessage(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "error-queue-already-active",
-                        Placeholder.legacy("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name())));
-            }
-        }, player));
+        gui.updateItem(config.getQueueActivateImpl().getSlot(), config.getQueueActivateImpl()
+                .<GuiConfigurable>getImmutableAccessor()
+                .with(new GuiActionAttribute(event -> {
+                    try {
+                        eventManager.startEventQueue(queueKey);
+                        updatePage(queueKey, config, eventManager, player);
+                    } catch (AlreadyActiveException e)
+                    {
+                        I18n.global.accessor(player.locale(), "error-queue-already-active")
+                                .getPlaceholderComponent(player, Placeholder.replace("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name()))
+                                .sendMessage(player);
+                    }
+                }))
+                .buildGuiItem(player));
     }
 
-    private void buildQueueDeactivator(QueueGuiConfigApi config, String queueKey, WorldEventManagerApi eventManager, Player player)
+    private void buildQueueDeactivator(QueueGuiConfig config, String queueKey, WorldEventManagerApi eventManager, Player player)
     {
-        QueueGuiConfig queueGuiConfig = (QueueGuiConfig) config;
-        gui.updateItem(config.getQueueDeactivate().getSlot(), queueGuiConfig.getQueueDeactivateImpl().buildLegacyGuiItem(event -> {
-            try {
-                eventManager.stopEventQueue(queueKey);
-                updatePage(queueKey, config, eventManager, player);
-            } catch (AlreadyInactiveException e)
-            {
-                player.sendMessage(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "error-queue-already-inactive",
-                        Placeholder.legacy("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name())));
-            }
-        }, player));
+        gui.updateItem(config.getQueueDeactivateImpl().getSlot(), config.getQueueDeactivateImpl()
+                .<GuiConfigurable>getImmutableAccessor()
+                .with(new GuiActionAttribute(event -> {
+                    try {
+                        eventManager.stopEventQueue(queueKey);
+                        updatePage(queueKey, config, eventManager, player);
+                    } catch (AlreadyInactiveException e)
+                    {
+                        I18n.global.accessor(player.locale(), "error-queue-already-inactive")
+                                .getPlaceholderComponent(player, Placeholder.replace("queue-name", eventManager.getEventQueueMap().get(queueKey).getQueueData().name()))
+                                .sendMessage(player);
+                    }
+                }))
+                .buildGuiItem(player));
     }
 }

@@ -1,10 +1,10 @@
 package org.nevermined.worldevents.expansion;
 
-import me.wyne.wutils.log.Log;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
+import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.expansion.DataProvider;
 import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 
@@ -36,7 +36,7 @@ public class ExpansionDataProvider implements DataProvider {
         try {
             this.expansionJar = new JarFile(new File(expansionDirectory, expansion.getExpansionData().jarName()));
         } catch (IOException e) {
-            Log.global.exception("An exception occurred trying to get expansion jar file", e);
+            WorldEvents.getInstance().getLog().error("An exception occurred trying to get expansion jar file", e);
         }
     }
 
@@ -72,7 +72,7 @@ public class ExpansionDataProvider implements DataProvider {
             JarEntry jarEntry = expansionJar.getJarEntry(path);
             return expansionJar.getInputStream(jarEntry);
         } catch (IOException e) {
-            Log.global.exception("An exception occurred trying to get resource '" + path + "'", e);
+            WorldEvents.getInstance().getLog().error("An exception occurred trying to get resource '" + path + "'", e);
         }
         return null;
     }
@@ -86,7 +86,7 @@ public class ExpansionDataProvider implements DataProvider {
                 return;
             FileUtils.copyInputStreamToFile(expansionJar.getInputStream(jarEntry), resource);
         } catch (IOException e) {
-            Log.global.exception("An exception occurred trying to save resource '" + path + "'", e);
+            WorldEvents.getInstance().getLog().error("An exception occurred trying to save resource '" + path + "'", e);
         }
     }
 
@@ -99,7 +99,7 @@ public class ExpansionDataProvider implements DataProvider {
                 return;
             FileUtils.copyInputStreamToFile(expansionJar.getInputStream(jarEntry), resource);
         } catch (IOException e) {
-            Log.global.exception("An exception occurred trying to save resource '" + source + "'", e);
+            WorldEvents.getInstance().getLog().error("An exception occurred trying to save resource '" + source + "'", e);
         }
     }
 

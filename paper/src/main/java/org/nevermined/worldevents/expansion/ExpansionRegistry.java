@@ -2,6 +2,7 @@ package org.nevermined.worldevents.expansion;
 
 import com.google.inject.Singleton;
 import me.wyne.wutils.log.Log;
+import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.exception.ExpansionRegistryException;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
@@ -16,7 +17,7 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
 
     private final Map<String, WorldEventExpansion> registeredExpansions = new HashMap<>()
     {
-        { put("Demo", new DemoExpansion()); }
+        { put("demo", new DemoExpansion()); }
     };
 
     @Override
@@ -26,7 +27,7 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
             throw new ExpansionRegistryException("Can not register expansion '" + key + "' because expansion with this key already exists!");
 
         registeredExpansions.put(key, expansion);
-        Log.global.info("Registered expansion '" + key + "'");
+        WorldEvents.getInstance().getLog().info("Registered expansion '" + key + "'");
     }
 
     @Override
@@ -37,14 +38,14 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
                 throw new ExpansionRegistryException("Can not register expansion '" + key + "' because expansion with this key already exists!");
 
             registeredExpansions.put(key, action);
-            Log.global.info("Registered expansion '" + key + "'");
+            WorldEvents.getInstance().getLog().info("Registered expansion '" + key + "'");
         });
     }
 
     @Override
     public void reloadExpansion(String key) {
         registeredExpansions.get(key).reload();
-        Log.global.info("Reloaded expansion '" + key + "'");
+        WorldEvents.getInstance().getLog().info("Reloaded expansion '" + key + "'");
     }
 
     @Override

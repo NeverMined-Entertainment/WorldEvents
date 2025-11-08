@@ -1,4 +1,9 @@
 lang: 'en.yml'
+usePlayerLanguage: true
+# LEGACY/ENHANCED_LEGACY
+serializer: LEGACY
+# OFF/FATAL/ERROR/WARN/INFO/DEBUG/TRACE/ALL
+logLevel: INFO
 
 events:
   demo-queue-1:

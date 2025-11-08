@@ -98,7 +98,7 @@ public class Placeholders extends PlaceholderExpansion {
 
             if (!eventDataParserMap.containsKey(args[3]))
             {
-                Log.global.error("Event placeholder type '" + args[3] + "' not found!");
+                WorldEvents.getInstance().getLog().error("Event placeholder type '" + args[3] + "' not found!");
                 return null;
             }
 
@@ -116,7 +116,7 @@ public class Placeholders extends PlaceholderExpansion {
                 }
             } catch (NullPointerException e)
             {
-                Log.global.exception(e);
+                WorldEvents.getInstance().getLog().error("", e);
                 return null;
             }
         }
@@ -130,7 +130,7 @@ public class Placeholders extends PlaceholderExpansion {
 
             if (!queueDataParserMap.containsKey(args[2]))
             {
-                Log.global.error("Queue placeholder type '" + args[2] + "' not found!");
+                WorldEvents.getInstance().getLog().error("Queue placeholder type '" + args[2] + "' not found!");
                 return null;
             }
 
@@ -138,7 +138,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return queueDataParserMap.get(args[2]).apply(args[1]);
             } catch (NullPointerException e)
             {
-                Log.global.exception(e);
+                WorldEvents.getInstance().getLog().error("", e);
                 return null;
             }
 
@@ -153,7 +153,7 @@ public class Placeholders extends PlaceholderExpansion {
 
             if (!expansionDataParserMap.containsKey(args[2]))
             {
-                Log.global.error("Expansion placeholder type '" + args[2] + "' not found!");
+                WorldEvents.getInstance().getLog().error("Expansion placeholder type '" + args[2] + "' not found!");
                 return null;
             }
 
@@ -161,7 +161,7 @@ public class Placeholders extends PlaceholderExpansion {
                 return expansionDataParserMap.get(args[2]).apply(args[1]);
             } catch (NullPointerException e)
             {
-                Log.global.exception(e);
+                WorldEvents.getInstance().getLog().error("", e);
                 return null;
             }
         }
@@ -253,7 +253,7 @@ public class Placeholders extends PlaceholderExpansion {
             List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             AtomicReference<String> startFormatted = new AtomicReference<>("??:??:??");
             queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getStartTime().ifPresent(instant ->
-                    startFormatted.set(DateTimeFormatter.ofPattern(I18n.global.getString("event-start-time-format")).withZone(ZoneId.systemDefault()).format(instant)));
+                    startFormatted.set(DateTimeFormatter.ofPattern(I18n.global.accessor("event-start-time-format").getString().get()).withZone(ZoneId.systemDefault()).format(instant)));
             return startFormatted.get();
         });
     }
@@ -264,7 +264,7 @@ public class Placeholders extends PlaceholderExpansion {
             List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
             AtomicReference<String> expireFormatted = new AtomicReference<>("??:??:??");
             queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getExpireTime().ifPresent(instant ->
-                    expireFormatted.set(DateTimeFormatter.ofPattern(I18n.global.getString("event-expire-time-format")).withZone(ZoneId.systemDefault()).format(instant)));
+                    expireFormatted.set(DateTimeFormatter.ofPattern(I18n.global.accessor("event-expire-time-format").getString().get()).withZone(ZoneId.systemDefault()).format(instant)));
             return expireFormatted.get();
         });
     }
@@ -312,7 +312,7 @@ public class Placeholders extends PlaceholderExpansion {
     private void createExpansionRegistryTimeParser()
     {
         expansionDataParserMap.put("time", expansionKey ->
-                DateTimeFormatter.ofPattern(I18n.global.getString("expansion-registry-time-format"))
+                DateTimeFormatter.ofPattern(I18n.global.accessor("expansion-registry-time-format").getString().get())
                         .withZone(ZoneId.systemDefault())
                         .format(expansionRegistry.getRegisteredExpansions().get(expansionKey).getExpansionData().registryTime()));
     }

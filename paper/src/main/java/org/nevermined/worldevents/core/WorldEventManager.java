@@ -102,11 +102,11 @@ public class WorldEventManager implements WorldEventManagerApi {
             eventQueueMap.put(queueKey, new WorldEventQueue(new QueueData(
                     queueKey,
                     queueSection.contains("name")
-                            ? I18n.global.getLegacyPlaceholderComponent(null, null, queueSection.getString("name"))
+                            ? I18n.global.accessor(queueSection.getString("name")).getPlaceholderComponent(null).get()
                             : Component.text(queueKey),
                     queueSection.contains("description")
                             ? queueSection.getStringList("description").stream()
-                            .map(s -> I18n.global.getLegacyPlaceholderComponent(null, null, s))
+                            .map(s -> I18n.global.accessor(s).getPlaceholderComponent(null).get())
                             .toList()
                             : Collections.unmodifiableList(new ArrayList<>()),
                     queueSection.contains("item")

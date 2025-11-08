@@ -6,19 +6,19 @@ import me.wyne.wutils.i18n.I18n;
 import me.wyne.wutils.i18n.language.replacement.Placeholder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
-import org.nevermined.worldevents.api.config.GlobalConfigApi;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
+import org.nevermined.worldevents.config.GlobalConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class QueuesGui extends org.nevermined.worldevents.gui.PaginatedGui {
 
-    public QueuesGui(MainGui mainGui, GlobalConfigApi config, WorldEventManagerApi eventManager, Player player)
+    public QueuesGui(MainGui mainGui, GlobalConfig config, WorldEventManagerApi eventManager, Player player)
     {
         gui = Gui.paginated()
-                .title(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queues-gui-header"))
+                .title(I18n.global.accessor(player.locale(), "queues-gui-header").getPlaceholderComponent(player).get())
                 .rows(6)
                 .disableAllInteractions()
                 .create();
@@ -27,15 +27,15 @@ public class QueuesGui extends org.nevermined.worldevents.gui.PaginatedGui {
         populatePage(config, eventManager, player);
     }
 
-    private void populatePage(GlobalConfigApi config, WorldEventManagerApi eventManager, Player player)
+    private void populatePage(GlobalConfig config, WorldEventManagerApi eventManager, Player player)
     {
         for (String queueKey : eventManager.getEventQueueMap().keySet())
         {
             WorldEventQueueApi queue = eventManager.getEventQueueMap().get(queueKey);
 
             List<Component> lore = new ArrayList<>(queue.getQueueData().description());
-            lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-capacity-format", Placeholder.replace("queue-key", queueKey)));
-            lore.add(I18n.global.getLegacyPlaceholderComponent(player.locale(), player, "queue-active-format", Placeholder.replace("queue-key", queueKey)));
+            lore.add(I18n.global.accessor(player.locale(), "queue-capacity-format").getPlaceholderComponent(player, Placeholder.replace("queue-key", queueKey)).get());
+            lore.add(I18n.global.accessor(player.locale(), "queue-active-format").getPlaceholderComponent(player, Placeholder.replace("queue-key", queueKey)).get());
 
             gui.addItem(ItemBuilder.from(queue.getQueueData().item())
                     .name(queue.getQueueData().name())

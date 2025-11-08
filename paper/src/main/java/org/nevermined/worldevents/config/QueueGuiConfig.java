@@ -2,60 +2,41 @@ package org.nevermined.worldevents.config;
 
 import com.google.inject.Singleton;
 import me.wyne.wutils.config.ConfigEntry;
-import me.wyne.wutils.config.configurables.GuiItemConfigurable;
+import me.wyne.wutils.config.configurables.GuiConfigurable;
+import me.wyne.wutils.config.configurables.gui.attribute.SlotAttribute;
+import me.wyne.wutils.config.configurables.item.attribute.MaterialAttribute;
+import me.wyne.wutils.config.configurables.item.attribute.NameAttribute;
 import org.bukkit.Material;
-import org.nevermined.worldevents.api.config.QueueGuiConfigApi;
-import org.nevermined.worldevents.api.config.configurable.GuiItemConfigurableApi;
-import org.nevermined.worldevents.config.configurable.GuiItemConfigurableWrapper;
-
-import java.util.ArrayList;
 
 @Singleton
-public class QueueGuiConfig implements QueueGuiConfigApi {
+public class QueueGuiConfig {
 
     @ConfigEntry(section = "GUI.Queue Gui", path = "queue-gui-info-slot")
     private int queueGuiInfoSlot = 4;
 
     @ConfigEntry(section = "GUI.Queue Gui", path = "queue-gui-activate")
-    private GuiItemConfigurable queueActivate = new GuiItemConfigurable(
-            "queue-gui-activate",
-            Material.GREEN_STAINED_GLASS_PANE,
-            49,
-            -1,
-            new ArrayList<>(),
-            null, null
-    );
+    private GuiConfigurable queueActivate = new GuiConfigurable(GuiConfigurable.builder()
+            .with(new NameAttribute("queue-gui-activate"))
+            .with(new MaterialAttribute(Material.GREEN_STAINED_GLASS_PANE))
+            .with(new SlotAttribute(49))
+            .buildImmutable());
 
     @ConfigEntry(section = "GUI.Queue Gui", path = "queue-gui-deactivate")
-    private GuiItemConfigurable queueDeactivate = new GuiItemConfigurable(
-            "queue-gui-deactivate",
-            Material.RED_STAINED_GLASS_PANE,
-            49,
-            -1,
-            new ArrayList<>(),
-            null, null
-    );
-
+    private GuiConfigurable queueDeactivate = new GuiConfigurable(GuiConfigurable.builder()
+            .with(new NameAttribute("queue-gui-deactivate"))
+            .with(new MaterialAttribute(Material.RED_STAINED_GLASS_PANE))
+            .with(new SlotAttribute(49))
+            .buildImmutable());
 
     public int getQueueGuiInfoSlot() {
         return queueGuiInfoSlot;
     }
 
-    @Override
-    public GuiItemConfigurableApi getQueueActivate() {
-        return new GuiItemConfigurableWrapper(queueActivate);
-    }
-
-    public GuiItemConfigurable getQueueActivateImpl() {
+    public GuiConfigurable getQueueActivateImpl() {
         return queueActivate;
     }
 
-    @Override
-    public GuiItemConfigurableApi getQueueDeactivate() {
-        return new GuiItemConfigurableWrapper(queueDeactivate);
-    }
-
-    public GuiItemConfigurable getQueueDeactivateImpl() {
+    public GuiConfigurable getQueueDeactivateImpl() {
         return queueDeactivate;
     }
 

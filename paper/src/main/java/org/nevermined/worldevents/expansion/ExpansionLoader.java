@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import jakarta.inject.Qualifier;
 import me.wyne.wutils.log.Log;
 import org.jetbrains.annotations.Nullable;
+import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
 import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 
@@ -63,15 +64,15 @@ public class ExpansionLoader {
                 WorldEventExpansion expansion = createExpansionInstance(expansionClass);
 
                 if (expansion.getKey() == null || expansion.getKey().isEmpty()) {
-                    Log.global.error("Can not register expansion in class '" + expansionClass.getName() + "' because key is not specified!");
+                    WorldEvents.getInstance().getLog().error("Can not register expansion in class '" + expansionClass.getName() + "' because key is not specified!");
                     continue;
                 }
                 if (expansion.getAction() == null) {
-                    Log.global.error("Can not register expansion in class '" + expansionClass.getName() + "' because action is not specified!");
+                    WorldEvents.getInstance().getLog().error("Can not register expansion in class '" + expansionClass.getName() + "' because action is not specified!");
                     continue;
                 }
                 if (expansion.getExpansionData() == null) {
-                    Log.global.error("Can not register expansion in class '" + expansionClass.getName() + "' because expansion data is not specified!");
+                    WorldEvents.getInstance().getLog().error("Can not register expansion in class '" + expansionClass.getName() + "' because expansion data is not specified!");
                     continue;
                 }
 
@@ -95,7 +96,7 @@ public class ExpansionLoader {
         try {
             jar = file.toURI().toURL();
         } catch (MalformedURLException e) {
-            Log.global.exception("An exception occurred trying to format file to URL", e);
+            WorldEvents.getInstance().getLog().error("An exception occurred trying to format file to URL", e);
         }
         final URLClassLoader loader = new URLClassLoader(new URL[]{jar}, clazz.getClassLoader());
         final List<String> matches = new ArrayList<>();
@@ -119,13 +120,13 @@ public class ExpansionLoader {
                         classes.add(loaded.asSubclass(clazz));
                     }
                 } catch (final NoClassDefFoundError | ClassNotFoundException e) {
-                    Log.global.exception("An exception occurred trying to find expansion classes", e);
+                    WorldEvents.getInstance().getLog().error("An exception occurred trying to find expansion classes", e);
                 }
             }
 
             loader.close();
         } catch (IOException e) {
-            Log.global.exception("An exception occurred trying to find expansion classes", e);
+            WorldEvents.getInstance().getLog().error("An exception occurred trying to find expansion classes", e);
         }
 
         return classes;
@@ -137,7 +138,7 @@ public class ExpansionLoader {
         try {
             return clazz.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            Log.global.exception("An exception occurred trying to create '" + clazz.getName() + "' expansion class", e);
+            WorldEvents.getInstance().getLog().error("An exception occurred trying to create '" + clazz.getName() + "' expansion class", e);
         }
         return null;
     }
