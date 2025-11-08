@@ -3,12 +3,10 @@ package org.nevermined.worldevents.expansion;
 import com.google.inject.Singleton;
 import me.wyne.wutils.log.Log;
 import org.nevermined.worldevents.api.core.exception.ExpansionRegistryException;
-import org.nevermined.worldevents.api.expansion.ExpansionData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
+import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 
-import java.io.File;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -16,13 +14,13 @@ import java.util.function.Supplier;
 @Singleton
 public class ExpansionRegistry implements ExpansionRegistryApi {
 
-    private final Map<String, ExpansionData> registeredExpansions = new HashMap<>()
+    private final Map<String, WorldEventExpansion> registeredExpansions = new HashMap<>()
     {
-        { put("Demo", new ExpansionData("demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now())); }
+        { put("Demo", new DemoExpansion()); }
     };
 
     @Override
-    public void registerExpansion(String key, ExpansionData expansion) throws ExpansionRegistryException
+    public void registerExpansion(String key, WorldEventExpansion expansion) throws ExpansionRegistryException
     {
         if (registeredExpansions.containsKey(key))
             throw new ExpansionRegistryException("Can not register expansion '" + key + "' because expansion with this key already exists!");
@@ -32,7 +30,7 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
     }
 
     @Override
-    public void registerExpansions(Map<String, ExpansionData> expansions) throws ExpansionRegistryException
+    public void registerExpansions(Map<String, WorldEventExpansion> expansions) throws ExpansionRegistryException
     {
         expansions.forEach((key, action) -> {
             if (registeredExpansions.containsKey(key))
@@ -44,31 +42,25 @@ public class ExpansionRegistry implements ExpansionRegistryApi {
     }
 
     @Override
-    public void unregisterExpansion(String key) throws ExpansionRegistryException
-    {
-        if (!registeredExpansions.containsKey(key))
-            throw new ExpansionRegistryException("Can not unregister expansion '" + key + "' because it wasn't registered!");
-
-        registeredExpansions.remove(key);
-        Log.global.info("Unregistered expansion '" + key + "'");
+    public void reloadExpansion(String key) {
+        registeredExpansions.get(key).reload();
+        Log.global.info("Reloaded expansion '" + key + "'");
     }
 
     @Override
-    public void clearExpansions()
-    {
-        getRegisteredExpansions().clear();
-        getRegisteredExpansions().put("demo", new ExpansionData("Demo", DemoExpansion::new, "WorldEvents", "org.nevermined.worldevents.expansions.ExpansionRegistry", Instant.now()));
+    public void reloadExpansions() {
+        registeredExpansions.keySet().forEach(this::reloadExpansion);
     }
 
     @Override
-    public Map<String, ExpansionData> getRegisteredExpansions() {
+    public Map<String, WorldEventExpansion> getRegisteredExpansions() {
         return registeredExpansions;
     }
 
     @Override
     public Map<String, Supplier<WorldEventAction>> getActionTypeMap() {
         Map<String, Supplier<WorldEventAction>> actionTypeMap = new HashMap<>();
-        registeredExpansions.forEach((key, expansion) -> actionTypeMap.put(key, expansion.actionSupplier()));
+        registeredExpansions.forEach((key, expansion) -> actionTypeMap.put(key, expansion.getAction()));
         return actionTypeMap;
     }
 

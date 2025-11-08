@@ -14,6 +14,7 @@ import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
 import org.nevermined.worldevents.api.expansion.ExpansionData;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
+import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,7 +94,7 @@ public class WorldEventManager implements WorldEventManagerApi {
         return eventQueueMap;
     }
 
-    private void loadEventQueues(FileConfiguration config, Map<String, ExpansionData> registeredExpansions)
+    private void loadEventQueues(FileConfiguration config, Map<String, WorldEventExpansion> registeredExpansions)
     {
         for (String queueKey : config.getConfigurationSection("events").getKeys(false))
         {

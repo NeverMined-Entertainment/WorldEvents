@@ -8,11 +8,11 @@ import java.util.function.Supplier;
 
 public interface ExpansionRegistryApi {
 
-    void registerExpansion(String key, ExpansionData expansion) throws ExpansionRegistryException;
-    void registerExpansions(Map<String, ExpansionData> expansions) throws ExpansionRegistryException;
-    void unregisterExpansion(String key) throws ExpansionRegistryException;
-    void clearExpansions();
-    Map<String, ExpansionData> getRegisteredExpansions();
+    void registerExpansion(String key, WorldEventExpansion expansion) throws ExpansionRegistryException;
+    void registerExpansions(Map<String, WorldEventExpansion> expansions) throws ExpansionRegistryException;
+    void reloadExpansion(String key);
+    void reloadExpansions();
+    Map<String, WorldEventExpansion> getRegisteredExpansions();
     Map<String, Supplier<WorldEventAction>> getActionTypeMap();
 
 }

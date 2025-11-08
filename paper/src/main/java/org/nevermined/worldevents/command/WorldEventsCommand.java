@@ -145,7 +145,6 @@ public class WorldEventsCommand {
     private String[] getExpansionActionSuggestions()
     {
         Set<String> suggestions = new HashSet<>();
-        suggestions.add("unregister");
         suggestions.add("info");
         return suggestions.toArray(String[]::new);
     }
@@ -355,11 +354,6 @@ public class WorldEventsCommand {
                     Placeholder.replace("expansion-key", expansionKey)));
 
         switch (action) {
-            case "unregister" -> {
-                expansionRegistry.unregisterExpansion(expansionKey);
-                sender.sendMessage(I18n.global.getLegacyPlaceholderComponent(I18n.toLocale(sender), sender, "success-expansion-unregistered",
-                        Placeholder.replace("expansion-key", expansionKey)));
-            }
             case "info" -> {
                 sender.sendMessage(I18n.reduceComponent(I18n.global.getLegacyPlaceholderComponentList(I18n.toLocale(sender), sender, "info-expansion",
                         Placeholder.replace("expansion-key", expansionKey))));

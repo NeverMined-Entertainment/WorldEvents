@@ -7,15 +7,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.nevermined.worldevents.api.WEApi;
 import org.nevermined.worldevents.api.config.ConfigProviderApi;
 import org.nevermined.worldevents.api.config.GlobalConfigApi;
-import org.nevermined.worldevents.api.expansion.ExpansionData;
-import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
 import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
-
-import java.io.File;
-import java.time.Instant;
-import java.util.function.Supplier;
 
 @Singleton
 public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEventsApi {
@@ -39,27 +33,8 @@ public class WorldEventsApi implements org.nevermined.worldevents.api.WorldEvent
     }
 
     @Override
-    public void registerWorldEventAction(String key, Supplier<WorldEventAction> actionSupplier) {
-        Class<? extends WorldEventAction> actionClass = actionSupplier.get().getClass();
-        expansionRegistry.registerExpansion(key, new ExpansionData(key, actionSupplier,
-                new File(actionClass.getProtectionDomain().getCodeSource().getLocation().getFile()).getName(),
-                actionClass.getName(),
-                Instant.now()));
-    }
-
-    @Override
-    public void registerWorldEventExpansion(ExpansionData expansionData) {
-        expansionRegistry.registerExpansion(expansionData.key(), expansionData);
-    }
-
-    @Override
     public void registerWorldEventExpansion(WorldEventExpansion worldEventExpansion) {
-        expansionRegistry.registerExpansion(worldEventExpansion.getKey(), worldEventExpansion.getExpansionData());
-    }
-
-    @Override
-    public void unregisterWorldEventAction(String key) {
-        expansionRegistry.unregisterExpansion(key);
+        expansionRegistry.registerExpansion(worldEventExpansion.getKey(), worldEventExpansion);
     }
 
     @Override

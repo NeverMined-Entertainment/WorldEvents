@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'xyz.jpenilla.run-paper' version '2.3.1'
 }
 
 dependencies {
@@ -11,6 +12,7 @@ dependencies {
     implementation project(":api")
 
     implementation "org.javatuples:javatuples:1.2"
+    implementation "commons-io:commons-io:2.18.0"
     implementation "me.lucko:helper:5.6.14"
     implementation("dev.triumphteam:triumph-gui:3.1.10") {
         exclude group: "net.kyori"
@@ -26,10 +28,6 @@ dependencies {
     implementation("me.wyne:WUtils-i18n:2.3.7") {
         exclude group: "net.kyori"
     }
-
-    testImplementation(platform("org.junit:junit-bom:5.10.2"))
-    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
-    testImplementation "com.github.MockBukkit:MockBukkit:v1.16-SNAPSHOT"
 }
 
 shadowJar {
@@ -45,6 +43,18 @@ shadowJar {
     relocate "com.google.inject", "org.nevermined.worldevents.shadow.google.guice"
     relocate "com.google.common", "org.nevermined.worldevents.shadow.google.common"
     relocate "me.wyne.wutils", "org.nevermined.worldevents.shadow.wutils"
+}
+
+runServer {
+    downloadPlugins {
+        url("https://ci.extendedclip.com/view/Plugins/job/PlaceholderAPI/197/artifact/build/libs/PlaceholderAPI-2.11.6.jar")
+        url("https://download.luckperms.net/1604/bukkit/loader/LuckPerms-Bukkit-5.5.15.jar")
+        github("dmulloy2", "ProtocolLib", "5.4.0", "ProtocolLib.jar")
+        github("ViaVersion", "ViaVersion", "5.2.1", "ViaVersion-5.2.1.jar")
+        github("ViaVersion", "ViaBackwards", "5.2.1", "ViaBackwards-5.2.1.jar")
+        github("CommandAPI", "CommandAPI", "9.4.2", "CommandAPI-9.4.2.jar")
+    }
+    minecraftVersion("1.16.5")
 }
 
 def targetJavaVersion = 16
@@ -72,8 +82,4 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
-}
-
-test {
-    useJUnitPlatform()
 }

@@ -5,8 +5,6 @@ import com.google.inject.Singleton;
 import jakarta.inject.Qualifier;
 import me.wyne.wutils.log.Log;
 import org.jetbrains.annotations.Nullable;
-import org.nevermined.worldevents.api.WorldEventsApi;
-import org.nevermined.worldevents.api.expansion.ExpansionData;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
 import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 
@@ -33,21 +31,19 @@ public class ExpansionLoader {
     @Retention(RUNTIME)
     public @interface ExpansionDirectory {}
 
-    private final WorldEventsApi api;
     private final ExpansionRegistryApi expansionRegistry;
     private final File defaultExpansionDirectory;
 
     @Inject
-    public ExpansionLoader(WorldEventsApi api, ExpansionRegistryApi expansionRegistry, @ExpansionDirectory File expansionDirectory)
+    public ExpansionLoader(ExpansionRegistryApi expansionRegistry, @ExpansionDirectory File expansionDirectory)
     {
-        this.api = api;
         this.expansionRegistry = expansionRegistry;
         this.defaultExpansionDirectory = expansionDirectory;
     }
 
     public void reloadExpansions()
     {
-        expansionRegistry.clearExpansions();
+        expansionRegistry.reloadExpansions();
         loadExpansions(defaultExpansionDirectory);
     }
 
@@ -58,7 +54,7 @@ public class ExpansionLoader {
         if (jars == null)
             return;
 
-        Map<String, ExpansionData> newExpansions = new HashMap<>();
+        Map<String, WorldEventExpansion> newExpansions = new HashMap<>();
 
         for (File expansionFile : jars)
         {
@@ -79,7 +75,11 @@ public class ExpansionLoader {
                     continue;
                 }
 
-                newExpansions.put(expansion.getKey(), expansion.getExpansionData());
+                if (expansionRegistry.getRegisteredExpansions().containsKey(expansion.getKey()))
+                    continue;
+
+                expansion.init(new ExpansionDataProvider(expansion, expansionDirectory));
+                newExpansions.put(expansion.getKey(), expansion);
             }
         }
 
@@ -135,7 +135,7 @@ public class ExpansionLoader {
     private WorldEventExpansion createExpansionInstance(Class<? extends WorldEventExpansion> clazz)
     {
         try {
-            return clazz.getDeclaredConstructor(WorldEventsApi.class).newInstance(api);
+            return clazz.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             Log.global.exception("An exception occurred trying to create '" + clazz.getName() + "' expansion class", e);
         }

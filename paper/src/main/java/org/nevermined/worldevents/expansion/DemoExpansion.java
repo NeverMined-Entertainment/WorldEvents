@@ -2,14 +2,27 @@ package org.nevermined.worldevents.expansion;
 
 import me.wyne.wutils.log.Log;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.jetbrains.annotations.NotNull;
 import org.nevermined.worldevents.api.core.EventData;
 import org.nevermined.worldevents.api.core.WorldEventAction;
 import org.nevermined.worldevents.api.core.WorldEventApi;
 import org.nevermined.worldevents.api.core.WorldEventQueueApi;
+import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 
 import java.time.Instant;
+import java.util.function.Supplier;
 
-public class DemoExpansion implements WorldEventAction {
+public class DemoExpansion extends WorldEventExpansion implements WorldEventAction {
+
+    @Override
+    public @NotNull String getKey() {
+        return "demo";
+    }
+
+    @Override
+    public @NotNull Supplier<WorldEventAction> getAction() {
+        return () -> this;
+    }
 
     @Override
     public void startEvent(WorldEventApi worldEvent, WorldEventQueueApi queue) {

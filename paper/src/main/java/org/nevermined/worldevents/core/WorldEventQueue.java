@@ -10,6 +10,7 @@ import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
 import org.nevermined.worldevents.api.expansion.ExpansionData;
+import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 import org.nevermined.worldevents.api.wrapper.PromiseWrapper;
 import org.nevermined.worldevents.wrapper.PromiseWrapperImpl;
 
@@ -36,7 +37,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     protected boolean isActive = false;
     protected Promise<Void> eventCyclePromise;
 
-    public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, ExpansionData> registeredExpansions)
+    public WorldEventQueue(QueueData queueData, ConfigurationSection queueSection, Map<String, WorldEventExpansion> registeredExpansions)
     {
         this.queueData = queueData;
         loadEventSet(queueSection, registeredExpansions);
@@ -217,17 +218,17 @@ public class WorldEventQueue implements WorldEventQueueApi {
         return null;
     }
 
-    private void loadEventSet(ConfigurationSection queueSection, Map<String, ExpansionData> registeredExpansions)
+    private void loadEventSet(ConfigurationSection queueSection, Map<String, WorldEventExpansion> registeredExpansions)
     {
         for (String eventKey : queueSection.getKeys(false))
         {
             if (RESERVED_CONFIG_NAMES.stream().anyMatch(reserved -> reserved.equalsIgnoreCase(eventKey)))
                 continue;
             if (!registeredExpansions.containsKey(queueSection.getConfigurationSection(eventKey).getString("type"))) {
-                Log.global.error("Unable to load event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "'");
-                Log.global.error("This event type was not registered yet");
-                Log.global.error("It may still be registered by other plugins using WorldEvent api");
-                Log.global.error("Prefer using expansions to load event types, they are loaded with WorldEvents plugin");
+                Log.global.warn("Unable to load event '" + eventKey + "' with type '" + queueSection.getConfigurationSection(eventKey).getString("type") + "'");
+                Log.global.warn("This event type was not registered yet");
+                Log.global.warn("It may still be registered by other plugins using WorldEvent api");
+                Log.global.warn("Prefer using expansions to load event types, they are loaded with WorldEvents plugin");
                 continue;
             }
             
@@ -248,7 +249,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
                     eventSection.getLong("duration"),
                     eventSection.getLong("cooldown")
             );
-            eventSet.put(eventKey, new WorldEventFactory(eventData, registeredExpansions.get(eventSection.getString("type")).actionSupplier()));
+            eventSet.put(eventKey, new WorldEventFactory(eventData, registeredExpansions.get(eventSection.getString("type")).getAction()));
             totalWeight += eventData.chancePercent();
         }
     }

@@ -181,7 +181,7 @@ public class Placeholders extends PlaceholderExpansion {
     {
         eventDataParserMap.put("type", (queueKey, eventIndex) -> {
             List<WorldEventApi> queue = worldEventManager.getEventQueueMap().get(queueKey).getEventQueueAsList();
-            return queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().expansionData().key();
+            return queue.get(eventIndex >= queue.size() ? queue.size() - 1 : eventIndex).getEventData().expansion().getExpansionData().key();
         });
     }
 
@@ -300,13 +300,13 @@ public class Placeholders extends PlaceholderExpansion {
     private void createExpansionJarParser()
     {
         expansionDataParserMap.put("jar", expansionKey ->
-                expansionRegistry.getRegisteredExpansions().get(expansionKey).jarName());
+                expansionRegistry.getRegisteredExpansions().get(expansionKey).getExpansionData().jarName());
     }
 
     private void createExpansionClassParser()
     {
         expansionDataParserMap.put("class", expansionKey ->
-                expansionRegistry.getRegisteredExpansions().get(expansionKey).className());
+                expansionRegistry.getRegisteredExpansions().get(expansionKey).getExpansionData().className());
     }
 
     private void createExpansionRegistryTimeParser()
@@ -314,7 +314,7 @@ public class Placeholders extends PlaceholderExpansion {
         expansionDataParserMap.put("time", expansionKey ->
                 DateTimeFormatter.ofPattern(I18n.global.getString("expansion-registry-time-format"))
                         .withZone(ZoneId.systemDefault())
-                        .format(expansionRegistry.getRegisteredExpansions().get(expansionKey).registryTime()));
+                        .format(expansionRegistry.getRegisteredExpansions().get(expansionKey).getExpansionData().registryTime()));
     }
 
     private void createExpansionUsageParser()
@@ -322,7 +322,7 @@ public class Placeholders extends PlaceholderExpansion {
         expansionDataParserMap.put("usage", expansionKey -> {
             Stream<String> eventKeysStream = worldEventManager.getEventQueueMap().values().stream()
                     .flatMap(queue -> queue.getEventSet().values().stream())
-                    .filter(eventFactory -> eventFactory.getEventData().expansionData().key().equals(expansionKey))
+                    .filter(eventFactory -> eventFactory.getEventData().expansion().getExpansionData().key().equals(expansionKey))
                     .map(eventFactory -> eventFactory.getEventData().key());
             return eventKeysStream
                     .reduce((s1, s2) -> s1 + ", " + s2).orElse("");
