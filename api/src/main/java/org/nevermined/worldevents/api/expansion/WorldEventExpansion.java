@@ -49,7 +49,7 @@ public abstract class WorldEventExpansion implements Plugin {
     @Override
     public void onLoad() {}
     @Override
-    public final void onEnable() {}
+    public void onEnable() {}
     @Override
     public void onDisable() {}
     public void reload() {}
