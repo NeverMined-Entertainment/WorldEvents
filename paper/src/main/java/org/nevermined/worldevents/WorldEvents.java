@@ -13,6 +13,7 @@ import me.wyne.wutils.log.JulLevel;
 import me.wyne.wutils.log.Level;
 import me.wyne.wutils.log.Log;
 import me.wyne.wutils.log.Log4jFactory;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.nevermined.worldevents.api.core.WorldEventManagerApi;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
@@ -74,9 +75,11 @@ public final class WorldEvents extends ExtendedJavaPlugin {
         initializeConfig();
 
         try {
-            WorldEventManagerApi worldEventManager = injector.getInstance(WorldEventManagerApi.class);
-            injector.getInstance(ExpansionLoader.class).reloadExpansions();
-            worldEventManager.reloadEventQueues();
+            Bukkit.getScheduler().runTask(this, () -> {
+                WorldEventManagerApi worldEventManager = injector.getInstance(WorldEventManagerApi.class);
+                injector.getInstance(ExpansionLoader.class).reloadExpansions();
+                worldEventManager.reloadEventQueues();
+            });
         } catch (ConfigurationException | ProvisionException e)
         {
             log.error("Guice configuration/provision exception", e);
