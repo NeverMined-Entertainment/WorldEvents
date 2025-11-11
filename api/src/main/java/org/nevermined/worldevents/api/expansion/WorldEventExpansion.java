@@ -28,7 +28,8 @@ public abstract class WorldEventExpansion implements Plugin {
     public final void init(DataProvider dataProvider) {
         this.expansionData = getExpansionData();
         this.dataProvider = dataProvider;
-        onModuleLoad();
+        onLoad();
+        onEnable();
     }
 
     @NotNull
@@ -45,10 +46,13 @@ public abstract class WorldEventExpansion implements Plugin {
                 Instant.now()) : expansionData;
     }
 
-    public void onModuleLoad() {}
-    public void reload() {}
+    @Override
+    public void onLoad() {}
+    @Override
+    public final void onEnable() {}
     @Override
     public void onDisable() {}
+    public void reload() {}
 
     public DataProvider getDataProvider() {
         return dataProvider;
@@ -106,19 +110,7 @@ public abstract class WorldEventExpansion implements Plugin {
 
     @Override
     public boolean isEnabled() {
-        return WEApi.getInstance().getPlugin().isEnabled();
-    }
-
-
-
-    @Override
-    public final void onLoad() {
-
-    }
-
-    @Override
-    public final void onEnable() {
-
+        return expansionData != null && dataProvider != null && WEApi.getInstance().getPlugin().isEnabled();
     }
 
     @Override
@@ -143,7 +135,7 @@ public abstract class WorldEventExpansion implements Plugin {
 
     @Override
     public @NotNull String getName() {
-        return WEApi.getInstance().getPlugin().getName();
+        return getKey();
     }
 
     @Override
