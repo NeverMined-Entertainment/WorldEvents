@@ -12,7 +12,6 @@ import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.core.*;
 import org.nevermined.worldevents.api.core.exception.AlreadyActiveException;
 import org.nevermined.worldevents.api.core.exception.AlreadyInactiveException;
-import org.nevermined.worldevents.api.expansion.ExpansionData;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
 import org.nevermined.worldevents.api.expansion.WorldEventExpansion;
 
@@ -48,7 +47,7 @@ public class WorldEventManager implements WorldEventManagerApi {
     public void startEventQueue(String queueKey) throws AlreadyActiveException
     {
         eventQueueMap.get(queueKey)
-                .startNext();
+                .startQueue();
     }
 
     @Override
@@ -63,7 +62,7 @@ public class WorldEventManager implements WorldEventManagerApi {
     public void stopEventQueue(String queueKey) throws AlreadyInactiveException
     {
         eventQueueMap.get(queueKey)
-                .stopCurrent();
+                .stopQueue();
     }
 
     @Override

@@ -29,7 +29,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     protected final QueueData queueData;
 
     protected final Map<String, WorldEventSelfFactoryApi> eventSet = new HashMap<>();
-    protected final Queue<WorldEventApi> eventQueue = new LinkedList<>();
+    protected final Deque<WorldEventApi> eventQueue = new LinkedList<>();
     
     private int totalWeight = 0;
 
@@ -70,7 +70,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     }
 
     @Override
-    public void startNext() throws AlreadyActiveException
+    public void startQueue() throws AlreadyActiveException
     {
         if (isActive)
             throw new AlreadyActiveException("Queue " + queueData.key() + " is already active");
@@ -91,7 +91,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     }
 
     @Override
-    public void stopCurrent() throws AlreadyInactiveException
+    public void stopQueue() throws AlreadyInactiveException
     {
         if (!isActive)
             throw new AlreadyInactiveException("Queue " + queueData.key() + " is already inactive");
@@ -107,8 +107,19 @@ public class WorldEventQueue implements WorldEventQueueApi {
             event.getStopPromise().closeSilently();
     }
 
-    protected void setTime()
+    @Override
+    public void stopCurrent() throws AlreadyInactiveException
     {
+        if (!isActive)
+            throw new AlreadyInactiveException("Queue " + queueData.key() + " is already inactive");
+
+        WorldEventApi event = pollEvent();
+        if (event.isActive())
+            event.stopEvent(this);
+    }
+
+    protected void setTime() {
+
         WorldEventApi previousEvent = null;
 
         for (WorldEventApi event : eventQueue)
@@ -146,7 +157,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
 
         if (event.isActive())
         {
-            stopCurrent();
+            stopQueue();
             startNextSilently();
             return event;
         }

@@ -213,7 +213,7 @@ public class WorldEventsCommand {
         switch (action) {
             case "start" -> {
                 try {
-                    queue.startNext();
+                    queue.startQueue();
                     I18n.global.accessor(sender, "success-queue-activated").getPlaceholderComponent(sender, Placeholder.legacy("queue-name", queue.getQueueData().name())).sendMessage(sender);
                 } catch (AlreadyActiveException e)
                 {
@@ -222,7 +222,7 @@ public class WorldEventsCommand {
             }
             case "stop" -> {
                 try {
-                    queue.stopCurrent();
+                    queue.stopQueue();
                     I18n.global.accessor(sender, "success-queue-deactivated").getPlaceholderComponent(sender, Placeholder.legacy("queue-name", queue.getQueueData().name())).sendMessage(sender);
                 } catch (AlreadyInactiveException e)
                 {
@@ -232,8 +232,8 @@ public class WorldEventsCommand {
             case "skip" -> {
                 if (queue.isActive()) {
                     Component eventName = queue.peekEvent().getEventData().name();
-                    queue.stopCurrent();
-                    queue.startNext();
+                    queue.stopQueue();
+                    queue.startQueue();
                     I18n.global.accessor(sender, "success-event-skipped").getPlaceholderComponent(sender, Placeholder.legacy("event-name", eventName)).sendMessage(sender);
                 } else {
                     Component eventName = queue.pollEvent().getEventData().name();
@@ -242,7 +242,7 @@ public class WorldEventsCommand {
             }
             case "remove" -> {
                 if (queue.isActive())
-                    queue.stopCurrent();
+                    queue.stopQueue();
                 worldEventManager.getEventQueueMap().remove(queueKey);
                 I18n.global.accessor(sender, "success-event-removed").getPlaceholderComponent(sender, Placeholder.legacy("queue-name", queue.getQueueData().name())).sendMessage(sender);
             }

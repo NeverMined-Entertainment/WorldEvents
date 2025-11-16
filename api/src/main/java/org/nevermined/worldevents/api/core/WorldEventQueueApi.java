@@ -13,7 +13,8 @@ public interface WorldEventQueueApi {
 
     WorldEventApi peekEvent();
     WorldEventApi pollEvent();
-    void startNext() throws AlreadyActiveException;
+    void startQueue() throws AlreadyActiveException;
+    void stopQueue() throws AlreadyInactiveException;
     void stopCurrent() throws AlreadyInactiveException;
 
     void queueEvent(WorldEventApi event);
