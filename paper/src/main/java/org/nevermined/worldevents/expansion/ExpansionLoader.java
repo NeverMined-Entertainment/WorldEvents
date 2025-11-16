@@ -120,7 +120,7 @@ public class ExpansionLoader {
                     if (clazz.isAssignableFrom(loaded)) {
                         classes.add(loaded.asSubclass(clazz));
                     }
-                } catch (Exception ignored) {
+                } catch (Throwable ignored) {
                     // Skipping bad classes
                 }
             }
