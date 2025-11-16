@@ -3,7 +3,6 @@ package org.nevermined.worldevents.expansion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import jakarta.inject.Qualifier;
-import me.wyne.wutils.log.Log;
 import org.jetbrains.annotations.Nullable;
 import org.nevermined.worldevents.WorldEvents;
 import org.nevermined.worldevents.api.expansion.ExpansionRegistryApi;
@@ -106,7 +105,9 @@ public class ExpansionLoader {
             JarEntry entry;
             while ((entry = stream.getNextJarEntry()) != null) {
                 final String name = entry.getName();
-                if (!name.endsWith(".class")) {
+                if (entry.isDirectory()
+                || !name.endsWith(".class")
+                || name.startsWith("META-INF/")) {
                     continue;
                 }
 
@@ -119,8 +120,8 @@ public class ExpansionLoader {
                     if (clazz.isAssignableFrom(loaded)) {
                         classes.add(loaded.asSubclass(clazz));
                     }
-                } catch (final NoClassDefFoundError | ClassNotFoundException e) {
-                    WorldEvents.getInstance().getLog().error("An exception occurred trying to find expansion classes", e);
+                } catch (Exception ignored) {
+                    // Skipping bad classes
                 }
             }
 
