@@ -2,7 +2,7 @@ name: WorldEvents
 version: '${version}'
 main: org.nevermined.worldevents.WorldEvents
 api-version: '1.16'
-softdepend: [ PlaceholderAPI ]
+softdepend: [ PlaceholderAPI, DecentHolograms, WorldEdit, WorldGuard ]
 author: Wyne
 description: Manages gameplay events
 website: https://github.com/NeverMined-Entertainment/WorldEvents
