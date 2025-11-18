@@ -34,6 +34,8 @@ public class ExpansionLoader {
     private final ExpansionRegistryApi expansionRegistry;
     private final File defaultExpansionDirectory;
 
+    private final Set<String> cachedClassMatches = new HashSet<>();
+
     @Inject
     public ExpansionLoader(ExpansionRegistryApi expansionRegistry, @ExpansionDirectory File expansionDirectory)
     {
@@ -116,12 +118,15 @@ public class ExpansionLoader {
 
             for (final String match : matches) {
                 try {
+                    if (cachedClassMatches.contains(match)) continue;
                     final Class<?> loaded = loader.loadClass(match);
                     if (clazz.isAssignableFrom(loaded)) {
                         classes.add(loaded.asSubclass(clazz));
+                    } else {
+                        cachedClassMatches.add(match);
                     }
                 } catch (Throwable ignored) {
-                    // Skipping bad classes
+                    cachedClassMatches.add(match);
                 }
             }
 
