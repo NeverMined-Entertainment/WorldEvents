@@ -53,11 +53,8 @@ public class WorldEvent implements WorldEventApi {
             return;
         isActive = true;
         stopPromise = Schedulers.sync().runLater(() -> {
-            if (!isActive && !stopPromise.isClosed()) {
-                stopPromise.closeSilently();
-                return;
-            }
-            stopEvent(queue);
+            if (isActive)
+                stopEvent(queue);
         }, eventData.durationSeconds(), TimeUnit.SECONDS);
         action.startEvent(this, queue);
     }
