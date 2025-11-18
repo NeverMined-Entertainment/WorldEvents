@@ -113,7 +113,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
         if (!isActive)
             throw new AlreadyInactiveException("Queue " + queueData.key() + " is already inactive");
 
-        WorldEventApi event = pollEvent();
+        WorldEventApi event = peekEvent();
         if (event.isActive())
             event.stopEvent(this);
     }
@@ -198,7 +198,7 @@ public class WorldEventQueue implements WorldEventQueueApi {
     @Override
     @Nullable
     public PromiseWrapper<Void> getEventCyclePromise() {
-        return new PromiseWrapperImpl<>(eventCyclePromise);
+        return eventCyclePromise == null ? null : new PromiseWrapperImpl<>(eventCyclePromise);
     }
 
     @Override
