@@ -122,8 +122,6 @@ public class ExpansionLoader {
                     final Class<?> loaded = loader.loadClass(match);
                     if (clazz.isAssignableFrom(loaded)) {
                         classes.add(loaded.asSubclass(clazz));
-                    } else {
-                        cachedClassMatches.add(match);
                     }
                 } catch (Throwable ignored) {
                     cachedClassMatches.add(match);
